@@ -10,15 +10,21 @@ export class CoursesService {
   private baseUrl = 'http://localhost:8087/cours/courses';
   private baseUrla = 'http://localhost:8087/cours/courses/addcours';
   private baseUrlb = 'http://localhost:8087/cours/courses/delete';
+  private baseUrls = 'http://localhost:8087/cours/courses/statistics';
 
 
 
-  constructor(private http: HttpClient) {}
+
+  constructor(private http: HttpClient) { }
 
   // Ajouter un cours
   createCourse(formData: FormData): Observable<any> {
     return this.http.post(`${this.baseUrl}/addcours`, formData);
   }
+  getCourseStatisticsByCategory(): Observable<{ [key: string]: number }> {
+    return this.http.get<{ [key: string]: number }>(`${this.baseUrl}/statistics`);
+  }
+
 
   // Récupérer tous les cours
   getAllCourses(): Observable<any[]> {
@@ -27,8 +33,8 @@ export class CoursesService {
   updateCourse(id: number, course: any): Observable<any> {
     return this.http.put<any>(`${this.baseUrl}/update/${id}`, course);
   }
-  
-  
+
+
 
   // Récupérer les catégories de cours
   getCategories(): Observable<string[]> {
@@ -43,23 +49,40 @@ export class CoursesService {
     return this.http.post(`${this.baseUrl}/upload-image`, formData);
   }
 
- // CoursService (même dans votre code)
+  // CoursService (même dans votre code)
 
-// CoursService (méthode pour supprimer un cours)
+  // CoursService (méthode pour supprimer un cours)
 
 
 
-deleteCourse(id: number): Observable<void> {
-  return this.http.delete<void>(`${this.baseUrl}/delete/${id}`, { responseType: 'text' as 'json' });
-}
-
-updateCourseWithImage(id: number, course: any, image?: File): Observable<any> {
-  const formData = new FormData();
-  formData.append('course', new Blob([JSON.stringify(course)], { type: 'application/json' }));
-  if (image) {
-    formData.append('image', image);
+  deleteCourse(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/delete/${id}`, { responseType: 'text' as 'json' });
   }
 
-  return this.http.put(`${this.baseUrl}/${id}/upload`, formData);
+  updateCourseWithImage(id: number, course: any, image?: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('course', new Blob([JSON.stringify(course)], { type: 'application/json' }));
+    if (image) {
+      formData.append('image', image);
+    }
+
+    return this.http.put(`${this.baseUrl}/${id}/upload`, formData);
+  }
+
+
+  addReview(idCourse: number, rating: number): Observable<any> {
+    return this.http.post(`http://localhost:8087/cours/reviews/courses/${idCourse}/rating`, {
+      rating: rating,
+      
+    });
+    
+
 }
+getCourseRating(idCourse: number): Observable<number> {
+  return this.http.get<number>(`http://localhost:8087/cours/reviews/courses/${idCourse}/rating`);
+}
+
+
+
+
 }

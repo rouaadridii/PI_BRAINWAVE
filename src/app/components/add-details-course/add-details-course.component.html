@@ -1,0 +1,16 @@
+<h2>Détails du cours</h2>
+
+<div>
+  <input type="text" [(ngModel)]="chapterTitle" placeholder="Titre du chapitre">
+  <input type="file" (change)="onFileSelected($event, 'pdf')">
+  <input type="file" (change)="onFileSelected($event, 'picture')">
+  <input type="file" (change)="onFileSelected($event, 'video')">
+  <button (click)="addAttachment()">Ajouter</button>
+</div>
+
+<h3>Liste des Attachements</h3>
+<ul>
+  <li *ngFor="let att of attachments">
+    {{ att.chapterTitle }} - <a [href]="att.pdf">PDF</a> - <img [src]="att.picture" width="50">
+  </li>
+</ul>

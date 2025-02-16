@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
+
 import { AppComponent } from './app.component';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -13,6 +14,11 @@ import { BackHeaderComponent } from './components/back-header/back-header.compon
 import { BackMenuAdminComponent } from './components/back-menu-admin/back-menu-admin.component';
 import { TeacherCoursesComponent } from './components/teacher-courses/teacher-courses.component';
 import { CoursesListComponent } from './components/courses-list/courses-list.component';
+import { AdminCoursesComponent } from './components/admin-courses/admin-courses.component';
+import { DetailsCourseComponent } from './components/details-course/details-course.component';
+import { AddDetailsCourseComponent } from './components/add-details-course/add-details-course.component';
+import { DashboardStatisticsComponent } from './components/dashboard-statistics/dashboard-statistics.component';
+
 
 
 @NgModule({
@@ -26,6 +32,10 @@ import { CoursesListComponent } from './components/courses-list/courses-list.com
     BackMenuAdminComponent,
     TeacherCoursesComponent,
     CoursesListComponent,
+    AdminCoursesComponent,
+    DetailsCourseComponent,
+    AddDetailsCourseComponent,
+    DashboardStatisticsComponent,
    
   ],
   imports: [
@@ -33,7 +43,10 @@ import { CoursesListComponent } from './components/courses-list/courses-list.com
     ReactiveFormsModule,
     BrowserModule,
     AppRoutingModule,
-    HttpClientModule
+   HttpClientModule,
+   
+
+    
   ],
   providers: [],
   bootstrap: [AppComponent]

@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
+import { Router } from '@angular/router';
 import { CoursesService } from 'src/app/services/courses.service';
-
+import { ReviewService } from 'src/app/services/review.service';
 
 declare global {
   interface Window {
@@ -22,12 +24,49 @@ export class CoursesListComponent implements OnInit {
   filteredCourses: any[] = []; // Cours filtrés en fonction de la recherche
   searchQuery: string = ''; // Query pour la recherche
   isSpeaking: boolean = false; // Indique si la lecture vocale est en cours
+  selectedFile!: File;
+  courseForm!: FormGroup;
+  courseRatings: { [key: number]: number } = {};
+  selectedCourseId: number | null = null;
+  userRating: number = 0;
+  userComment: string = '';
 
-  constructor(private courseService: CoursesService){}
+
+  constructor(private courseService: CoursesService, private reviewService: ReviewService, private fb: FormBuilder, private router: Router) {
+    // Initialisation du formulaire d'ajout d'avis
+   
+  }
 
   ngOnInit(): void {
     this.loadCourses();
+    this.loadCategories();
+
+    this.courseService.getAllCourses().subscribe(courses => {
+      this.courses = courses;
+      this.courses.forEach(course => {
+        this.courseService.getCourseRating(course.idCourse).subscribe(rating => {
+          this.courseRatings[course.idCourse] = rating;
+        });
+      });
+    });
   }
+
+  openRatingPopup(courseId: number) {
+    this.selectedCourseId = courseId;
+    this.userRating = 0;
+    this.userComment = '';
+  }
+
+ /* submitRating() {
+    if (this.selectedCourseId !== null) {
+      this.courseService.addReview(this.selectedCourseId, this.userRating, this.userComment)
+        .subscribe(() => {
+          this.courseRatings[this.selectedCourseId!] = this.userRating;
+          this.selectedCourseId = null;
+        });
+    }
+  }
+*/
 
   // Charger les cours depuis le backend
   loadCourses() {
@@ -36,6 +75,15 @@ export class CoursesListComponent implements OnInit {
       this.courses = data;
       this.filteredCourses = data; // Initialiser les cours filtrés
     });
+  
+  }
+
+  rateCourse(idCourse: number, rating: number) {
+    this.courseService.addReview(idCourse, rating).subscribe(response => {
+      console.log('Note enregistrée avec succès !', response);
+      // Met à jour la note en local pour l'affichage immédiat
+      this.courses.find(c => c.idCourse === idCourse)!.rating = rating;
+    });
   }
 
   // Sélectionner un cours pour modification
@@ -43,8 +91,87 @@ export class CoursesListComponent implements OnInit {
     this.selectedCourse = { ...course }; // Copie du cours pour modification
   }
 
+  updateCourse() {
+    if (this.courseForm.invalid) {
+      alert('Veuillez remplir tous les champs obligatoires.');
+      return;
+    }
+  
+    if (!this.selectedCourse?.idCourse) {
+      console.error("⚠️ Aucun cours sélectionné pour la mise à jour !");
+      return;
+    }
+  
+    const formData = new FormData();
+    formData.append('title', this.courseForm.get('title')?.value);
+    formData.append('description', this.courseForm.get('description')?.value);
+    formData.append('date', this.courseForm.get('date')?.value);
+    formData.append('level', this.courseForm.get('level')?.value);
+    formData.append('status', this.courseForm.get('status')?.value);
+    formData.append('price', this.courseForm.get('price')?.value);
+    formData.append('liked', this.courseForm.get('liked')?.value);
+    formData.append('categorie', this.courseForm.get('categorie')?.value);
+  
+    if (this.selectedFile) {
+      formData.append('image', this.selectedFile);
+    }
+  
+    this.courseService.updateCourse(this.selectedCourse.idCourse, formData).subscribe(
+      (response) => {
+        console.log('✅ Cours mis à jour avec succès', response);
+        alert('Cours mis à jour avec succès.');
+        this.router.navigate(['/courses-list']); // Redirection après mise à jour
+      },
+      (error) => {
+        console.error('❌ Erreur lors de la mise à jour du cours :', error);
+        alert('Une erreur est survenue lors de la mise à jour.');
+      }
+    );
+  }
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   // Mettre à jour un cours
-  updateCourse(): void {
+  /*updateCourse(): void {
     if (!this.selectedCourse?.idCourse) {
       console.error("⚠️ Aucun cours sélectionné pour la mise à jour !");
       return;
@@ -60,7 +187,14 @@ export class CoursesListComponent implements OnInit {
         console.error('❌ Erreur lors de la mise à jour du cours :', error);
       }
     });
+  }*/
+  
+  onFileSelected(event: any) {
+    if (event.target.files.length > 0) {
+      this.selectedFile = event.target.files[0];
+    }
   }
+
 
   // Annuler la mise à jour
   cancelUpdate(): void {
@@ -205,4 +339,21 @@ export class CoursesListComponent implements OnInit {
     });
   }
 
-}
+ 
+  }
+
+
+ 
+
+
+
+
+
+  
+
+
+  
+
+
+
+  
