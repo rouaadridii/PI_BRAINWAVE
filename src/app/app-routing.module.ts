@@ -9,6 +9,7 @@ import { CoursesListComponent } from './components/courses-list/courses-list.com
 import { AdminCoursesComponent } from './components/admin-courses/admin-courses.component';
 import { DashboardStatisticsComponent } from './components/dashboard-statistics/dashboard-statistics.component';
 import { AddDetailsCourseComponent } from './components/add-details-course/add-details-course.component';
+import { UpdateCourseComponent } from './components/update-course/update-course.component';
 
 const routes: Routes = [
 
@@ -22,6 +23,7 @@ const routes: Routes = [
   {path:'teachercourses',component:TeacherCoursesComponent},
   {path: 'courses-list', component: CoursesListComponent },
   {path: 'adddetailCours', component: AddDetailsCourseComponent },
+  { path: 'modifier-cours/:idCourse', component: UpdateCourseComponent },
 
   
 

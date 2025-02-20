@@ -67,3 +67,43 @@
     background-color: #5a6268;
   }
   
+
+
+
+
+
+
+
+  /* teacher-courses.component.scss - STYLES MODIFIÉS POUR LES ALERTES DE VALIDATION */
+
+/* ... Vos styles CSS existants (pour :host, container, card, form, etc.) ... */
+
+
+/* --- Styles personnalisés pour les messages d'erreur de validation (invalid-feedback) --- */
+.invalid-feedback {
+  display: none; /* Masquer par défaut (Bootstrap le gère déjà mais pour s'assurer) */
+  width: 100%;
+  margin-top: 0.25rem;
+  font-size: 0.875em;
+  color: #dc3545; /* Couleur d'erreur Bootstrap (rouge) par défaut */
+  font-weight: 500; /* Semi-gras pour les messages d'erreur */
+  padding: 0.5rem 0.75rem; /* Padding intérieur */
+  background-color: #fdeeee; /* Fond rouge très clair, pastel */
+  border: 1px solid #fcc5c9; /* Bordure rouge clair */
+  border-radius: 0.2rem;
+  box-shadow: 0 0 0.3rem rgba(0, 0, 0, 0.05); /* Ombre légère */
+  margin-bottom: 0.5rem; /* Marge inférieure pour séparer des champs suivants */
+}
+
+/* Afficher invalid-feedback quand le champ parent est invalide et touché/modifié */
+input.ng-invalid.ng-touched + .invalid-feedback,
+textarea.ng-invalid.ng-touched + .invalid-feedback,
+select.ng-invalid.ng-touched + .invalid-feedback,
+input.ng-invalid.ng-dirty + .invalid-feedback,
+textarea.ng-invalid.ng-dirty + .invalid-feedback,
+select.ng-invalid.ng-dirty + .invalid-feedback {
+  display: block; /* Afficher le message d'erreur */
+}
+
+
+/* ... Le reste de votre code CSS dans teacher-courses.component.scss ... */

@@ -19,3 +19,4 @@ describe('CoursesListComponent', () => {
     expect(component).toBeTruthy();
   });
 });
+ 

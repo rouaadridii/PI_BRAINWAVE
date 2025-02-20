@@ -268,7 +268,7 @@ header
 
 /* Par défaut, vous appliquez une couleur de fond transparent */
 .header-area {
-  background-color: rgba(250, 250, 250, 0.15); 
+  background-color: #000000; 
   position: fixed; /* Pour garder la position au-dessus au départ */
   top: 0px;
   left: 0;
@@ -288,8 +288,8 @@ header
 }
 
 .header-area .main-nav {
-  min-height: 80px;
-  background: transparent;
+  min-height: 40px;
+  background:#000000;
 }
 
 .header-area .main-nav .logo {

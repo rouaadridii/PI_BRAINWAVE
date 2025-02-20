@@ -52,11 +52,9 @@
         <div *ngFor="let course of sortedCourses(); let i = index" class="col" [attr.id]="'course-' + course.idCourse">
           <div class="card shadow-lg border-light rounded">
             <!-- Image du cours -->
-            <img 
-              [src]="course.picture ? 'http://localhost:8087/cours/courses/download-image/' + course.picture : 'assets/default-image.jpg'" 
-              class="card-img-top" 
-              alt="Image du cours" 
-              style="height: 200px; object-fit: cover;">
+            < <img [src]="course.picture ? (course.picture.startsWith('http') ? course.picture : 'http://localhost:8087/cours/courses/download-image/' + course.picture) : 'assets/default-image.jpg'"
+            class="card-img-top course-image rounded-top"
+            alt="Image du cours">
             
             <div class="card-body">
               <!-- Titre du cours -->
@@ -92,9 +90,7 @@
               </a>
   
               <!-- Bouton pour modifier -->
-              <button class="btn btn-warning mt-2" (click)="selectCourse(course)">
-                Modifier
-              </button>
+             
   
               <!-- Bouton pour supprimer -->
               <button class="btn btn-danger mt-2" (click)="confirmerEtSupprimerCours(course)">

@@ -1,0 +1,72 @@
+<div class="container">
+    <h2>Modifier un Cours</h2>
+  
+    <div *ngIf="messageSucces" class="alert alert-success">{{ messageSucces }}</div>
+    <div *ngIf="messageErreur" class="alert alert-danger">{{ messageErreur }}</div>
+  
+    <form [formGroup]="coursForm" (ngSubmit)="modifierCours()">
+      <div class="mb-3">
+        <label for="title" class="form-label">Titre du cours *</label>
+        <input type="text" class="form-control" id="title" formControlName="title">
+        <div *ngIf="coursForm.get('title')?.invalid && (coursForm.get('title')?.dirty || coursForm.get('title')?.touched)" class="text-danger">
+          Le titre est obligatoire.
+        </div>
+      </div>
+  
+      <div class="mb-3">
+        <label for="description" class="form-label">Description *</label>
+        <textarea class="form-control" id="description" formControlName="description" rows="3"></textarea>
+        <div *ngIf="coursForm.get('description')?.invalid && (coursForm.get('description')?.dirty || coursForm.get('description')?.touched)" class="text-danger">
+          La description est obligatoire.
+        </div>
+      </div>
+  
+      <div class="mb-3">
+        <label for="date" class="form-label">Date</label>
+        <input type="date" class="form-control" id="date" formControlName="date">
+      </div>
+  
+      <div class="mb-3">
+        <label for="level" class="form-label">Niveau</label>
+        <input type="text" class="form-control" id="level" formControlName="level">
+      </div>
+  
+      <div class="mb-3 form-check">
+        <input type="checkbox" class="form-check-input" id="status" formControlName="status">
+        <label class="form-check-label" for="status">Statut Activé</label>
+      </div>
+  
+      <div class="mb-3">
+        <label for="price" class="form-label">Prix</label>
+        <input type="number" class="form-control" id="price" formControlName="price">
+      </div>
+  
+      <div class="mb-3 form-check">
+        <input type="checkbox" class="form-check-input" id="liked" formControlName="liked">
+        <label class="form-check-label" for="liked">Aimé</label>
+      </div>
+  
+           <!-- Catégorie (chargée dynamiquement) -->
+        <div class="mb-3">
+            <label for="categorie" class="form-label">Catégorie :</label>
+            <select id="categorie" class="form-select" formControlName="categorie" required>
+              <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+            </select>
+          </div>
+
+
+      <div class="mb-3">
+        <label for="picture" class="form-label">Image actuelle</label>
+        <div *ngIf="cours?.picture">
+          <img [src]="cours?.picture" alt="Image actuelle du cours" style="max-width: 200px;">
+        </div>
+      </div>
+  
+      <div class="mb-3">
+        <label for="file" class="form-label">Nouvelle Image (optionnel)</label>
+        <input type="file" class="form-control" id="image" (change)="onFileSelected($event)" accept="image/*">
+      </div>
+  
+      <button type="submit" class="btn btn-primary" [disabled]="coursForm.invalid">Modifier le Cours</button>
+    </form>
+  </div>

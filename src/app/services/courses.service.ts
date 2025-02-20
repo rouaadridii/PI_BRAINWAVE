@@ -1,6 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { Course } from '../components/course';
+
 
 @Injectable({
   providedIn: 'root'
@@ -11,6 +13,8 @@ export class CoursesService {
   private baseUrla = 'http://localhost:8087/cours/courses/addcours';
   private baseUrlb = 'http://localhost:8087/cours/courses/delete';
   private baseUrls = 'http://localhost:8087/cours/courses/statistics';
+  private baseUrlm = 'http://localhost:8087/cours/courses/update-cours/';
+
 
 
 
@@ -30,10 +34,55 @@ export class CoursesService {
   getAllCourses(): Observable<any[]> {
     return this.http.get<any[]>(`${this.baseUrl}/getcourse`);
   }
-  updateCourse(id: number, course: any): Observable<any> {
-    return this.http.put<any>(`${this.baseUrl}/update/${id}`, course);
-  }
+  /*updateCourse(idCourse: number, courseData: any, file?: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('title', courseData.title);
+    formData.append('description', courseData.description);
+    formData.append('date', courseData.date);
+    formData.append('level', courseData.level);
+    formData.append('status', courseData.status);
+    formData.append('price', courseData.price);
+    formData.append('liked', courseData.liked);
+    formData.append('categorie', courseData.categorie);
+  
+    if (file) {
+      formData.append('file', file);
+    }
+  
+    return this.http.put(`http://localhost:8087/cours/courses/update-cours/${idCourse}`, formData);
+  }*/
 
+
+
+    /*updateCourse(idCourse: number, coursData: Course, file?: File): Observable<Course> {
+      const formData: FormData = new FormData();
+  
+      // Ajouter les données du cours au FormData
+      formData.append('title', coursData.title);
+      formData.append('description', coursData.description);
+      formData.append('date', coursData.date ? coursData.date.toString() : ''); // Convertir Date en string ISO
+      formData.append('level', coursData.level);
+      formData.append('status', String(coursData.status)); // Convertir boolean en string
+      formData.append('price', String(coursData.price)); // Convertir number en string
+      formData.append('liked', String(coursData.liked)); // Convertir boolean en string
+      formData.append('categorie', coursData.categorie); // Assurez-vous que categorie est un string ou compatible
+  
+      // Ajouter le fichier image si présent
+      if (file) {
+        formData.append('file', file, file.name);
+      }
+  
+      // Effectuer la requête PUT vers votre endpoint d'update
+      return this.http.put<Course>(`${this.baseUrl}/update-cours/${idCourse}`, formData);
+    }*/
+
+      updateCourse(idCourse: any, coursData: any): Observable<Course> {
+        return this.http.put<Course>(`${this.baseUrl}/update-cours/${idCourse}`, coursData); // Correct string interpolation with backticks and ${}
+    }
+  getCourseById(id: number): Observable<Course> {
+    return this.http.get<Course>(`${this.baseUrl}/${id}`);
+  }
+  
 
 
   // Récupérer les catégories de cours
