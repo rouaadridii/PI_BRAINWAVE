@@ -1,0 +1,46 @@
+<!-- Background Video -->
+<video autoplay muted loop id="bg-video">
+  <source src="/assets/templatefront/assets/images/course-video.mp4" type="video/mp4" />
+</video>
+
+<!-- White mask overlay -->
+<div id="video-overlay"></div>
+
+<!-- Centered Login Form -->
+<div class="login-form-container">
+  <div class="text-center">
+      <a href="/home" class="logo">
+          <img src="/assets/templatefront/assets/images/logo.png" alt="Logo">
+      </a>
+  </div>
+
+  <form class="login-form" style="margin-top: 40px;" [formGroup]="formLogin" (ngSubmit)="onLogin()">
+      <div class="form-group">
+          <input type="email" id="email" name="email" placeholder="Enter your email" formControlName="email">
+          <div class="alert alert-danger" *ngIf="formLogin.controls['email'].invalid && formLogin.controls['email'].touched">
+            <p *ngIf="formLogin.controls['email'].hasError('required')">email Is Mandatory</p>
+            <p *ngIf="formLogin.controls['email'].hasError('email')">must be an email</p>
+        </div>
+      </div>
+
+      <div class="form-group">
+          <input type="password" id="password" name="password" placeholder="Enter your password" formControlName="password">
+          <div class="alert alert-danger" *ngIf="formLogin.controls['password'].invalid && formLogin.controls['password'].touched">
+            <p *ngIf="formLogin.controls['password'].hasError('required')">Password Is Mandatory</p>
+          </div>
+          
+      </div>
+
+      <button class="btn" type="submit" [disabled]="formLogin.invalid ">Login</button>
+  </form>
+
+  <div class="text-center mt-3">
+      <a href="#" class="forget">Forgot password?</a>
+  </div>
+
+  <!-- "Don't have an account?" and "Create one" button in one line -->
+  <div class="account-options">
+      <p>Don't have an account?</p>
+      <button class="btn-outline" [routerLink]="['/signup']">Create one</button>
+  </div>
+</div>

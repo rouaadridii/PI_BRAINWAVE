@@ -1,0 +1,128 @@
+/* Full-screen video */
+#bg-video {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;
+    z-index: -2;
+}
+
+/* White overlay mask */
+#video-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: -1;
+}
+
+/* Centered form container */
+.login-form-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 255, 255, 0.5);
+    padding: 40px;
+    border-radius: 10px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    width: 400px;
+    text-align: center;
+}
+
+/* Logo size adjustment */
+.logo img {
+    width: 170px;
+    height: auto;
+}
+
+/* Form styling */
+.form-group {
+    text-align: left;
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    font-weight: bold;
+    color: #333;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.login-form input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+/* Button styling */
+.login-form .btn {
+    width: 100%;
+    background-color: #14597e;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.login-form .btn:hover {
+    background-color: #0d3c5d;
+}
+
+/* Forget Password */
+.forget {
+    display: inline-block;
+    margin-top: 10px;
+    color: #14597e;
+    text-decoration: none;
+}
+
+.forget:hover {
+    text-decoration: underline;
+}
+
+/* "Don't have an account?" & "Create one" button */
+.account-options {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.account-options p {
+    margin: 0;
+    font-size: 14px;
+    color: #333;
+}
+
+.account-options .btn-outline {
+    border: 2px solid #d8363a;
+    color: #d8363a;
+    background: transparent;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.account-options .btn-outline:hover {
+    background: #d8363a;
+    color: white;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .login-form-container {
+        width: 90%;
+        padding: 30px;
+    }
+}
