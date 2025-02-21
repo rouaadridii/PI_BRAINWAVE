@@ -1,101 +1,151 @@
-.container {
-    max-width: 600px;
-    margin: auto;
-    padding: 20px;
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  }
-  
-  h2 {
-    text-align: center;
-    color: #333;
-    margin-bottom: 20px;
-  }
-  
-  form {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .form-group {
-    margin-bottom: 15px;
-  }
-  
-  label {
-    font-weight: bold;
-    color: #555;
-  }
-  
-  input, select, textarea {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-  }
-  
-  input:focus, select:focus, textarea:focus {
-    outline: none;
-    border-color: #007bff;
-  }
-  
-  .btn {
-    padding: 10px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: bold;
-    text-align: center;
-  }
-  
-  .btn-primary {
-    background-color: #007bff;
-    border: none;
-    color: white;
-  }
-  
-  .btn-primary:hover {
-    background-color: #0056b3;
-  }
-  
-  .btn-secondary {
-    background-color: #6c757d;
-    border: none;
-    color: white;
-  }
-  
-  .btn-secondary:hover {
-    background-color: #5a6268;
-  }
-  
+/* teacher-courses.component.css - STYLE COMPLET ET AMÉLIORÉ POUR LE FORMULAIRE TEACHER COURSES */
 
+/* --- Import des styles globaux (si nécessaire) ---
+   Si vous avez des styles globaux Bootstrap ou des variables de couleurs,
+   vous pouvez les importer ici. Exemple (si vous utilisez styles.css global):
+   @import 'src/styles.css';
+*/
 
-
-
-
-
-
-  /* teacher-courses.component.scss - STYLES MODIFIÉS POUR LES ALERTES DE VALIDATION */
-
-/* ... Vos styles CSS existants (pour :host, container, card, form, etc.) ... */
-
-
-/* --- Styles personnalisés pour les messages d'erreur de validation (invalid-feedback) --- */
-.invalid-feedback {
-  display: none; /* Masquer par défaut (Bootstrap le gère déjà mais pour s'assurer) */
-  width: 100%;
-  margin-top: 0.25rem;
-  font-size: 0.875em;
-  color: #dc3545; /* Couleur d'erreur Bootstrap (rouge) par défaut */
-  font-weight: 500; /* Semi-gras pour les messages d'erreur */
-  padding: 0.5rem 0.75rem; /* Padding intérieur */
-  background-color: #fdeeee; /* Fond rouge très clair, pastel */
-  border: 1px solid #fcc5c9; /* Bordure rouge clair */
-  border-radius: 0.2rem;
-  box-shadow: 0 0 0.3rem rgba(0, 0, 0, 0.05); /* Ombre légère */
-  margin-bottom: 0.5rem; /* Marge inférieure pour séparer des champs suivants */
+/* --- Styles pour l'hôte du composant (optionnel, si besoin d'un style spécifique au composant) --- */
+:host {
+  /* --- Styles pour le fond de page - APPLIQUER L'IMAGE DE FOND ICI UNIQUEMENT --- */
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center center;
+  display: block;
+  min-height: 100vh;
+  color: white;
+  margin-bottom: 0;
+  padding-bottom: 0;
 }
 
-/* Afficher invalid-feedback quand le champ parent est invalide et touché/modifié */
+/* --- Conteneur principal du formulaire --- */
+.container {
+  max-width: 1600px; /* Gardez la largeur maximale pour limiter la largeur du formulaire */
+  margin-left: auto;
+  margin-right: auto;
+  padding: 30px;
+  background-color: #fff; /* Gardez la couleur de fond blanche pour le conteneur (ou mettez transparent si vous voulez voir l'image à travers) */
+  border-radius: 15px;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+  margin-top: 100px;
+   background-image: url('/assets/templatefront/assets/images/meetings-bg.jpg'); /* SUPPRIMEZ cette ligne -  Ne pas redéfinir l'image de fond ici */
+}
+
+/* --- Titre du formulaire --- */
+h2 {
+  text-align: center;
+  color: #343a40; /* Couleur gris foncé (plus professionnel) */
+  margin-bottom: 30px; /* Plus d'espace sous le titre */
+  font-weight: 700; /* Titre en gras */
+  font-size: 2rem; /* Taille de police du titre augmentée */
+  
+}
+
+/* --- Formulaire --- */
+form {
+  display: flex;
+  flex-direction: column;
+  /* Pas de style flex-direction: column; ici, car Bootstrap row/col gère la disposition */
+}
+
+/* --- Groupe de champs (div.form-group) --- */
+.form-group {
+  margin-bottom: 20px; /* Plus d'espace entre les groupes de champs */
+}
+
+/* --- Labels --- */
+label {
+  display: block; /* Labels prennent toute la largeur pour une meilleure lisibilité */
+  margin-bottom: 8px; /* Espace sous les labels */
+  font-weight: 600; /* Labels légèrement en gras */
+  color: #495057; /* Couleur gris moyen pour les labels */
+  font-size: 1.1rem; /* Taille de police des labels légèrement augmentée */
+}
+
+/* --- Inputs, Selects, Textareas --- */
+input.form-control, /* Cibler spécifiquement avec la classe Bootstrap form-control */
+select.form-select,   /* Cibler spécifiquement avec la classe Bootstrap form-select */
+textarea.form-control { /* Cibler spécifiquement avec la classe Bootstrap form-control */
+  width: 100%;
+  padding: 12px 15px; /* Padding légèrement plus grand pour un aspect plus spacieux */
+  border: 1px solid #ced4da;
+  border-radius: 10px; /* Bords arrondis (plus cohérent) */
+  font-size: 1rem; /* Taille de police standard */
+  color: #495057; /* Couleur du texte standard */
+  background-color: #f8f9fa; /* Fond gris très clair */
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out; /* Transition douce pour focus */
+}
+
+input.form-control:focus,
+select.form-select:focus,
+textarea.form-control:focus {
+  outline: none;
+  border-color: #007bff; /* Bleu Bootstrap primaire au focus */
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); /* Ombre bleue Bootstrap primaire au focus */
+  background-color: #fff; /* Fond blanc au focus */
+}
+
+/* --- Boutons (Classes Bootstrap btn, btn-primary, btn-secondary) --- */
+.btn {
+  padding: 12px 25px; /* Padding bouton ajusté */
+  border-radius: 10px; /* Bords arrondis bouton (cohérent) */
+  cursor: pointer;
+  font-weight: 600; /* Texte bouton en gras léger */
+  text-align: center;
+  font-size: 1.1rem; /* Taille de police bouton légèrement augmentée */
+  transition: all 0.3s ease; /* Transition douce bouton */
+  border: none; /* Retirer la bordure par défaut des boutons (pour plus de contrôle) */
+  outline: none !important; /* Retirer l'outline au focus des boutons */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Ombre légère bouton */
+}
+
+.btn-primary {
+  background-color: #007bff; /* Bleu Bootstrap primaire */
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3; /* Bleu Bootstrap primaire plus foncé au hover */
+}
+
+.btn-primary:active, /* Style pour l'état "actif" (clic enfoncé) */
+.btn-primary:focus { /* Style pour l'état "focus" (clavier navigation) */
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.5) !important; /* Ombre bleue plus claire au focus/actif */
+}
+
+.btn-secondary {
+  background-color: #6c757d; /* Gris Bootstrap secondaire */
+  color: white;
+}
+
+.btn-secondary:hover {
+  background-color: #5a6268; /* Gris Bootstrap secondaire plus foncé au hover */
+}
+
+.btn-secondary:active,
+.btn-secondary:focus {
+  box-shadow: 0 0 0 0.2rem rgba(108, 117, 125, 0.5) !important; /* Ombre grise Bootstrap secondaire au focus/actif */
+}
+
+/* --- Messages d'erreur de validation (invalid-feedback) --- */
+.invalid-feedback {
+  display: none; /* Masquer par défaut (Bootstrap le gère, mais pour s'assurer) */
+  width: 100%;
+  margin-top: 0.5rem; /* Marge au-dessus des erreurs augmentée */
+  margin-bottom: 0.5rem; /* Marge en dessous des erreurs ajoutée */
+  font-size: 0.9rem; /* Taille police erreurs légèrement augmentée */
+  color: #dc3545; /* Rouge Bootstrap danger */
+  font-weight: 500; /* Messages d'erreur semi-gras */
+  padding: 10px 15px; /* Padding message erreur plus important */
+  background-color: #fdeeee; /* Fond rouge très clair, pastel */
+  border: 1px solid #fcc5c9; /* Bordure rouge clair */
+  border-radius: 8px; /* Bords arrondis pour les messages d'erreur */
+  box-shadow: 0 0 0.3rem rgba(0, 0, 0, 0.05); /* Ombre légère erreurs */
+}
+
+/* Afficher invalid-feedback quand le champ parent est invalide et touché/modifié (inchangé) */
 input.ng-invalid.ng-touched + .invalid-feedback,
 textarea.ng-invalid.ng-touched + .invalid-feedback,
 select.ng-invalid.ng-touched + .invalid-feedback,
@@ -106,4 +156,39 @@ select.ng-invalid.ng-dirty + .invalid-feedback {
 }
 
 
-/* ... Le reste de votre code CSS dans teacher-courses.component.scss ... */
+/* --- Styles spécifiques pour les checkbox (si nécessaire, ici pour "Publié") --- */
+.form-check {
+  padding-left: 0; /* Retirer le padding par défaut des form-check pour aligner label à gauche */
+}
+
+.form-check-input {
+  margin-right: 0.5rem; /* Espace entre le checkbox et le label */
+  /* ... d'autres styles spécifiques pour le checkbox input si besoin ... */
+}
+
+.form-check-label {
+  font-weight: 500; /* Label du checkbox en gras léger (déjà défini dans le snippet précédent) */
+  color: #495057; /* Couleur label checkbox (déjà défini dans le snippet précédent) */
+  /* ... d'autres styles spécifiques pour le label du checkbox si besoin ... */
+}
+
+/* --- Responsive (Adaptation écran, ici simple pour max-width container) --- */
+@media (max-width: 768px) {
+  .container {
+    max-width: 100%; /* Sur petit écran, container prend toute la largeur */
+    padding-left: 15px; /* Padding gauche réduit sur petit écran */
+    padding-right: 15px; /* Padding droit réduit sur petit écran */
+    margin-left: 0; /* Supprimer les marges latérales sur petit écran */
+    margin-right: 0;
+  }
+  h2 {
+    font-size: 1.7rem; /* Réduire la taille du titre sur petit écran */
+    margin-bottom: 25px; /* Ajuster la marge du titre sur petit écran */
+  }
+}
+
+.teacher-course-form .card {
+  /* ... vos styles CSS existants ... */
+  margin-bottom: 80px;
+  margin-top: 50px;  /* Ajout de la marge en bas */
+}

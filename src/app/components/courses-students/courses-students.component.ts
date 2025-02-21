@@ -1,24 +1,24 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CoursesService } from 'src/app/services/courses.service';
 import { ReviewService } from 'src/app/services/review.service';
 
+
 declare global {
-    interface Window {
-        SpeechRecognition: any;
-        webkitSpeechRecognition: any;
-    }
+  interface Window {
+      SpeechRecognition: any;
+      webkitSpeechRecognition: any;
+  }
 }
-
 @Component({
-    selector: 'app-courses-list',
-    templateUrl: './courses-list.component.html',
-    styleUrls: ['./courses-list.component.scss']
+  selector: 'app-courses-students',
+  templateUrl: './courses-students.component.html',
+  styleUrls: ['./courses-students.component.scss']
 })
-export class CoursesListComponent implements OnInit {
+export class CoursesStudentsComponent {
 
-    courses: any[] = []; // Liste des cours
+ courses: any[] = []; // Liste des cours
     selectedCourse: any = null; // Cours sélectionné pour modification
     categories: string[] = [];
     filteredCourses: any[] = []; // Cours filtrés en fonction de la recherche
@@ -77,9 +77,17 @@ export class CoursesListComponent implements OnInit {
 
 
     onCategoryButtonClick(category: string): void {
-        this.selectedCategory = category;
-        this.filterCourses(); // Re-filtrer et mettre à jour la pagination
-    }
+      this.selectedCategory = category;
+      if (category === 'favorites') {
+          // Filtrer pour afficher seulement les cours favoris (liked === true)
+          this.filteredCourses = this.courses.filter(course => course.liked); // 🔑  ФИЛЬТР ПО  course.liked
+      } else if (category === 'all') {
+          this.filteredCourses = [...this.courses];
+      }
+      // ... остальная логика для других категорий ...
+      this.totalCourses = this.filteredCourses.length;
+      this.currentPage = 1;
+  }
 
     // Fonction pour obtenir les cours paginés pour la page actuelle
     getPaginatedCourses(): any[] {
@@ -270,39 +278,47 @@ export class CoursesListComponent implements OnInit {
         return this.getPaginatedCourses().sort((a, b) => Number(b.liked) - Number(a.liked));
     }
 
-    toggleFavorite(course: any) {
-        course.liked = !course.liked; // Inverse l'état du favoris
-        this.courses = [...this.courses]; // Met à jour la liste pour déclencher le changement dans Angular
+    toggleFavorite(course: any): void {
+      course.liked = !course.liked;
 
-        // Attendre le rafraîchissement avant de scroller
-        setTimeout(() => {
-            if (course.liked) {
-                const element = document.getElementById('course-' + course.idCourse);
-                if (element) {
-                    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-            }
-        }, 100);
-    }
+      this.courseService.updateCourseLikedStatus(course.idCourse, course.liked).subscribe({
+          next: (response) => {
+              console.log('Statut favori mis à jour sur le serveur pour le cours', course.title, ':', course.liked);
+          },
+          error: (error) => {
+              console.error('Erreur lors de la mise à jour du statut favori sur le serveur', error);
+              course.liked = !course.liked;
+              alert('Erreur lors de la mise à jour du statut favori. Veuillez réessayer.');
+          }
+      });
+    
+
+      if (this.selectedCategory === 'favorites') {
+          this.filterCourses();
+      }
+      this.courses = [...this.courses];
+  }
+
+  
 
     confirmerEtSupprimerCours(course: any): void {
         if (!course?.idCourse) {
             console.error("⚠️ ID du cours est indéfini !");
             return;
         }
-
+    
         if (confirm(`Êtes-vous sûr de vouloir supprimer le cours: ${course.title} ?`)) {
             console.log("⏳ Suppression du cours confirmée par l'utilisateur, appel au service...");
-
+    
             this.courseService.deleteCourse(course.idCourse).subscribe({
                 next: (response) => {
                     console.log('Réponse du serveur:', response);
                     console.log(`✅ Cours avec ID ${course.idCourse} supprimé du backend.`);
-
+    
                     //  MISE A JOUR DE LA LISTE DES COURS ET RE-FILTRAGE/PAGINATION -  C'EST ICI QUE CA DOIT ÊTRE !
                     this.courses = this.courses.filter(c => c.idCourse !== course.idCourse);
                     console.log(`✅ Cours avec ID ${course.idCourse} supprimé de l'UI (mise à jour immédiate).`);
-
+    
                     this.filterCourses(); //  RE-FILTRER ET RE-PAGINER APRES SUPPRESSION
                 },
                 error: (error) => {
@@ -324,31 +340,12 @@ export class CoursesListComponent implements OnInit {
         });
     }
 
-    selectCategory(category: string): void {   //  ✅ selectCategory method
+    selectCategory(category: string): void {  //  ✅ selectCategory method
         this.selectedCategory = category;
         this.filterCourses();
         // Ici, vous déclencheriez typiquement un rechargement des données ou un filtrage
         // Pour l'instant, implémentation de base dans le clic du bouton template
         console.log('Category selected:', this.selectedCategory);
-    }
-
-    toggleCourseVisibility(course: any): void {
-        const newStatus = !course.status; // Inverse le statut actuel (true -> false, false -> true)
-
-        this.courseService.updateCourseStatus(course.idCourse, newStatus).subscribe({ // **Adaptez la méthode de service pour la mise à jour du statut**
-            next: (response) => {
-                console.log(`Statut du cours "${course.title}" mis à jour avec succès à: ${newStatus}`);
-                course.status = newStatus; // Met à jour le statut dans l'objet course local pour rafraîchir l'UI immédiatement
-
-                // [Optionnel] :  Recharger la liste complète des cours pour être sûr d'avoir les données les plus récentes du backend
-                // this.loadCourses();
-            },
-            error: (error) => {
-                console.error(`Erreur lors de la mise à jour du statut du cours "${course.title}"`, error);
-                // [Optionnel] :  Gestion d'erreur plus fine (afficher un message à l'utilisateur, etc.)
-                alert(`Erreur lors de la modification de la visibilité du cours "${course.title}". Veuillez réessayer.`);
-            }
-        });
     }
 
 

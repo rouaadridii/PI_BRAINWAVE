@@ -1,81 +1,95 @@
-<div class="container mt-4">
-  <div class="card shadow p-4">
-      <h2 class="text-center">Ajouter un nouveau cours</h2>
+<body>
+    <app-front-header></app-front-header>
 
-      <form [formGroup]="courseForm" (ngSubmit)="onSubmit()" class="scrollable-form">
-          <div class="mb-3">
-              <label for="title" class="form-label">Titre :</label>
-              <input type="text" id="title" class="form-control" formControlName="title">
-              <div *ngIf="courseForm.get('title')?.invalid && (courseForm.get('title')?.touched || courseForm.get('title')?.dirty)" class="invalid-feedback">
-                  <small *ngIf="courseForm.get('title')?.errors?.['required']">Le titre du cours est obligatoire.</small>
-                  <small *ngIf="courseForm.get('title')?.errors?.['minlength']">Le titre doit contenir au moins {{ courseForm.get('title')?.errors?.['minlength']?.requiredLength }} caractères.</small>
-              </div>
-          </div>
+    <div class="container mt-4 teacher-course-form"> <!-- Conteneur spécifique pour le formulaire -->
+        <div class="card shadow p-4">
+            <h2 class="text-center mb-4">Ajouter un nouveau cours</h2> <!-- Ajout de mb-4 pour espacement sous le titre -->
 
-          <div class="mb-3">
-              <label for="description" class="form-label">Description :</label>
-              <textarea id="description" class="form-control" rows="3" formControlName="description"></textarea>
-              <div *ngIf="courseForm.get('description')?.invalid && (courseForm.get('description')?.touched || courseForm.get('description')?.dirty)" class="invalid-feedback">
-                  <small *ngIf="courseForm.get('description')?.errors?.['required']">La description du cours est obligatoire.</small>
-                  <small *ngIf="courseForm.get('description')?.errors?.['minlength']">La description doit contenir au moins {{ courseForm.get('description')?.errors?.['minlength']?.requiredLength }} caractères.</small>
-              </div>
-          </div>
+            <form [formGroup]="courseForm" (ngSubmit)="onSubmit()" class="scrollable-form">
+                <div class="row mb-3"> <!-- Utilisation de row pour la grille -->
+                    <div class="col-md-6"> <!-- Première colonne pour le titre -->
+                        <label for="title" class="form-label">Titre :</label>
+                        <input type="text" id="title" class="form-control" formControlName="title">
+                        <div *ngIf="courseForm.get('title')?.invalid && (courseForm.get('title')?.touched || courseForm.get('title')?.dirty)" class="invalid-feedback">
+                            <small *ngIf="courseForm.get('title')?.errors?.['required']">Le titre du cours est obligatoire.</small>
+                            <small *ngIf="courseForm.get('title')?.errors?.['minlength']">Le titre doit contenir au moins {{ courseForm.get('title')?.errors?.['minlength']?.requiredLength }} caractères.</small>
+                        </div>
+                    </div>
+                    <div class="col-md-6"> <!-- Deuxième colonne, vide pour l'instant (ou pour un autre champ si besoin) -->
+                        <!-- Vous pouvez ajouter un autre champ ici si vous le souhaitez -->
+                    </div>
+                </div>
 
-          <div class="mb-3">
-              <label for="date" class="form-label">Date :</label>
-              <input type="date" id="date" class="form-control" formControlName="date">
-              <div *ngIf="courseForm.get('date')?.invalid && (courseForm.get('date')?.touched || courseForm.get('date')?.dirty)" class="invalid-feedback">
-                  <small *ngIf="courseForm.get('date')?.errors?.['required']">La date du cours est obligatoire.</small>
-              </div>
-          </div>
+                <div class="mb-3">
+                    <label for="description" class="form-label">Description :</label>
+                    <textarea id="description" class="form-control" rows="3" formControlName="description"></textarea>
+                    <div *ngIf="courseForm.get('description')?.invalid && (courseForm.get('description')?.touched || courseForm.get('description')?.dirty)" class="invalid-feedback">
+                        <small *ngIf="courseForm.get('description')?.errors?.['required']">La description du cours est obligatoire.</small>
+                        <small *ngIf="courseForm.get('description')?.errors?.['minlength']">La description doit contenir au moins {{ courseForm.get('description')?.errors?.['minlength']?.requiredLength }} caractères.</small>
+                    </div>
+                </div>
 
-          <div class="mb-3">
-              <label for="picture" class="form-label">Image :</label>
-              <input type="file" id="picture" class="form-control" (change)="onFileSelected($event)">
-          </div>
+                <div class="row mb-3"> <!-- Nouvelle row pour aligner date et image horizontalement -->
+                    <div class="col-md-6">
+                        <label for="date" class="form-label">Date :</label>
+                        <input type="date" id="date" class="form-control" formControlName="date">
+                        <div *ngIf="courseForm.get('date')?.invalid && (courseForm.get('date')?.touched || courseForm.get('date')?.dirty)" class="invalid-feedback">
+                            <small *ngIf="courseForm.get('date')?.errors?.['required']">La date du cours est obligatoire.</small>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="picture" class="form-label">Image :</label>
+                        <input type="file" id="picture" class="form-control" (change)="onFileSelected($event)">
+                    </div>
+                </div>
 
-          <div class="mb-3">
-              <label for="level" class="form-label">Niveau :</label>
-              <select id="level" class="form-select" formControlName="level">
-                  <option value="" disabled selected>Sélectionner un niveau</option>
-                  <option value="Débutant">Débutant</option>
-                  <option value="Intermédiaire">Intermédiaire</option>
-                  <option value="Avancé">Avancé</option>
-              </select>
-              <div *ngIf="courseForm.get('level')?.invalid && (courseForm.get('level')?.touched || courseForm.get('level')?.dirty)" class="invalid-feedback">
-                  <small *ngIf="courseForm.get('level')?.errors?.['required']">Le niveau du cours est obligatoire.</small>
-              </div>
-          </div>
+                <div class="row mb-3"> <!-- Nouvelle row pour aligner niveau et statut horizontalement -->
+                    <div class="col-md-6">
+                        <label for="level" class="form-label">Niveau :</label>
+                        <select id="level" class="form-select" formControlName="level">
+                            <option value="" disabled selected>Sélectionner un niveau</option>
+                            <option value="Débutant">Débutant</option>
+                            <option value="Intermédiaire">Intermédiaire</option>
+                            <option value="Avancé">Avancé</option>
+                        </select>
+                        <div *ngIf="courseForm.get('level')?.invalid && (courseForm.get('level')?.touched || courseForm.get('level')?.dirty)" class="invalid-feedback">
+                            <small *ngIf="courseForm.get('level')?.errors?.['required']">Le niveau du cours est obligatoire.</small>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Statut :</label>
+                        <div class="form-check">
+                            <input type="checkbox" id="status" class="form-check-input" formControlName="status">
+                            <label for="status" class="form-check-label">Publié</label>
+                        </div>
+                    </div>
+                </div>
 
-          <div class="mb-3">
-              <label class="form-label">Statut :</label>
-              <div class="form-check">
-                  <input type="checkbox" id="status" class="form-check-input" formControlName="status">
-                  <label for="status" class="form-check-label">Publié</label>
-              </div>
-          </div>
 
-          <div class="mb-3">
-              <label for="price" class="form-label">Prix :</label>
-              <input type="number" id="price" class="form-control" formControlName="price" min="0">
-              <div *ngIf="courseForm.get('price')?.invalid && (courseForm.get('price')?.touched || courseForm.get('price')?.dirty)" class="invalid-feedback">
-                  <small *ngIf="courseForm.get('price')?.errors?.['required']">Le prix du cours est obligatoire.</small>
-                  <small *ngIf="courseForm.get('price')?.errors?.['min']">Le prix ne peut pas être négatif.</small>
-              </div>
-          </div>
+                <div class="row mb-3"> <!-- Nouvelle row pour aligner prix et catégorie horizontalement -->
+                    <div class="col-md-6">
+                        <label for="price" class="form-label">Prix :</label>
+                        <input type="number" id="price" class="form-control" formControlName="price" min="0">
+                        <div *ngIf="courseForm.get('price')?.invalid && (courseForm.get('price')?.touched || courseForm.get('price')?.dirty)" class="invalid-feedback">
+                            <small *ngIf="courseForm.get('price')?.errors?.['required']">Le prix du cours est obligatoire.</small>
+                            <small *ngIf="courseForm.get('price')?.errors?.['min']">Le prix ne peut pas être négatif.</small>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="categorie" class="form-label">Catégorie :</label>
+                        <select id="categorie" class="form-select" formControlName="categorie">
+                            <option value="" disabled selected>Sélectionner une catégorie</option>
+                            <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+                        </select>
+                        <div *ngIf="courseForm.get('categorie')?.invalid && (courseForm.get('categorie')?.touched || courseForm.get('categorie')?.dirty)" class="invalid-feedback">
+                            <small *ngIf="courseForm.get('categorie')?.errors?.['required']">La catégorie du cours est obligatoire.</small>
+                        </div>
+                    </div>
+                </div>
 
-          <div class="mb-3">
-              <label for="categorie" class="form-label">Catégorie :</label>
-              <select id="categorie" class="form-select" formControlName="categorie">
-                  <option value="" disabled selected>Sélectionner une catégorie</option>
-                  <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
-              </select>
-              <div *ngIf="courseForm.get('categorie')?.invalid && (courseForm.get('categorie')?.touched || courseForm.get('categorie')?.dirty)" class="invalid-feedback">
-                  <small *ngIf="courseForm.get('categorie')?.errors?.['required']">La catégorie du cours est obligatoire.</small>
-              </div>
-          </div>
-
-          <button type="submit" class="btn btn-primary w-100" [disabled]="courseForm.invalid">Ajouter</button>
-      </form>
-  </div>
-</div>
+                <button type="submit" class="btn btn-primary w-100">Ajouter le cours</button> <!-- Bouton prend toute la largeur -->
+            </form>
+        </div>
+    </div>
+    <app-front-footer></app-front-footer>
+</body>

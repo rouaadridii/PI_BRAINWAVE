@@ -10,6 +10,7 @@ import { AdminCoursesComponent } from './components/admin-courses/admin-courses.
 import { DashboardStatisticsComponent } from './components/dashboard-statistics/dashboard-statistics.component';
 import { AddDetailsCourseComponent } from './components/add-details-course/add-details-course.component';
 import { UpdateCourseComponent } from './components/update-course/update-course.component';
+import { CoursesStudentsComponent } from './components/courses-students/courses-students.component';
 
 const routes: Routes = [
 
@@ -24,6 +25,7 @@ const routes: Routes = [
   {path: 'courses-list', component: CoursesListComponent },
   {path: 'adddetailCours', component: AddDetailsCourseComponent },
   { path: 'modifier-cours/:idCourse', component: UpdateCourseComponent },
+  { path: 'coursesStudent', component: CoursesStudentsComponent },
 
   
 

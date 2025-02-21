@@ -308,3 +308,123 @@
 
 /* --- Fin des styles pour les boutons IA et Microphone --- */
 /* --- Fin de vos styles existants --- */
+
+.btn-add-course {
+  background-color: #28a745; /* Vert Bootstrap succès (plus foncé) */
+  color: white;
+  border: 1px solid #28a745; /* Bordure verte assortie */
+  border-radius: 10px; /* Bords arrondis */
+  padding: 12px 25px; /* Padding confortable */
+  font-weight: 600; /* Texte en gras */
+  font-size: 1.1rem; /* Taille de police un peu plus grande */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15); /* Ombre discrète */
+  transition: background-color 0.3s ease, transform 0.2s ease; /* Transitions douces */
+  display: inline-flex; /* Pour aligner l'icône et le texte horizontalement */
+  align-items: center; /* Centrer verticalement l'icône et le texte */
+  justify-content: center; /* Centrer horizontalement (au cas où) */
+  gap: 8px; /* Espace entre l'icône et le texte */
+}
+
+.btn-add-course:hover {
+  background-color: #218838; /* Vert Bootstrap succès (encore plus foncé) au hover */
+  border-color: #218838;
+  transform: translateY(-2px); /* Léger effet de soulèvement au survol */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Ombre un peu plus prononcée au survol */
+}
+
+.btn-add-course:active {
+  background-color: #1e7e34; /* Vert Bootstrap succès (encore plus foncé) à l'activation */
+  border-color: #1e7e34;
+  transform: translateY(0); /* Retour à la position normale à l'activation */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15); /* Ombre de base à l'activation */
+}
+
+.btn-add-course i.fas.fa-plus-circle {
+  font-size: 1.2rem; /* Taille de l'icône "plus-circle" */
+  opacity: 0.9; /* Légère transparence pour adoucir l'icône */
+}
+
+
+/* ... tous vos styles CSS précédents ... */
+
+/* --- Styles pour la pagination --- */
+.pagination-container {
+  margin-top: 25px; /* Espace au-dessus des contrôles de pagination */
+  display: flex;
+  justify-content: center; /* Centrer les contrôles horizontalement */
+  align-items: center; /* Centrer verticalement */
+}
+
+.pagination-btn {
+  background-color: #f8f9fa; /* Fond gris très clair */
+  color: #495057; /* Couleur de texte standard */
+  border: 1px solid #ced4da; /* Bordure légère */
+  border-radius: 8px; /* Bords arrondis */
+  padding: 0.6rem 1rem; /* Padding bouton pagination */
+  margin: 0 4px; /* Marge horizontale entre les boutons */
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  font-size: 0.9rem; /* Taille de police pagination réduite */
+
+  &:hover:enabled {
+    background-color: #e9ecef; /* Légèrement plus foncé au hover */
+    color: #343a40; /* Texte légèrement plus foncé au hover */
+  }
+
+  &:disabled {
+    opacity: 0.6; /* Opacité réduite pour les boutons désactivés */
+    cursor: default; /* Cursor par défaut pour les boutons désactivés */
+  }
+
+  &.active {
+    background-color: #007bff; /* Couleur primaire Bootstrap pour la page active */
+    color: white;
+    border-color: #007bff;
+    font-weight: 600; /* Texte en gras pour la page active */
+  }
+
+  &.prev-btn, &.next-btn {
+    i {
+      margin: 0 4px; /* Marge pour les icônes chevron */
+    }
+  }
+
+  &.page-number-btn {
+    min-width: 2.2rem; /* Largeur minimale pour les boutons numérotés */
+    text-align: center;
+  }
+}
+
+.page-numbers {
+  display: flex;
+  align-items: center;
+  margin: 0 10px; /* Marge horizontale pour le conteneur des numéros de page */
+}
+
+
+/* Responsive pour petits écrans (pagination) */
+@media (max-width: 576px) { /* Pour écrans très petits (e.g., petits téléphones) */
+  .pagination-container {
+    flex-direction: column; /* Pagination en colonne sur très petits écrans */
+    align-items: center;
+  }
+
+  .pagination-btn {
+    margin: 5px 0; /* Marge verticale entre les boutons en colonne */
+    width: 100%; /* Boutons pagination prennent toute la largeur sur petits écrans */
+    text-align: center; /* Texte centré dans les boutons pagination */
+  }
+
+  .page-numbers {
+    margin: 10px 0; /* Marge verticale pour les numéros de page en colonne */
+    flex-wrap: wrap; /* Permettre aux numéros de page de passer à la ligne si trop nombreux */
+    justify-content: center; /* Centrer les numéros de page */
+  }
+
+  .pagination-btn.page-number-btn {
+    margin: 3px; /* Marge autour des boutons de numéro de page en wrap */
+    min-width: 1.8rem; /* Réduire la largeur minimale des boutons de numéro de page sur petits écrans */
+    font-size: 0.8rem; /* Réduire la taille de la police sur petits écrans */
+    padding: 0.4rem 0.8rem; /* Réduire le padding sur petits écrans */
+  }
+}

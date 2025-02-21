@@ -19,6 +19,7 @@ import { DetailsCourseComponent } from './components/details-course/details-cour
 import { AddDetailsCourseComponent } from './components/add-details-course/add-details-course.component';
 import { DashboardStatisticsComponent } from './components/dashboard-statistics/dashboard-statistics.component';
 import { UpdateCourseComponent } from './components/update-course/update-course.component';
+import { CoursesStudentsComponent } from './components/courses-students/courses-students.component';
 
 
 
@@ -37,7 +38,8 @@ import { UpdateCourseComponent } from './components/update-course/update-course.
     DetailsCourseComponent,
     AddDetailsCourseComponent,
     DashboardStatisticsComponent,
-    UpdateCourseComponent
+    UpdateCourseComponent,
+    CoursesStudentsComponent
    
   ],
   imports: [

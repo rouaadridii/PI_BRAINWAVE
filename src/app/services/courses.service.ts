@@ -131,7 +131,14 @@ getCourseRating(idCourse: number): Observable<number> {
   return this.http.get<number>(`http://localhost:8087/cours/reviews/courses/${idCourse}/rating`);
 }
 
-
-
+updateCourseLikedStatus(idCourse: number, liked: boolean): Observable<any> {
+  return this.http.put(`${this.baseUrl}/${idCourse}/like`, {}, { params: { liked: liked.toString() } });
+}
+updateCourseStatus(idCourse: number, newStatus: boolean): Observable<any> {
+  // ✅ Endpoint PUT corrigé pour correspondre à l'URL backend: /courses/{idCourse}/status
+  return this.http.put(`${this.baseUrl}/${idCourse}/status`, newStatus); // ✅ Envoi de newStatus directement dans le corps JSON
+  // ou, si votre backend attend une structure JSON spécifique pour le statut :
+  // return this.http.put(`${this.apiUrl}/${idCourse}/status`, { status: newStatus }); // Envoi de { status: newStatus } dans le corps JSON
+}
 
 }

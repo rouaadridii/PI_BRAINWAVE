@@ -1,91 +1,203 @@
 <body>
-<app-front-header></app-front-header>
-
-
-<div class="container-fluid list-cours-container">
-    <div class="filters-bar mb-3">
+    <app-front-header></app-front-header>
+  
+    <div class="container-fluid list-cours-container">
+      <div class="filters-bar mb-3">
+        <button routerLink="/teachercourses" class="btn btn-add-course mb-3">
+          <i class="fas fa-plus-circle"></i> Ajouter un cours
+        </button>
+  
         <div class="input-group search-container">
-            <input type="text" class="form-control search-input" placeholder="Rechercher un cours..." [(ngModel)]="searchQuery" (input)="searchCourses()">
-            <button class="btn mic-btn" type="button" (click)="startSpeechRecognition()">
-                <i class="fa fa-microphone mic-icon"></i>
-            </button>
-            <button class="btn-ai mt-2" (click)="textToSpeech()">
-                <span class="icon">
-                    <i class="fas fa-robot"></i>
-                </span>
-                <span class="text">
-                    {{ isSpeaking ? 'Arrêter la lecture' : 'Lire avec IA' }}
-                </span>
-            </button>
+          <input
+            type="text"
+            class="form-control search-input"
+            placeholder="Rechercher un cours..."
+            [(ngModel)]="searchQuery"
+            (input)="searchCourses()"
+          />
+          <button class="btn mic-btn" type="button" (click)="startSpeechRecognition()">
+            <i class="fa fa-microphone mic-icon"></i>
+          </button>
+          <button class="btn-ai mt-2" (click)="textToSpeech()">
+            <span class="icon">
+              <i class="fas fa-robot"></i>
+            </span>
+            <span class="text">
+              {{ isSpeaking ? 'Arrêter la lecture' : 'Lire avec IA' }}
+            </span>
+          </button>
         </div>
         <div class="category-filters mt-3">
-            <button class="btn category-btn" [ngClass]="{'active': selectedCategory === 'all'}" (click)="onCategoryButtonClick('all')">ALL COURSES</button>
-            <button class="btn category-btn" [ngClass]="{'active': selectedCategory === 'soon'}" (click)="selectedCategory = 'soon'">SOON</button>
-            <button class="btn category-btn" [ngClass]="{'active': selectedCategory === 'important'}" (click)="selectedCategory = 'important'">IMPORTANT</button>
-            <button class="btn category-btn" [ngClass]="{'active': selectedCategory === 'attractive'}" (click)="selectedCategory = 'attractive'">ATTRACTIVE</button>
+          <button
+            class="btn category-btn"
+            [ngClass]="{ active: selectedCategory === 'all' }"
+            (click)="onCategoryButtonClick('all')"
+          >
+            ALL COURSES
+          </button>
+          <button
+            class="btn category-btn"
+            [ngClass]="{ active: selectedCategory === 'soon' }"
+            (click)="onCategoryButtonClick('soon')"
+          >
+            SOON
+          </button>
+          <button
+            class="btn category-btn"
+            [ngClass]="{ active: selectedCategory === 'important' }"
+            (click)="onCategoryButtonClick('important')"
+          >
+            IMPORTANT
+          </button>
+          <button
+            class="btn category-btn"
+            class="btn category-btn"
+            [ngClass]="{ active: selectedCategory === 'attractive' }"
+            (click)="onCategoryButtonClick('attractive')"
+          >
+            ATTRACTIVE
+          </button>
         </div>
-    </div>
-
-    <div *ngIf="courses.length > 0; else noCourses" class="row row-cols-1 row-cols-md-3 g-4">
-        <div *ngFor="let course of sortedCourses(); let i = index" class="col" [attr.id]="'course-' + course.idCourse">
-            <div class="card course-card shadow-lg border-0 rounded h-100">
-                <img [src]="course.picture ? (course.picture.startsWith('http') ? course.picture : 'http://localhost:8087/cours/courses/download-image/' + course.picture) : 'assets/default-image.jpg'"
-                     class="card-img-top course-image rounded-top"
-                     alt="Image du cours">
-                <div class="card-body d-flex flex-column">
-                    <div class="course-header d-flex justify-content-between align-items-center mb-2">
-                        <span class="course-price badge bg-primary rounded-pill">${{ course.price | number: '1.2-2' }}</span>
-                        <span class="course-category badge bg-light text-secondary rounded-pill">{{ course.categorie }}</span>
-                    </div>
-                    <h5 class="card-title course-title text-dark mb-2">{{ course.title }}</h5>
-                    <p class="card-text course-description text-muted flex-grow-1">{{ course.description || 'Description non disponible' }}</p>
-                    <ul class="list-unstyled course-details-list mb-3">
-                        <li>
-                            <i class="fas fa-calendar-alt detail-icon"></i> Date :
-                            <div class="course-date-formatted">
-                                <span class="course-date-month">{{ course.date | date: 'MMM' | uppercase }}</span>
-                                <span class="course-date-day">{{ course.date | date: 'd' }}</span>
-                            </div>
-                        </li>
-                        <li><i class="fas fa-check-circle detail-icon"></i> Status :
-                            <span [ngClass]="{'text-success': course.status, 'text-danger': !course.status}">
-                                {{ course.status ? 'Disponible' : 'Indisponible' }}
-                            </span>
-                        </li>
-                    </ul>
-                    <div class="course-actions d-flex justify-content-between align-items-center">
-                        <div class="rating">
-                            <i *ngFor="let star of [1,2,3,4,5]; let i = index"
-                               class="fa"
-                               [ngClass]="hoveredRating >= star ? 'fa-star text-warning' : (courseRatings[course.idCourse] >= star ? 'fa-star text-warning' : 'fa-star-o text-warning')"
-                               (mouseover)="hoverRating(star)"
-                               (mouseout)="hoverRating(0)"
-                               (click)="rateCourse(course.idCourse, star)">
-                            </i>
-                        </div>
-                        <div class="action-buttons">
-                            <a [routerLink]="['/course-detail', course.idCourse]" class="btn btn-sm btn-outline-primary">Voir Détails</a>
-                            <a [routerLink]="['/modifier-cours', course.idCourse]" class="btn btn-sm btn-outline-warning">Modifier</a>
-                            <button class="btn btn-sm btn-outline-danger" (click)="confirmerEtSupprimerCours(course)">Supprimer</button>
-                        </div>
-                    </div>
+      </div>
+  
+      <div
+        *ngIf="courses.length > 0; else noCourses"
+        class="row row-cols-1 row-cols-md-3 g-4"
+      >
+        <div
+          *ngFor="let course of sortedCourses(); let i = index"
+          class="col"
+          [attr.id]="'course-' + course.idCourse"
+        >
+          <div class="card course-card shadow-lg border-0 rounded h-100">
+            <img
+              [src]="
+                course.picture
+                  ? course.picture.startsWith('http')
+                    ? course.picture
+                    : 'http://localhost:8087/cours/courses/download-image/' +
+                      course.picture
+                  : 'assets/default-image.jpg'
+              "
+              class="card-img-top course-image rounded-top"
+              alt="Image du cours"
+            />
+            <div class="card-body d-flex flex-column">
+              <div
+                class="course-header d-flex justify-content-between align-items-center mb-2"
+              >
+                <span class="course-price badge bg-primary rounded-pill"
+                  >${{ course.price | number: '1.2-2' }}</span
+                >
+                <span
+                  class="course-category badge bg-light text-secondary rounded-pill"
+                  >{{ course.categorie }}</span
+                >
+              </div>
+              <h5 class="card-title course-title text-dark mb-2">
+                {{ course.title }}
+              </h5>
+              <p class="card-text course-description text-muted flex-grow-1">
+                {{ course.description || 'Description non disponible' }}
+              </p>
+              <ul class="list-unstyled course-details-list mb-3">
+                <li>
+                  <i class="fas fa-calendar-alt detail-icon"></i> Date :
+                  <div class="course-date-formatted">
+                    <span class="course-date-month"
+                      >{{ course.date | date: 'MMM' | uppercase }}</span
+                    >
+                    <span class="course-date-day">{{
+                      course.date | date: 'd'
+                    }}</span>
+                  </div>
+                </li>
+                <li>
+                  <i class="fas fa-check-circle detail-icon"></i> Status :
+                  <span class="status-container">
+                    <span *ngIf="course.status" class="text-success">Publié</span>
+                    <span *ngIf="!course.status" class="text-danger">Non publié</span>
+  
+                    <i
+                      class="fa"
+                      [ngClass]="{'fa-eye': course.status, 'fa-eye-slash': !course.status}"
+                      (click)="toggleCourseVisibility(course)"
+                      style="cursor: pointer; margin-left: 10px;" title="Cliquer pour changer la visibilité du cours pour les étudiants"
+                    ></i>
+                  </span>
+                </li>
+              </ul>
+              <div
+                class="course-actions d-flex justify-content-between align-items-center"
+              >
+                <div class="rating">
+                  <i
+                    *ngFor="let star of [1, 2, 3, 4, 5]; let i = index"
+                    class="fa"
+                    [ngClass]="
+                      hoveredRating >= star
+                        ? 'fa-star text-warning'
+                        : courseRatings[course.idCourse] >= star
+                        ? 'fa-star text-warning'
+                        : 'fa-star-o text-warning'
+                    "
+                    (mouseover)="hoverRating(star)"
+                    (mouseout)="hoverRating(0)"
+                    (click)="rateCourse(course.idCourse, star)"
+                  >
+                  </i>
                 </div>
+                <div class="action-buttons">
+                  <a
+                    [routerLink]="['/course-detail', course.idCourse]"
+                    class="btn btn-sm btn-outline-primary"
+                    >Voir Détails</a
+                  >
+                  <a
+                    [routerLink]="['/modifier-cours', course.idCourse]"
+                    class="btn btn-sm btn-outline-warning"
+                    >Modifier</a
+                  >
+                  <button
+                    class="btn btn-sm btn-outline-danger"
+                    (click)="confirmerEtSupprimerCours(course)"
+                  >
+                    Supprimer
+                  </button>
+                </div>
+              </div>
             </div>
+          </div>
         </div>
-    </div>
-
-    <ng-template #noCourses>
+      </div>
+  
+      <ng-template #noCourses>
         <div class="alert alert-warning text-center mt-4" role="alert">
-            Aucun cours disponible.
+          Aucun cours disponible.
         </div>
-    </ng-template>
-</div>
-
-
-
-
-<app-front-footer></app-front-footer>
-
-
-
-</body>
+      </ng-template>
+  
+      <div class="pagination-container mt-4 d-flex justify-content-center align-items-center">
+        <button class="btn pagination-btn prev-btn" (click)="previousPage()" [disabled]="currentPage === 1">
+          <i class="fas fa-chevron-left"></i> Précédent
+        </button>
+  
+        <div class="page-numbers d-flex align-items-center mx-3">
+          <button
+            *ngFor="let page of getPagesArray()"
+            class="btn pagination-btn page-number-btn"
+            [ngClass]="{'active': currentPage === page}"
+            (click)="goToPage(page)"
+          >
+            {{ page }}
+          </button>
+        </div>
+  
+        <button class="btn pagination-btn next-btn" (click)="nextPage()" [disabled]="currentPage === totalPages() || totalPages() === 0">
+          Suivant <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+  
+    <app-front-footer></app-front-footer>
+  </body>
