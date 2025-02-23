@@ -12,23 +12,17 @@ export class ProfileComponent {
   profileImageUrl: string | ArrayBuffer | null = '';
 
   constructor(private userService: UserService) {}
-  
-  ngOnInit() {
-    const email = localStorage.getItem('userEmail');
-    if (email) {
-      this.userEmail = email.split('@')[0]; // Extract the part before "@"
-    }
-    this.userService.getUserProfile().subscribe(
+  user: any;
+
+  ngOnInit(): void {
+    this.userService.getUserInfo().subscribe(
       (data) => {
-        this.userProfile = data;
-        if (data.profileImage) {
-          // If there's a profile image URL, create an image URL for frontend
-          this.profileImageUrl = data.profileImage;
-        }
+        this.user = data;  // Store user data
       },
       (error) => {
-        console.error('Error fetching user profile:', error);
+        console.error('Error fetching user data:', error);
       }
     );
   }
+  
 }

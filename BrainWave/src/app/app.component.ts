@@ -13,12 +13,12 @@ export class AppComponent {
 
   constructor(private router: Router) {
     this.router.events.subscribe((event) => {
-      if (event instanceof NavigationEnd) {
+      /*if (event instanceof NavigationEnd) {
         this.isProfilePage = this.router.url.includes('/profile'); 
-      }
+      }*/
       if (event instanceof NavigationEnd) {
         const currentUrl = this.router.url;
-        this.isAuthPage = currentUrl.includes('/login') || currentUrl.includes('/signup'); // Exclude navbar on login and signup pages
+        this.isAuthPage = currentUrl.includes('/login') || currentUrl.includes('/signup') || currentUrl.includes('/profile'); // Exclude navbar on login and signup pages
       }
     });
   }

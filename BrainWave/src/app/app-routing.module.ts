@@ -7,16 +7,18 @@ import { FrontFooterComponent } from './components/front-footer/front-footer.com
 import { LoginComponent } from './components/Usermanagement/login/login.component';
 import { SignupComponent } from './components/Usermanagement/signup/signup.component';
 import { ProfileComponent } from './components/Usermanagement/profile/profile.component';
+import { FrontHeaderAuthentificatedComponent } from './components/front-header-authentificated/front-header-authentificated.component';
+import { AuthGuard } from './auth.guard';
 
 const routes: Routes = [
 
   {path:'home',component:HomeComponent},
-  {path:'dashboard',component:DashboardComponent},
+  {path:'dashboard',component:DashboardComponent, canActivate: [AuthGuard]},
   {path:'front_header',component:FrontHeaderComponent},
   {path:'front_footer',component:FrontFooterComponent},
   {path:'login',component:LoginComponent},
   {path:'signup',component:SignupComponent},
-  {path:'profile',component:ProfileComponent},
+  {path:'profile',component:ProfileComponent, canActivate: [AuthGuard]},
   { path: '', redirectTo: '/home', pathMatch: 'full' }
 
 ];

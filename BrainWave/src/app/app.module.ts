@@ -14,6 +14,7 @@ import { BackMenuAdminComponent } from './components/back-menu-admin/back-menu-a
 import { LoginComponent } from './components/Usermanagement/login/login.component';
 import { SignupComponent } from './components/Usermanagement/signup/signup.component';
 import { ProfileComponent } from './components/Usermanagement/profile/profile.component';
+import { FrontHeaderAuthentificatedComponent } from './components/front-header-authentificated/front-header-authentificated.component';
 
 @NgModule({
   declarations: [
@@ -27,6 +28,7 @@ import { ProfileComponent } from './components/Usermanagement/profile/profile.co
     LoginComponent,
     SignupComponent,
     ProfileComponent,
+    FrontHeaderAuthentificatedComponent,
   ],
   imports: [
     FormsModule,

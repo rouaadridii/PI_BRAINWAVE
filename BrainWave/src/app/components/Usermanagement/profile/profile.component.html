@@ -1,16 +1,16 @@
-      <section style="background-color: #eee; margin-top: 50px;margin-bottom: 30px;">
+    <app-front-header-authentificated></app-front-header-authentificated>
+    <section style="background-color: #eee; margin-top: 50px;margin-bottom: 30px;">
         <div class="container py-5">
           
       
           <div class="row">
-            <div class="col-lg-4">
+            <div class="col-lg-4" *ngIf="user">
               <div class="card mb-4">
                 <div class="card-body text-center">
-                  <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3.webp" alt="avatar"
+                  <img src="{{ user.picture }}" alt="avatar"
                     class="rounded-circle img-fluid" style="width: 150px;">
-                  <h5 class="my-3">John Smith</h5>
-                  <p class="text-muted mb-1">Full Stack Developer</p>
-                  <p class="text-muted mb-4">Bay Area, San Francisco, CA</p>
+                  <h5 class="my-3">{{ user.name }} {{ user.surname }}</h5>
+                  <p class="text-muted mb-1">{{ user.role }}</p>
                 </div>
               </div>
               <div class="card mb-4 mb-lg-0">
@@ -26,8 +26,8 @@
                     </li>
                     <li class="list-group-item d-flex justify-content-between align-items-center p-3">
                       <i class="fab fa-twitter fa-lg" style="color: #55acee;"></i>
-                      <p class="mb-0">@mdbootstrap</p>
-                    </li>
+                      <p class="mb-0">mdbootstrap</p>
+                    </li> 
                     <li class="list-group-item d-flex justify-content-between align-items-center p-3">
                       <i class="fab fa-instagram fa-lg" style="color: #ac2bac;"></i>
                       <p class="mb-0">mdbootstrap</p>
@@ -40,7 +40,7 @@
                 </div>
               </div>
             </div>
-            <div class="col-lg-8">
+            <div class="col-lg-8" >
               <div class="card mb-4">
                 <div class="card-body">
                   <div class="row">
@@ -48,7 +48,7 @@
                       <p class="mb-0">Full Name</p>
                     </div>
                     <div class="col-sm-9">
-                      <p class="text-muted mb-0">Johnatan Smith</p>
+                      <p class="text-muted mb-0">{{ user.name }} {{ user.surname }}</p>
                     </div>
                   </div>
                   <hr>
@@ -56,8 +56,8 @@
                     <div class="col-sm-3">
                       <p class="mb-0">Email</p>
                     </div>
-                    <div class="col-sm-9" *ngIf="userEmail">
-                      <p class="text-muted mb-0"> {{ userEmail }}@gmail.com</p>
+                    <div class="col-sm-9">
+                      <p class="text-muted mb-0">{{ user.email }}</p>
                     </div>
                   </div>
                   <hr>
@@ -66,16 +66,16 @@
                       <p class="mb-0">Phone</p>
                     </div>
                     <div class="col-sm-9">
-                      <p class="text-muted mb-0">(097) 234-5678</p>
+                      <p class="text-muted mb-0">{{ user.phoneNumber }}</p>
                     </div>
                   </div>
                   <hr>
                   <div class="row">
                     <div class="col-sm-3">
-                      <p class="mb-0">Mobile</p>
+                      <p class="mb-0">Birth Date</p>
                     </div>
                     <div class="col-sm-9">
-                      <p class="text-muted mb-0">(098) 765-4321</p>
+                      <p class="text-muted mb-0">{{ user.birthDate | date:'yyyy-MM-dd' }}</p>
                     </div>
                   </div>
                   <hr>
@@ -84,7 +84,7 @@
                       <p class="mb-0">Address</p>
                     </div>
                     <div class="col-sm-9">
-                      <p class="text-muted mb-0">Bay Area, San Francisco, CA</p>
+                      <p class="text-muted mb-0">{{ user.address }}</p>
                     </div>
                   </div>
                 </div>

@@ -20,31 +20,32 @@ formLogin = new FormGroup({
     onLogin() {
       if (this.formLogin.valid) {
         const { email, password } = this.formLogin.value;
-    
+  
         if (email && password) {
           this.userService.login(email, password).subscribe(
             (response) => {
               const token = response?.token;
               if (token) {
                 localStorage.setItem('jwt', token); // Store the JWT token
-    
+  
                 // Decode the token
                 const decodedToken: any = jwtDecode(token);
                 console.log('Decoded Token:', decodedToken); // Debugging
-    
+  
                 // Extract and store the user's email
                 const userEmail = decodedToken?.sub; // 'sub' usually contains the email
                 if (userEmail) {
                   localStorage.setItem('userEmail', userEmail);
                   console.log('User Email:', userEmail); // Debugging
                 }
-    
+  
                 this.router.navigate(['/profile']); // Redirect to profile
               } else {
                 alert('Invalid response from server');
               }
             },
             (error) => {
+              console.error(error);
               alert('Login failed. Please check your credentials.');
             }
           );
@@ -53,7 +54,6 @@ formLogin = new FormGroup({
         }
       }
     }
-    
     
     
     
