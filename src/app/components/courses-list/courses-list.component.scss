@@ -428,3 +428,103 @@
     padding: 0.4rem 0.8rem; /* Réduire le padding sur petits écrans */
   }
 }
+.mic-btn {
+  /* ... vos styles existants pour .mic-btn ... */
+}
+
+.mic-icon {
+  /* ... vos styles existants pour .mic-icon ... */
+}
+
+.mic-icon.listening {
+  color: #007bff; /* Exemple: Changer la couleur en bleu quand actif */
+  /* Vous pouvez ajouter d'autres styles comme une animation ici */
+  animation: pulse 1.5s infinite; /* Exemple d'animation pulsée */
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.average-rating {
+  display: flex;
+  align-items: center;
+  .star-icon {
+      font-size: 0.8em;
+      margin-left: 0.2em;
+      color: orange;
+  }
+}
+
+.review-form-popup {
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .review-form-content {
+      background-color: #fefefe;
+      margin: 15% auto; /* 15% from the top and centered */
+      padding: 20px;
+      border: 1px solid #888;
+      width: 60%; /* Could be more or less, depending on screen size */
+      border-radius: 10px;
+      box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+
+      h3 {
+          margin-top: 0;
+          margin-bottom: 15px;
+          color: #333;
+      }
+
+      p.text-muted {
+          font-size: 0.9em;
+          color: #777;
+          margin-bottom: 20px;
+      }
+
+      .stars {
+          margin-bottom: 20px;
+          i.fa-star {
+              cursor: pointer;
+              color: #ccc;
+              &.active {
+                  color: orange;
+              }
+              &:hover {
+                  color: orange;
+              }
+          }
+      }
+
+      .form-label {
+          font-weight: bold;
+          margin-top: 10px;
+      }
+
+      textarea.form-control {
+          margin-bottom: 15px;
+      }
+
+      .form-buttons {
+          display: flex;
+          justify-content: flex-end;
+          gap: 10px;
+      }
+  }
+}

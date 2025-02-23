@@ -14,8 +14,9 @@ export class CoursesService {
   private baseUrlb = 'http://localhost:8087/cours/courses/delete';
   private baseUrls = 'http://localhost:8087/cours/courses/statistics';
   private baseUrlm = 'http://localhost:8087/cours/courses/update-cours/';
+  private baseUrln = 'http://localhost:8087/cours/reviews/courses';
 
-
+  
 
 
 
@@ -120,10 +121,11 @@ export class CoursesService {
 
 
   addReview(idCourse: number, rating: number): Observable<any> {
-    return this.http.post(`http://localhost:8087/cours/reviews/courses/${idCourse}/rating`, {
+    return this.http.post(`http://localhost:8087/cours/reviews/courses/${idCourse}`, {
       rating: rating,
       
     });
+    
     
 
 }
@@ -139,6 +141,24 @@ updateCourseStatus(idCourse: number, newStatus: boolean): Observable<any> {
   return this.http.put(`${this.baseUrl}/${idCourse}/status`, newStatus); // ✅ Envoi de newStatus directement dans le corps JSON
   // ou, si votre backend attend une structure JSON spécifique pour le statut :
   // return this.http.put(`${this.apiUrl}/${idCourse}/status`, { status: newStatus }); // Envoi de { status: newStatus } dans le corps JSON
+}
+
+getAverageRating(idCourse: number): Observable<number> {
+      return this.http.get<number>(`${this.baseUrln}/courses/${idCourse}/average`);
+    }
+
+
+
+  addCourseWithoutAttachment(courseData: FormData): Observable<any> { // Pour la création du cours SANS pièces jointes
+    return this.http.post(`${this.baseUrl}/addcours`, courseData);
+}
+
+addAttachmentToCourse(idCourse: number, attachmentData: FormData): Observable<any> { // Pour ajouter les pièces jointes APRES
+    return this.http.post(`http://localhost:8087/cours/attachements/${idCourse}/add`, attachmentData); // Endpoint pour les pièces jointes
+}
+
+addCourse(courseData: FormData): Observable<Course> {
+  return this.http.post<Course>(`${this.baseUrl}/addcours`, courseData);
 }
 
 }

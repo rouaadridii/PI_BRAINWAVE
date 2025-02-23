@@ -428,3 +428,50 @@
       padding: 0.4rem 0.8rem; /* Réduire le padding sur petits écrans */
     }
   }
+
+  /* ... (existing styles) ... */
+
+.search-bar {
+  position: relative; /* Important pour positionner les suggestions */
+  margin-bottom: 15px;
+}
+
+.search-bar input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.suggestions-list {
+  position: absolute; /* Positionner sous le champ de recherche */
+  top: 100%; /* Juste en dessous du champ */
+  left: 0;
+  right: 0;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-top: none; /* Pas de bordure supérieure car elle est déjà sur le champ */
+  border-bottom-left-radius: 4px;
+  border-bottom-right-radius: 4px;
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  z-index: 10; /* S'assurer que la liste est au-dessus des autres éléments */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Ombre légère */
+}
+
+.suggestions-list li {
+  padding: 10px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.suggestions-list li:hover,
+.suggestions-list li.highlighted {
+  background-color: #f0f0f0; /* Couleur de fond au survol ou quand mis en évidence */
+}
+
+.suggestions-list li:not(:last-child) {
+  border-bottom: 1px solid #eee; /* Séparateur entre les suggestions */
+}

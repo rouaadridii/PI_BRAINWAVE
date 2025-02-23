@@ -9,5 +9,6 @@ export interface Course {
     price: number;
     liked: boolean;
     categorie: string;
+    averageRating:number;
   }
   
