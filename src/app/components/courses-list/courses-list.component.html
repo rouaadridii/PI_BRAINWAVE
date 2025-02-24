@@ -64,6 +64,7 @@
         *ngIf="courses.length > 0; else noCourses"
         class="row row-cols-1 row-cols-md-3 g-4"
       >
+      
         <div
           *ngFor="let course of sortedCourses(); let i = index"
           class="col"
@@ -149,7 +150,7 @@
                 </div>
                 <div class="action-buttons">
                   <a
-                    [routerLink]="['/course-detail', course.idCourse]"
+                    [routerLink]="['/detail-cours', course.idCourse]"
                     class="btn btn-sm btn-outline-primary"
                     >Voir Détails</a
                   >

@@ -1,0 +1,33 @@
+<div class="course-attachments-page-container">
+    <h1>Ressources du Cours</h1>
+  
+    <div class="attachment-component">
+      <h2 class="attachment-component-title">Ressources du Cours</h2>
+      <ul class="attachment-list" *ngIf="attachments.length > 0; else noAttachments">
+        <li *ngFor="let attachment of attachments" class="attachment-item">
+          <h3 class="chapter-title">{{ attachment.chapterTitle }}</h3>
+  
+          <div *ngIf="attachment.pdf" class="attachment-pdf">
+            <h4>Fichier PDF:</h4>
+            <iframe [src]="getPdfUrl(attachment.pdf)" width="100%" height="500px"></iframe>
+            </div>
+  
+          <div *ngIf="attachment.picture" class="attachment-picture">
+            <h4>Image:</h4>
+            <img [src]="getImageUrl(attachment.picture)" alt="Image du chapitre">
+          </div>
+  
+          <div *ngIf="attachment.video" class="attachment-video">
+            <h4>Vidéo:</h4>
+            <div class="video-container">
+              <iframe [src]="attachment.video" frameborder="0" allowfullscreen></iframe>
+               </div>
+          </div>
+        </li>
+      </ul>
+      <ng-template #noAttachments>
+        <p>Aucune ressource ajoutée pour ce cours.</p>
+      </ng-template>
+    </div>
+  
+  </div>

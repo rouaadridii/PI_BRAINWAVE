@@ -15,6 +15,7 @@ export class CoursesService {
   private baseUrls = 'http://localhost:8087/cours/courses/statistics';
   private baseUrlm = 'http://localhost:8087/cours/courses/update-cours/';
   private baseUrln = 'http://localhost:8087/cours/reviews/courses';
+  private apiUrl = 'http://localhost:8087/cours/attachements';
 
   
 
@@ -159,6 +160,9 @@ addAttachmentToCourse(idCourse: number, attachmentData: FormData): Observable<an
 
 addCourse(courseData: FormData): Observable<Course> {
   return this.http.post<Course>(`${this.baseUrl}/addcours`, courseData);
+}
+getAttachmentsByCourseId(idCourse: number): Observable<any[]> {
+  return this.http.get<any[]>(`${this.apiUrl}/${idCourse}`);
 }
 
 }

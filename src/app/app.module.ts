@@ -20,6 +20,7 @@ import { AddDetailsCourseComponent } from './components/add-details-course/add-d
 import { DashboardStatisticsComponent } from './components/dashboard-statistics/dashboard-statistics.component';
 import { UpdateCourseComponent } from './components/update-course/update-course.component';
 import { CoursesStudentsComponent } from './components/courses-students/courses-students.component';
+import { AttachmentComponent } from './components/attachment/attachment.component';
 
 
 
@@ -39,7 +40,8 @@ import { CoursesStudentsComponent } from './components/courses-students/courses-
     AddDetailsCourseComponent,
     DashboardStatisticsComponent,
     UpdateCourseComponent,
-    CoursesStudentsComponent
+    CoursesStudentsComponent,
+    AttachmentComponent,
    
   ],
   imports: [

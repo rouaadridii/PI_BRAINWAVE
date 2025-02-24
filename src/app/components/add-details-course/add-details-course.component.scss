@@ -1,0 +1,189 @@
+.detail-course-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Assure que le conteneur prend au moins toute la hauteur de l'écran */
+    background-color: #f8f9fa; /* Fond gris très clair */
+    font-family: 'Arial', sans-serif; /* Police moderne et lisible */
+
+    .detail-course-content {
+        flex-grow: 1; /* Permet au contenu de s'étendre et de pousser le footer vers le bas */
+        padding: 2rem;
+        margin-top: 60px; /* Espace pour le header fixe */
+        margin-bottom: 40px; /* Espace au-dessus du footer */
+        max-width: 960px; /* Largeur maximale pour un meilleur confort de lecture */
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .course-info {
+        background-color: white;
+        padding: 2rem;
+        border-radius: 10px;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.05); /* Ombre légère pour relever la section */
+        margin-bottom: 2rem;
+
+        .course-header {
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #eee; /* Ligne de séparation subtile */
+            padding-bottom: 1rem;
+
+            .course-title {
+                font-size: 2.5rem;
+                color: #343a40; /* Gris foncé pour le titre */
+                margin: 0;
+            }
+
+            .course-badges {
+                display: flex;
+                gap: 0.5rem; /* Espacement entre les badges */
+            }
+        }
+
+        .course-badges .badge {
+            padding: 0.5rem 0.8rem;
+            border-radius: 0.3rem;
+            font-weight: 500;
+            &.course-category {
+                background-color: #007bff; /* Bleu Bootstrap pour la catégorie */
+                color: white;
+            }
+            &.status-published {
+                background-color: #28a745; /* Vert Bootstrap pour publié */
+                color: white;
+            }
+            &.status-draft {
+                background-color: #ffc107; /* Jaune Bootstrap pour brouillon */
+                color: #212529; /* Texte sombre pour le contraste sur jaune */
+            }
+        }
+
+
+        .course-media {
+            margin-bottom: 1.5rem;
+            border-radius: 8px;
+            overflow: hidden; /* Pour que l'image respecte le border-radius */
+            box-shadow: 0 0.2rem 0.5rem rgba(0, 0, 0, 0.1); /* Ombre légère sur l'image */
+
+            .course-image {
+                display: block; /* Important pour éviter l'espace sous l'image */
+                width: 100%;
+                height: auto;
+                object-fit: cover; /* Pour que l'image remplisse l'espace */
+                object-position: center;
+            }
+        }
+
+        .course-details-info {
+            p {
+                margin-bottom: 0.75rem;
+                color: #495057; /* Gris moyen pour le texte principal */
+                i {
+                    margin-right: 0.5rem;
+                    color: #007bff; /* Icônes bleues */
+                }
+                strong {
+                    font-weight: 600; /* Gras plus marqué pour les labels */
+                    color: #343a40;
+                }
+            }
+        }
+    }
+
+    .attachment-section {
+        background-color: white;
+        padding: 2rem;
+        border-radius: 10px;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.05);
+
+        h2 {
+            font-size: 2rem;
+            color: #343a40;
+            margin-bottom: 1.5rem;
+        }
+
+        .attachment-form {
+            .form-group {
+                margin-bottom: 1.5rem;
+
+                .form-label {
+                    display: block;
+                    margin-bottom: 0.5rem;
+                    font-weight: 500;
+                    color: #343a40;
+                    &.required::after {
+                        content: " *";
+                        color: red;
+                    }
+                }
+
+                .form-control, .form-control-file {
+                    padding: 0.75rem;
+                    border: 1px solid #ced4da;
+                    border-radius: 0.3rem;
+                    width: 100%;
+                    font-size: 1rem;
+                    &:focus {
+                        outline: none;
+                        border-color: #007bff;
+                        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+                    }
+                }
+                .form-control-file {
+                    padding-top: 0.5rem; /* Ajuste le padding vertical pour les inputs de fichier */
+                    padding-bottom: 0.5rem;
+                }
+
+                .form-text {
+                    font-size: 0.875rem;
+                    color: #6c757d; /* Couleur de texte muted */
+                }
+            }
+
+            .form-actions {
+                display: flex;
+                gap: 1rem;
+                align-items: center;
+
+                .btn-primary {
+                    background-color: #007bff;
+                    border-color: #007bff;
+                    &:hover, &:focus {
+                        background-color: #0056b3;
+                        border-color: #0056b3;
+                        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.5);
+                    }
+                }
+
+                .btn-secondary {
+                    color: #fff;
+                    background-color: #6c757d;
+                    border-color: #6c757d;
+                    &:hover, &:focus {
+                        background-color: #545b62;
+                        border-color: #4e555b;
+                        box-shadow: 0 0 0 0.2rem rgba(108, 117, 125, 0.5);
+                    }
+                }
+
+                .form-alert {
+                    margin-left: 1rem;
+                    padding: 0.75rem 1.25rem;
+                    border-radius: 0.3rem;
+                    &.success {
+                        background-color: #d4edda;
+                        color: #155724;
+                        border-color: #c3e6cb;
+                    }
+                    &.error {
+                        background-color: #f8d7da;
+                        color: #721c24;
+                        border-color: #f5c6cb;
+                    }
+                }
+            }
+        }
+    }
+}

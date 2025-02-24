@@ -157,11 +157,7 @@
                 </div>
   
                 <div class="action-buttons">
-                  <a
-                    [routerLink]="['/course-detail', course.idCourse]"
-                    class="btn btn-sm btn-outline-primary"
-                    >Voir Détails</a
-                  >
+                  <a [routerLink]="['/course-attachments', course.idCourse]" class="btn btn-sm btn-outline-primary">Voir Details</a>
                   <button class="btn btn-sm btn-outline-info" (click)="openReviewForm(course.idCourse)">
                     Review
                   </button>
