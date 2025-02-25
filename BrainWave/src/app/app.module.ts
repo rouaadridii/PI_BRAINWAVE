@@ -11,6 +11,10 @@ import { FrontHeaderComponent } from './components/front-header/front-header.com
 import { FrontFooterComponent } from './components/front-footer/front-footer.component';
 import { BackHeaderComponent } from './components/back-header/back-header.component';
 import { BackMenuAdminComponent } from './components/back-menu-admin/back-menu-admin.component';
+import { AjouterReclamationComponent } from './components/ajouter-reclamation/ajouter-reclamation.component';
+import { ListeReclamationsComponent } from './components/liste-reclamation/liste-reclamation.component';
+import { AdminReclamationComponent } from './components/admin-reclamation/admin-reclamation.component';
+import { ListTeacherComponent } from './components/list-teacher/list-teacher.component';
 
 @NgModule({
   declarations: [
@@ -20,7 +24,11 @@ import { BackMenuAdminComponent } from './components/back-menu-admin/back-menu-a
     FrontHeaderComponent,
     FrontFooterComponent,
     BackHeaderComponent,
-    BackMenuAdminComponent
+    BackMenuAdminComponent,
+    AjouterReclamationComponent,
+    ListeReclamationsComponent,
+    AdminReclamationComponent,
+    ListTeacherComponent
   ],
   imports: [
     FormsModule,
