@@ -1,0 +1,141 @@
+<section class="meetings-page" id="meetings">
+  <div class="container">
+    <!-- Loading Spinner -->
+    <div *ngIf="loading" class="text-center my-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+
+    <!-- Error Message -->
+    <div *ngIf="error" class="alert alert-danger">
+      {{ error }}
+    </div>
+
+    <!-- Article Details -->
+    <div class="row" *ngIf="article">
+      <div class="col-lg-12">
+        <div class="meeting-single-item">
+          <!-- Article Header -->
+          <div class="thumb">
+            <div class="price">
+              <span class="badge" [ngClass]="{
+                'bg-primary': article.categorie === 'NEWS',
+                'bg-success': article.categorie === 'SUCCESS_STORY',
+                'bg-info': article.categorie === 'BLOG'
+              }">{{ article.categorie }}</span>
+            </div>
+            <img [src]="article.picture || 'assets/images/default-article.jpg'" 
+                 [alt]="article.title" 
+                 class="img-fluid">
+          </div>
+
+          <div class="down-content">
+            <!-- Article Title and Meta -->
+            <div class="title-section mb-4">
+              <h2 class="translate">{{ article.title }}</h2>
+              <div class="meta-info">
+                <span class="date">
+                  <i class="fa fa-calendar me-2"></i>
+                  {{ article.date | date }}
+                </span>
+                <span class="views ms-3">
+                  <i class="fa fa-eye me-2"></i>
+                  {{ article.views || 0 }} views
+                </span>
+                <span class="shares ms-3">
+                  <i class="fa fa-share me-2"></i>
+                  {{ article.numberShares || 0 }} shares
+                </span>
+              </div>
+            </div>
+
+            <!-- Resources Section -->
+            <div class="resources-section mt-4" *ngIf="article.ressources && article.ressources.length > 0">
+              <h3 class="mb-4">Resources</h3>
+              <div class="row">
+                <div class="col-md-6 mb-4" *ngFor="let resource of article.ressources">
+                  <div class="resource-card card h-100">
+                    <!-- Resource Image -->
+                    <img *ngIf="resource.picture" 
+                         [src]="resource.picture" 
+                         class="card-img-top resource-image" 
+                         [alt]="resource.description">
+                    
+                    <div class="card-body">
+                      <!-- Resource Description -->
+                      <h5 class="card-title" *ngIf="resource.description">
+                        {{ resource.description }}
+                      </h5>
+                      
+                      <!-- Resource Links -->
+                      <div class="resource-links mt-3">
+                        <a *ngIf="resource.video" 
+                           [href]="resource.video" 
+                           target="_blank" 
+                           class="btn btn-outline-primary me-2">
+                          <i class="fa fa-video-camera"></i> Watch Video
+                        </a>
+                        
+                        <a *ngIf="resource.pdf" 
+                           [href]="resource.pdf" 
+                           target="_blank" 
+                           class="btn btn-outline-danger">
+                          <i class="fa fa-file-pdf-o"></i> View PDF
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons mt-4">
+              <button class="btn btn-primary me-2" 
+                      [routerLink]="['/articles/edit', article.id]">
+                <i class="fa fa-edit"></i> Edit Article
+              </button>
+              
+              <button class="btn btn-danger me-2" 
+                      (click)="deleteArticle(article.id)">
+                <i class="fa fa-trash"></i> Delete
+              </button>
+              
+              <button class="btn btn-secondary" 
+                      (click)="goBack()">
+                <i class="fa fa-arrow-left"></i> Back to Articles
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .resource-image {
+    height: 200px;
+    object-fit: cover;
+  }
+
+  .meta-info {
+    color: #666;
+    font-size: 0.9rem;
+  }
+
+  .resource-card {
+    transition: transform 0.2s;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+
+  .resource-card:hover {
+    transform: translateY(-5px);
+  }
+
+  .action-buttons {
+    border-top: 1px solid #eee;
+    padding-top: 20px;
+  }
+</style> 

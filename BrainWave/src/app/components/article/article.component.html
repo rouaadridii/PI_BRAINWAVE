@@ -1,0 +1,166 @@
+<section class="meetings-page" id="meetings">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="section-heading">
+          <h2 class="translate">All Articles</h2>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12">
+        <!-- Search and filter section with improved design -->
+        <div class="card mb-4 shadow-sm">
+          <div class="card-body">
+            <div class="row align-items-center">
+              <div class="col-md-6 mb-3 mb-md-0">
+                <div class="input-group">
+                  <span class="input-group-text bg-primary text-white">
+                    <i class="fa fa-search"></i>
+                  </span>
+                  <input
+                    type="text"
+                    class="form-control"
+                    [attr.placeholder]="searchPlaceholder"
+                    [(ngModel)]="searchText"
+                    (input)="filterArticles()"
+                  />
+                </div>
+              </div>
+              
+              <div class="col-md-6">
+                <div class="input-group">
+                  <span class="input-group-text bg-primary text-white">
+                    <i class="fa fa-filter"></i>
+                  </span>
+                  <select 
+                    class="form-select"
+                    [(ngModel)]="selectedCategorie" 
+                    (change)="onCategorieChange(selectedCategorie)">
+                    <option value="ALL" class="translate">All Categories</option>
+                    <option value="NEWS" class="translate">News</option>
+                    <option value="SUCCESS_STORY" class="translate">Success Stories</option>
+                    <option value="BLOG" class="translate">Blog Posts</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Add language switcher -->
+        <div class="card mb-4 shadow-sm">
+          <div class="card-body">
+            <div class="d-flex justify-content-end">
+              <div class="btn-group">
+                <button 
+                  class="btn btn-outline-primary" 
+                  [class.active]="sourceLang === 'en'" 
+                  (click)="onLanguageChange('en', sourceLang !== 'fr' ? 'fr' : 'ar')">
+                  EN
+                </button>
+                <button 
+                  class="btn btn-outline-primary" 
+                  [class.active]="sourceLang === 'fr'" 
+                  (click)="onLanguageChange('fr', sourceLang !== 'en' ? 'en' : 'ar')">
+                  FR
+                </button>
+                <button 
+                  class="btn btn-outline-primary" 
+                  [class.active]="sourceLang === 'ar'" 
+                  (click)="onLanguageChange('ar', sourceLang !== 'fr' ? 'fr' : 'en')" 
+                  dir="rtl">
+                  عربي
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        
+        <div class="row">
+          <!-- Loading indicator with improved design -->
+          <div *ngIf="loading" class="col-12 text-center p-5">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </div>
+
+          <!-- Error message with improved design -->
+          <div *ngIf="error" class="col-12 mb-4">
+            <div class="alert alert-danger d-flex align-items-center">
+              <i class="fa fa-exclamation-circle me-2"></i>
+              {{ error }}
+            </div>
+          </div>
+
+          <!-- Add Article Button with improved design -->
+          <div class="col-12 mb-4">
+            <button class="btn btn-primary gradient-button" routerLink="/articles/add">
+              <span class="translate">Add New Article</span>
+            </button>
+          </div>
+
+          <!-- Articles Grid with improved design -->
+          <div class="col-lg-4 col-md-6 mb-4" *ngFor="let article of filteredArticles">
+            <div class="meeting-item h-100 shadow-sm" [routerLink]="['/articles', article.id]">
+              <div class="thumb position-relative">
+                <div class="price">
+                  <span class="badge translate" [ngClass]="{
+                    'bg-primary': article.categorie === 'NEWS',
+                    'bg-success': article.categorie === 'SUCCESS_STORY',
+                    'bg-info': article.categorie === 'BLOG'
+                  }">{{ article.categorie }}</span>
+                </div>
+                <img [src]="article.picture || 'assets/images/default-article.jpg'" 
+                     [alt]="article.title"
+                     class="img-fluid">
+              </div>
+              <div class="down-content p-4">
+                <h4 class="mb-3 translate">{{ article.title }}</h4>
+                <div class="date mb-3">
+                  <h6 class="text-muted">
+                    <i class="fa fa-calendar me-2"></i>
+                    {{ article.date | date }}
+                  </h6>
+                </div>
+                <div class="info mb-3">
+                  <div class="row text-muted">
+                    <div class="col-6">
+                      <i class="fa fa-eye me-2"></i>{{ article.views || 0 }}
+                    </div>
+                    <div class="col-6">
+                      <i class="fa fa-share me-2"></i>{{ article.numberShares || 0 }}
+                    </div>
+                  </div>
+                </div>
+                <div class="button-group d-flex gap-2">
+                  <button class="btn btn-outline-primary btn-sm flex-grow-1" 
+                          [routerLink]="['/articles/edit', article.id]">
+                    <i class="fa fa-edit me-1"></i> <span class="translate">Edit</span>
+                  </button>
+                  <button class="btn btn-outline-danger btn-sm flex-grow-1" 
+                          (click)="$event.stopPropagation(); deleteArticle(article.id)">
+                    <i class="fa fa-trash me-1"></i> <span class="translate">Delete</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- No results message with improved design -->
+          <div *ngIf="filteredArticles.length === 0 && !loading" 
+               class="col-12 text-center p-5">
+            <div class="alert alert-info">
+              <i class="fa fa-info-circle me-2"></i>
+              <span class="translate">No articles found matching your criteria</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

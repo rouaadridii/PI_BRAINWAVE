@@ -1,0 +1,116 @@
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { ArticleServiceService } from '../../article-service.service';
+import { Article } from '../../models/article';
+import { Ressource } from '../../models/ressource';
+
+@Component({
+  selector: 'app-edit-article',
+  templateUrl: './edit-article.component.html',
+  styleUrls: ['./edit-article.component.scss']
+})
+export class EditArticleComponent implements OnInit {
+  article: Article = {
+    title: '',
+    date: new Date().toISOString().split('T')[0],
+    categorie: 'NEWS',
+    status: true,
+    views: 0,
+    numberShares: 0,
+    ressources: [],
+    user: { id: 1 }
+  };
+
+  newResource: Ressource = {
+    description: '',
+    video: '',
+    pdf: '',
+    picture: ''
+  };
+
+  loading = false;
+  error: string | null = null;
+
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private articleService: ArticleServiceService
+  ) { }
+
+  ngOnInit(): void {
+    this.loading = true;
+    const id = this.route.snapshot.paramMap.get('id');
+    
+    if (id) {
+      this.articleService.getArticleById(Number(id)).subscribe({
+        next: (article) => {
+          console.log('Loaded article:', article);
+          // Ensure we have the complete article with resources
+          this.article = {
+            ...article,
+            ressources: article.ressources || []
+          };
+          this.loading = false;
+        },
+        error: (error) => {
+          console.error('Error loading article:', error);
+          this.error = 'Error loading article details';
+          this.loading = false;
+        }
+      });
+    }
+  }
+
+  addResource(): void {
+    if (!this.article.ressources) {
+      this.article.ressources = [];
+    }
+    this.article.ressources.push({...this.newResource});
+    this.newResource = {
+      description: '',
+      video: '',
+      pdf: '',
+      picture: ''
+    };
+  }
+
+  removeResource(index: number): void {
+    if (this.article.ressources) {
+      this.article.ressources.splice(index, 1);
+    }
+  }
+
+  onSubmit(): void {
+    if (this.article.id) {
+      // Ensure resources are properly included
+      const articleToUpdate = {
+        ...this.article,
+        ressources: this.article.ressources || []
+      };
+
+      console.log('Submitting update for article:', articleToUpdate);
+      
+      this.articleService.updateArticle(this.article.id, articleToUpdate).subscribe({
+        next: (response) => {
+          console.log('Article updated successfully:', response);
+          this.router.navigate(['/articles']);
+        },
+        error: (error) => {
+          console.error('Error details:', error);
+          if (error.status === 200 || error.status === 204) {
+            console.log('Update successful (no content)');
+            this.router.navigate(['/articles']);
+          } else {
+            this.error = `Error updating article: ${error.message || 'Unknown error'}`;
+          }
+        }
+      });
+    } else {
+      this.error = 'Cannot update article: No ID provided';
+    }
+  }
+
+  cancel(): void {
+    this.router.navigate(['/articles']);
+  }
+} 
