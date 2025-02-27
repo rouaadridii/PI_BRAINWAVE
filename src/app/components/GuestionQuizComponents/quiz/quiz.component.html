@@ -1,0 +1,127 @@
+<body>
+  <!-- ***** Header Area Start ***** -->
+  <app-front-header></app-front-header>
+  <!-- ***** Header Area End ***** -->
+
+  <div class="page-content">
+    <br><br><br>
+
+    <head>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+      <style>
+        body {
+          display: flex;
+          flex-direction: column;
+          min-height: 100vh;
+          margin: 0;
+          background-image: url('/assets/background_take_quiz.png');
+          background-size: cover;
+          background-position: center;
+          background-repeat: no-repeat;
+          background-attachment: fixed;
+        }
+
+        .page-content {
+          flex: 1; /* Permet au contenu de prendre tout l'espace disponible */
+        }
+
+        .actions-column {
+          width: 271px;
+          text-align: center;
+        }
+
+        .btn {
+          padding: 6px 16px;
+        }
+
+        th {
+          background-color: #007bff !important;
+          color: white !important;
+          padding: 10px !important;
+          text-align: center !important;
+        }
+
+        tbody tr {
+          background-color: rgba(255, 255, 255, 0.866) !important;
+        }
+
+        table {
+          border-radius: 10px !important;
+          overflow: hidden;
+        }
+
+        .container table {
+          border: 3px solid #007bff !important;
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
+        }
+
+        table,
+        th,
+        td {
+          border: 1px solid #000000 !important;
+        }
+
+        h2 {
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          font-size: 2.5rem;
+          color: #333;
+          text-align: center;
+          padding: 4px 0;
+          background: linear-gradient(to right, #56CCF2, #2F80ED);
+          color: white;
+          border-radius: 10px;
+          text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+        }
+      </style>
+    </head>
+
+    <div class="container">
+      <h2>Quizs List</h2> <br>
+
+      <div class="mb-3 input-group">
+        <input type="text" class="form-control" placeholder="Rechercher un quiz..." [(ngModel)]="searchTerm"
+          (input)="filterQuizzes()" />
+        <span class="input-group-text">
+          <i class="fas fa-search"></i>
+        </span>
+      </div>
+
+      <button class="btn btn-success" [routerLink]="['/add-quiz']">Add a Quiz <i class="fas fa-plus"></i></button>
+
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Duration</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th class="actions-column">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let quiz of filteredQuizzes">
+            <td>{{ quiz.titleQuiz }}</td>
+            <td>{{ quiz.duration }}</td>
+            <td>{{ quiz.startDate | date:'dd/MM/yyyy HH:mm' }}</td>
+            <td>{{ quiz.endDate | date:'dd/MM/yyyy HH:mm' }}</td>
+            <td class="actions-column">
+              <button class="btn btn-warning" [routerLink]="['/update-quiz', quiz.idQuiz]">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button (click)="deleteQuiz(quiz.idQuiz)" class="btn btn-danger">
+                <i class="fas fa-trash"></i>
+              </button>
+              <button class="btn btn-primary" [routerLink]="['/questions', quiz.idQuiz]">View Questions</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <br><br><br>
+  </div>
+
+  <!-- ***** Footer Area Start ***** -->
+  <app-front-footer></app-front-footer>
+  <!-- ***** Footer Area End ***** -->
+
+  </body>

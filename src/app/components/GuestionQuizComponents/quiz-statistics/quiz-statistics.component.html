@@ -1,0 +1,125 @@
+      <!-- Back Menu Admin Start -->
+       <app-back-menu-admin></app-back-menu-admin>
+      <!-- Back Menu Admin End -->
+      
+      
+        <!-- navbar Start -->
+         <app-back-header></app-back-header>
+        <!-- navbar End -->
+
+        
+<div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Titre du Quiz</th>
+          <th>Pourcentage de Succès</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let quiz of quizStatistics">
+          <td>{{ quiz.title }}</td>
+          <td>
+            <div class="chart-container">
+              <canvas baseChart
+                      [data]="quiz.pieChartData"
+                      [labels]="quiz.pieChartData.labels"
+                      [type]="pieChartType">
+              </canvas>
+              <div class="percentage-labels">
+                <span class="success-label">{{ quiz.successRate | number:'1.0-2' }}% <span class="label-title">Succès</span></span>
+                <span class="failure-label">{{ quiz.failureRate | number:'1.0-2' }}% <span class="label-title">Échec</span></span>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+</div>
+  
+<style>
+.table-container {
+  max-width: 70%;
+  overflow-x: auto;
+  margin: 20px auto;
+  padding: 10px;
+  margin-top: -550px;
+  margin-right: 118px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 15px; /* Coins arrondis */
+  border: 3px solid black; /* Bordure unique */
+  overflow: hidden; /* Pour s'assurer que le contenu respecte les coins arrondis */
+}
+
+th, td {
+  padding: 16px;
+  text-align: center;
+  font-family: 'Roboto', sans-serif;
+  font-size: 16px;
+  color: #333;
+  border: 2px solid rgb(114, 114, 114); /* Bordures internes */
+}
+
+th {
+  background-color: #007BFF;
+  color: white;
+  font-weight: bold;
+}
+
+tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+tr:hover {
+  background-color: #f1f1f1;
+  cursor: pointer;
+}
+
+.chart-container {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  margin: 0 auto;
+}
+
+.percentage-labels {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  top: 50%;
+  left: 130%;
+  transform: translateY(-50%);
+  text-align: left;
+  font-family: 'Arial', sans-serif;
+}
+
+.success-label, .failure-label {
+  font-weight: bold;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+}
+
+.success-label {
+  color: green;
+}
+
+.failure-label {
+  color: red;
+  margin-top: 5px;
+}
+
+.label-title {
+  margin-left: 5px;
+  font-size: 12px;
+}
+
+</style>
