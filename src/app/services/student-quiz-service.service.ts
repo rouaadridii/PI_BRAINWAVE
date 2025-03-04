@@ -36,6 +36,18 @@ export class StudentQuizService {
     return this.http.post(this.apiUrl + '/create-checkout-session', null, { params, responseType: 'text' });
   }
 
+  updatePaymentStatus(studentCin: number, quizId: number): Observable<string> {
+    const params = new HttpParams()
+      .set('studentCin', studentCin.toString())
+      .set('quizId', quizId.toString());
+
+    return this.http.put(this.apiUrl + '/update-payment-status', null, { params, responseType: 'text' });
+  }
+
+
+
+
+
   // Création d'un paiement PayPal
   createPayPalPayment(amount: number): Observable<string> {
     return this.http.post<string>(`${this.apiUrl}/pay?amount=${amount}`, {}, { responseType: 'text' as 'json' });

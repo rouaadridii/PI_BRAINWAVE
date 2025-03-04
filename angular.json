@@ -17,6 +17,14 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
+            "allowedCommonJsDependencies": [
+      "core-js/modules/es.string.split.js",
+      "core-js/modules/es.string.starts-with.js",
+      "core-js/modules/es.string.trim.js",
+      "core-js/modules/web.dom-collections.iterator.js",
+      "raf",
+      "rgbcolor"
+    ],
             "outputPath": "dist/quiz-front",
             "index": "src/index.html",
             "main": "src/main.ts",

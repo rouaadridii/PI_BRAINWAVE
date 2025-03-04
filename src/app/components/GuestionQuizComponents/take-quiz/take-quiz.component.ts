@@ -51,6 +51,7 @@ export class TakeQuizComponent implements OnInit {
     this.loadStudentInfo();
     this.route.queryParams.subscribe(params => {
       if (params['paymentSuccess'] === 'true') {
+        this.updatePaymentStatus(this.id);
         this.paymentSuccess = true;
       }});
 
@@ -65,6 +66,23 @@ export class TakeQuizComponent implements OnInit {
 
   goToPayment(): void {
     this.router.navigate(['/payement-stripe'], {queryParams: {quizId : this.quizId}});
+  }
+
+  updatePaymentStatus(studentCin: number) {
+    if (this.quizId === null) {
+      console.error("quizId est null. Impossible de mettre à jour le statut de paiement.");
+      return;
+    }
+    this.studentQuizService.updatePaymentStatus(studentCin, this.quizId).subscribe(
+      (response) => {
+        console.log("Statut de paiement mis à jour avec succès :", response);
+        // Rediriger ou afficher un message de succès
+      },
+      error => {
+        console.error("Erreur lors de la mise à jour du statut de paiement :", error);
+        // Gérer l'erreur
+      }
+    );
   }
 
   loadStudentInfo(): void {
@@ -250,8 +268,8 @@ resetDrop(questionId: number, pairId: number) {
 
   autoSubmitQuiz(): void {
     if (!this.quizStarted || this.questions.length === 0) {
-        console.warn("Le quiz n'a pas encore commencé. Pas de soumission automatique.");
-        return;
+      console.warn("Le quiz n'a pas encore commencé. Pas de soumission automatique.");
+      return;
     }
 
     if (this.isSubmitted) return;
@@ -259,22 +277,27 @@ resetDrop(questionId: number, pairId: number) {
     clearInterval(this.intervalId);
 
     for (let question of this.questions) {
-        if (question.type === 'DRAG_AND_DROP' && question.dragAndDropPairs) {
-            for (const pair of this.dragAndDropPairs[question.idQuestion]) {
-                const key = question.idQuestion + '-' + pair.idDragAndDrop;
-                if (!this.droppedItems[key]) {
-                    this.droppedItems[key] = {
-                        idDragAndDrop: pair.idDragAndDrop,
-                        sourceText: '',
-                        targetText: '',
-                        questionId: pair.questionId
-                    };
-                }
-            }
+      if (question.type === 'DRAG_AND_DROP' && question.dragAndDropPairs) {
+        for (const pair of this.dragAndDropPairs[question.idQuestion]) {
+          const key = question.idQuestion + '-' + pair.idDragAndDrop;
+          if (!this.droppedItems[key]) {
+            this.droppedItems[key] = {
+              idDragAndDrop: pair.idDragAndDrop,
+              sourceText: '',
+              targetText: '',
+              questionId: pair.questionId
+            };
+          }
         }
+      } else if (question.type === 'MULTIPLE_CHOICE') {
+        if (this.selectedResponses[question.idQuestion] === undefined) {
+          // Traiter une question à choix multiple non répondue comme une réponse incorrecte
+          this.selectedResponses[question.idQuestion] = -1; // Ou une autre valeur par défaut pour indiquer l'absence de réponse
+        }
+      }
     }
     this.submitQuiz();
-}
+  }
 
 /*getIncorrectResponse(question: Question): number {
     if (!question.responses || question.responses.length === 0) {
@@ -291,76 +314,86 @@ resetDrop(questionId: number, pairId: number) {
 }*/
 
 submitQuiz(): void {
-  const responsesToSubmit: { questionId: number, response: any, responseType: string }[] = [];
-  let hasResponses = false;
+    const responsesToSubmit: { questionId: number, response: any, responseType: string }[] = [];
+    let hasResponses = false;
+    let allMultipleChoiceAnswered = true; // Ajout d'une variable pour suivre les réponses à choix multiples
 
-  for (const question of this.questions) {
+    for (const question of this.questions) {
       let response: any;
       let responseType: string;
 
       if (question.type === 'DRAG_AND_DROP') {
-          const dragAndDropResponses: { [key: string]: { sourceText: string, targetText: string } } = {};
-          let allPairsFilled = true;
+        const dragAndDropResponses: { [key: string]: { sourceText: string, targetText: string } } = {};
+        let allPairsFilled = true;
 
-          for (const pair of this.dragAndDropPairs[question.idQuestion]) {
-              const droppedPair = this.droppedItems[question.idQuestion + '-' + pair.idDragAndDrop];
-              if (droppedPair) {
-                  dragAndDropResponses[question.idQuestion + '-' + pair.idDragAndDrop] = {
-                      sourceText: droppedPair.sourceText,
-                      targetText: droppedPair.targetText
-                  };
-                  hasResponses = true;
-              } else {
-                  allPairsFilled = false;
-                  break;
-              }
+        for (const pair of this.dragAndDropPairs[question.idQuestion]) {
+          const droppedPair = this.droppedItems[question.idQuestion + '-' + pair.idDragAndDrop];
+          if (droppedPair) {
+            dragAndDropResponses[question.idQuestion + '-' + pair.idDragAndDrop] = {
+              sourceText: droppedPair.sourceText,
+              targetText: droppedPair.targetText
+            };
+            hasResponses = true;
+          } else {
+            allPairsFilled = false;
+            break;
           }
+        }
 
-          if (!allPairsFilled) {
-              alert("Veuillez remplir toutes les paires pour les questions de type Drag and Drop avant de soumettre!");
-              return;
-          }
+        if (!allPairsFilled) {
+          alert("Veuillez remplir toutes les paires pour les questions de type Drag and Drop avant de soumettre!");
+          return;
+        }
 
-          response = dragAndDropResponses;
-          responseType = 'DRAG_AND_DROP';
+        response = dragAndDropResponses;
+        responseType = 'DRAG_AND_DROP';
       } else {
-          response = this.selectedResponses[question.idQuestion];
-          responseType = 'MULTIPLE_CHOICE';
-          if (response !== undefined) {
-              hasResponses = true;
-          }
+        response = this.selectedResponses[question.idQuestion];
+        responseType = 'MULTIPLE_CHOICE';
+
+        if (response === undefined) {
+          allMultipleChoiceAnswered = false; // Marquer une question à choix multiple comme non répondue
+        } else {
+          hasResponses = true;
+        }
       }
 
       if (response === undefined && question.type !== 'DRAG_AND_DROP') {
-          continue; // Passer à la question suivante si aucune réponse n'est sélectionnée pour une question à choix multiple
+        continue; // Passer à la question suivante si aucune réponse n'est sélectionnée pour une question à choix multiple
       }
 
       responsesToSubmit.push({
-          questionId: question.idQuestion,
-          response: response,
-          responseType: responseType,
+        questionId: question.idQuestion,
+        response: response,
+        responseType: responseType,
       });
-  }
+    }
 
-  if (!hasResponses) {
+    // Vérification avant la soumission
+    if (!allMultipleChoiceAnswered) {
+      alert("Vous n'avez pas répondu à toutes les questions à choix multiples!")
+      return;
+    }
+
+    if (!hasResponses) {
       console.warn("Aucune réponse sélectionnée. Pas de soumission.");
       return;
-  }
+    }
 
-  console.log('Réponses envoyées au serveur:', responsesToSubmit);
+    console.log('Réponses envoyées au serveur:', responsesToSubmit);
 
-  if (this.quizId !== null && this.id !== null) {
+    if (this.quizId !== null && this.id !== null) {
       this.studentQuizService.evaluateQuiz(this.quizId, this.id, responsesToSubmit).subscribe(
-          (score) => {
-              this.score = score;
-              this.showQuizQuestions = false;
-          },
-          (error) => {
-              console.error("Erreur lors de l'évaluation du quiz:", error);
-          }
+        (score) => {
+          this.score = score;
+          this.showQuizQuestions = false;
+        },
+        (error) => {
+          console.error("Erreur lors de l'évaluation du quiz:", error);
+        }
       );
+    }
   }
-}
 
   getScoreColor(): string {
     if (this.score !== null) {
