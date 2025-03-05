@@ -11,6 +11,9 @@ import { UserService } from 'src/app/services/user.service';
 export class SignupComponent implements OnInit {
   isToggled = false;
   formSignUp!: FormGroup;
+  verificationCode: string = ''; // Add verification code input
+  message: string = '';
+  isVerified: boolean = false;
 
   constructor(private userService: UserService, private router: Router) { }
 
@@ -108,7 +111,45 @@ export class SignupComponent implements OnInit {
     }
   }
 
+  sendVerificationCode() {
+    const emailValue = this.formSignUp.get('email')?.value;
+    console.log('Email value:', emailValue);
+    console.log("formSignUp:", this.formSignUp)
+
+    if (emailValue) {
+      this.userService.sendVerificationEmail(emailValue).subscribe(
+        (response) => {
+          this.message = response.message;
+        },
+        (error) => {
+          this.message = error.error.message;
+        }
+      );
+    } else {
+      this.message = 'Email is empty.';
+    }
+  }
+
+  verifyCode() {
+    const emailValue = this.formSignUp.get('email')?.value;
+    if (emailValue) {
+      this.userService.verifyEmail(emailValue, this.verificationCode).subscribe(
+        (response) => {
+          this.message = response.message;
+          this.isVerified = true;
+        },
+        (error) => {
+          this.message = error.error.message;
+        }
+      );
+    } else {
+      this.message = "Email is empty.";
+    }
+
+  }
+
   onSubmit() {
+    this.isVerified = false;
     this.formSignUp.markAllAsTouched();
     console.log("Form errors:", this.formSignUp.errors);
     console.log("Form controls:", this.formSignUp.controls);
@@ -149,6 +190,7 @@ export class SignupComponent implements OnInit {
       },
       error: (error) => {
         console.error('Signup failed', error);
+        this.message = error.error.message;
       }
     });
   }

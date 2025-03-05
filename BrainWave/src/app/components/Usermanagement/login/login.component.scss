@@ -126,3 +126,52 @@
         padding: 30px;
     }
 }
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+    width: 300px;
+    max-width: 80%;
+    height: 150px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-top: 5px solid red; /* Add red top border */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add subtle shadow */
+  }
+  
+  .modal-content p {
+    margin-bottom: 15px;
+    font-weight: bold; /* Make text bold */
+    color: #333; /* Darker text color */
+  }
+  
+  .modal-content button {
+    padding: 8px 15px;
+    background-color: #f44336; /* Red background for button */
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .modal-content button:hover {
+    background-color: #d32f2f; /* Darker red on hover */
+  }

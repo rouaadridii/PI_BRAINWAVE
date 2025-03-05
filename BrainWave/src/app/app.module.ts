@@ -15,6 +15,9 @@ import { LoginComponent } from './components/Usermanagement/login/login.componen
 import { SignupComponent } from './components/Usermanagement/signup/signup.component';
 import { ProfileComponent } from './components/Usermanagement/profile/profile.component';
 import { FrontHeaderAuthentificatedComponent } from './components/front-header-authentificated/front-header-authentificated.component';
+import { UsersListComponent } from './components/Usermanagement/users-list/users-list.component';
+import { RecaptchaFormsModule, RecaptchaModule } from 'ng-recaptcha';
+import { ResetPasswordComponent } from './components/Usermanagement/reset-password/reset-password.component';
 
 @NgModule({
   declarations: [
@@ -29,13 +32,17 @@ import { FrontHeaderAuthentificatedComponent } from './components/front-header-a
     SignupComponent,
     ProfileComponent,
     FrontHeaderAuthentificatedComponent,
+    UsersListComponent,
+    ResetPasswordComponent,
   ],
   imports: [
     FormsModule,
     ReactiveFormsModule,
     BrowserModule,
     AppRoutingModule,
-    HttpClientModule
+    HttpClientModule,
+    RecaptchaModule,
+    RecaptchaFormsModule,
   ],
   providers: [],
   bootstrap: [AppComponent]

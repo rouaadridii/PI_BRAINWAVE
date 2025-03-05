@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { UserService } from 'src/app/services/user.service';
 
 @Component({
   selector: 'app-back-header',
@@ -7,4 +8,10 @@ import { Component } from '@angular/core';
 })
 export class BackHeaderComponent {
 
+  constructor(private userService: UserService) {}
+
+  
+  logout() {
+    this.userService.logout();
+  }
 }

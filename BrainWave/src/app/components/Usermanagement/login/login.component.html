@@ -31,16 +31,43 @@
           
       </div>
 
+      <re-captcha siteKey="6LeG2-MqAAAAAM4t_DgHbFuuT7YkbMcF0jGKwkuv" (resolved)="resolved($event)"></re-captcha>
       <button class="btn" type="submit" [disabled]="formLogin.invalid ">Login</button>
   </form>
 
   <div class="text-center mt-3">
-      <a href="#" class="forget">Forgot password?</a>
+      <a href="#" class="forget" (click)="showForgotPasswordForm(); $event.preventDefault();">Forgot password?</a>
+  </div>
+
+  <div *ngIf="isForgotPassword">
+    <h2>Forgot your password ?</h2>
+    <form [formGroup]="forgotPasswordForm" (ngSubmit)="submitForgotPassword()">
+      <div class="form-group">
+        <input type="email" id="email" name="email" placeholder="Enter your email address" formControlName="email"/>
+        <div class="alert alert-danger" *ngIf="forgotPasswordForm.controls['email'].invalid && forgotPasswordForm.controls['email'].touched">
+          <p *ngIf="forgotPasswordForm.controls['email'].hasError('required')">Email is mandatory.</p>
+          <p *ngIf="forgotPasswordForm.controls['email'].hasError('email')">Please enter a valid email address.</p>
+        </div>
+      </div>
+      <button type="submit" [disabled]="forgotPasswordForm.invalid">Submit</button>
+    </form>
   </div>
 
   <!-- "Don't have an account?" and "Create one" button in one line -->
   <div class="account-options">
       <p>Don't have an account?</p>
       <button class="btn-outline" [routerLink]="['/signup']">Create one</button>
+  </div>
+</div>
+<div class="modal" *ngIf="showPendingNotification">
+  <div class="modal-content">
+    <p>Your account is pending approval by the admin.</p>
+    <button (click)="closeNotification()">OK</button>
+  </div>
+</div>
+<div class="modal" *ngIf="showBannedNotification">
+  <div class="modal-content">
+    <p>Your account has been banned. Please contact support.</p>
+    <button (click)="closeNotification()">OK</button>
   </div>
 </div>

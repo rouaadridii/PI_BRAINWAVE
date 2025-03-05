@@ -7,8 +7,9 @@ import { FrontFooterComponent } from './components/front-footer/front-footer.com
 import { LoginComponent } from './components/Usermanagement/login/login.component';
 import { SignupComponent } from './components/Usermanagement/signup/signup.component';
 import { ProfileComponent } from './components/Usermanagement/profile/profile.component';
-import { FrontHeaderAuthentificatedComponent } from './components/front-header-authentificated/front-header-authentificated.component';
 import { AuthGuard } from './auth.guard';
+import { UsersListComponent } from './components/Usermanagement/users-list/users-list.component';
+import { ResetPasswordComponent } from './components/Usermanagement/reset-password/reset-password.component';
 
 const routes: Routes = [
 
@@ -19,6 +20,8 @@ const routes: Routes = [
   {path:'login',component:LoginComponent},
   {path:'signup',component:SignupComponent},
   {path:'profile',component:ProfileComponent, canActivate: [AuthGuard]},
+  {path:'listeusers',component:UsersListComponent, canActivate: [AuthGuard]},
+  { path: 'reset-password/:token', component: ResetPasswordComponent },
   { path: '', redirectTo: '/home', pathMatch: 'full' }
 
 ];

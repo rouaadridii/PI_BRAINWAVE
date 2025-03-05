@@ -7,8 +7,7 @@ import { Component, HostListener, Input } from '@angular/core';
 })
 export class FrontHeaderComponent {
 
-  @Input() isProfilePage: boolean = false;
-  
+  @Input() darkMode: boolean = false;
   @HostListener('window:scroll', [])
   onWindowScroll() {
     const header = document.querySelector('.header-area');

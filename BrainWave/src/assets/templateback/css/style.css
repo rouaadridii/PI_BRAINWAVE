@@ -20627,7 +20627,7 @@ div.tagsinput {
   font-weight: normal;
   padding: 0;
   width: 244px;
-  z-index: 11;
+  z-index: 9;
   transition: width 0.25s ease, background 0.25s ease;
   -webkit-transition: width 0.25s ease, background 0.25s ease;
   -moz-transition: width 0.25s ease, background 0.25s ease;

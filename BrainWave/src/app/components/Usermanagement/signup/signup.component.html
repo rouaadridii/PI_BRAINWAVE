@@ -137,7 +137,16 @@
                                           <p *ngIf="formSignUp.controls['email'].hasError('required')">Email is mandatory</p>
                                           <p *ngIf="formSignUp.controls['email'].hasError('email')">Invalid email format</p>
                                         </div>
+                                        <button type="button" (click)="sendVerificationCode()">Send Verification Code</button>
                                       </div>
+
+                                      <div class="col-md-4">
+                                        <label class="form-label" for="verificationCode">Verification Code</label>
+                                        <input type="text" id="verificationCode" class="form-control form-input" [(ngModel)]="verificationCode" [ngModelOptions]="{standalone: true}" placeholder="Verification Code" />
+                                        <button type="button" (click)="verifyCode()">Verify Code</button>
+                                      </div>
+                    
+                                      <p *ngIf="message">{{ message }}</p>
                                 
                                       <div class="col-md-4">
                                         <label class="form-label" for="password">Password</label>
@@ -158,7 +167,7 @@
                                       </div>
 
                                     <div class="text-center pt-1 mb-4 pb-1">
-                                        <button data-mdb-button-init data-mdb-ripple-init class="btn custom-btn" type="submit">
+                                        <button [disabled]="!isVerified" data-mdb-button-init data-mdb-ripple-init class="btn custom-btn" type="submit">
                                             Sign Up
                                         </button>
                                     </div>
