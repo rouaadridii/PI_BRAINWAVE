@@ -1,0 +1,486 @@
+// Variables
+$primary-color: #007bff;
+$secondary-color: #6c757d;
+$success-color: #28a745;
+$danger-color: #dc3545;
+$warning-color: #ffc107;
+$light-gray: #f8f9fa;
+$dark-gray: #343a40;
+$font-family: 'Arial', sans-serif;
+
+// Réinitialisation globale
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: $font-family;
+}
+
+.course-detail-container {
+    background-image: url('/assets/templatefront/assets/images/meetings-bg.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    padding: 4rem 0;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+
+    .course-card-wrapper {
+        width: 100%;
+        max-width: 1200px;
+        padding: 0;
+
+        .course-card {
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            padding: 2rem;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+
+            @media (max-width: 768px) {
+                padding: 1rem;
+            }
+        }
+    }
+}
+
+.course-image-container {
+    margin-bottom: 1.5rem;
+    text-align: center;
+
+    .course-image {
+        max-width: 100%;
+        max-height: 400px;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+        object-fit: cover;
+    }
+}
+
+.course-info {
+    .course-title {
+        font-size: 2rem;
+        font-weight: bold;
+        margin-bottom: 0.8rem;
+        color: $dark-gray;
+    }
+
+    .course-description {
+        font-size: 1rem;
+        color: $secondary-color;
+        margin-bottom: 1.5rem;
+        line-height: 1.6;
+        text-align: justify;
+    }
+}
+
+.course-details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+
+    .course-details-item {
+        display: flex;
+        align-items: center;
+        padding: 0.8rem;
+        border-radius: 8px;
+        background-color: $light-gray;
+
+        .detail-icon {
+            margin-right: 0.8rem;
+            color: $primary-color;
+            font-size: 1.2rem;
+        }
+
+        .detail-label {
+            font-weight: bold;
+            margin-right: 0.5rem;
+            color: $dark-gray;
+        }
+
+        .status-available {
+            color: $success-color;
+            font-weight: bold;
+        }
+
+        .status-unavailable {
+            color: $danger-color;
+            font-weight: bold;
+        }
+
+        .progress-circle {
+            position: relative;
+            margin: 0 10px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: $light-gray;
+
+            .progress-value {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                font-size: 0.8rem;
+                font-weight: bold;
+                color: $dark-gray;
+            }
+
+            .progress-left,
+            .progress-right {
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                overflow: hidden;
+
+                .progress-bar {
+                    position: absolute;
+                    width: 100%;
+                    height: 100%;
+                    background-color: $light-gray;
+                    border-radius: 50%;
+                    border: 3px solid $primary-color;
+                    border-color: $light-gray;
+                    clip: rect(0, 25px, 50px, 0);
+                }
+            }
+
+            .progress-right {
+                .progress-bar {
+                    clip: rect(0, 50px, 50px, 25px);
+                }
+            }
+
+            .progress-left {
+                .progress-bar {
+                    transform: rotate(180deg);
+                }
+            }
+
+            &[data-value] {
+                .progress-right .progress-bar {
+                    border-top-color: $primary-color;
+                    border-right-color: $primary-color;
+                }
+
+                .progress-left .progress-bar {
+                    border-bottom-color: $primary-color;
+                    border-left-color: $primary-color;
+                }
+
+                @for $i from 0 through 100 {
+                    &[data-value="#{$i}"] {
+                        .progress-right .progress-bar {
+                            transform: rotate(#{($i * 3.6)}deg);
+                        }
+
+                        .progress-left .progress-bar {
+                            transform: rotate(#{180 + (($i - 50) * 3.6)}deg);
+
+                            @if $i <=50 {
+                                display: none;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+.attachments-section {
+    margin-bottom: 2rem;
+
+    .section-title {
+        font-size: 1.8rem;
+        font-weight: bold;
+        margin-bottom: 1rem;
+        color: $dark-gray;
+
+        .lucide {
+            margin-right: 0.5rem;
+            color: $primary-color;
+        }
+    }
+
+    .attachments-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 1rem;
+
+        th,
+        td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid $light-gray;
+        }
+
+        th {
+            background-color: $primary-color;
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background-color: rgba($light-gray, 0.5);
+        }
+    }
+
+    .download-button,
+    .validate-button,
+    .view-button {
+        // Styles communs à tous les boutons
+        padding: 0.6rem 1.2rem; // Augmente le padding pour des boutons plus grands
+        border: none;
+        border-radius: 25px; // Bords plus arrondis
+        cursor: pointer;
+        transition: all 0.3s ease; // Transition plus douce pour toutes les propriétés
+        font-weight: 600; // Texte en gras
+        text-transform: uppercase; // Texte en majuscules
+        letter-spacing: 0.5px; // Espacement léger entre les lettres
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); // Ombre subtile
+
+        &:hover {
+            transform: translateY(-3px); // Effet de soulèvement au survol
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); // Ombre plus prononcée au survol
+        }
+
+        &:focus {
+            // Ajout d'un style focus pour l'accessibilité
+            outline: none;
+            box-shadow: 0 0 0 3px rgba($primary-color, 0.5); // Halo de focus
+        }
+
+    }
+
+    .download-button {
+        background-color: $primary-color;
+        color: white;
+        text-decoration: none;
+
+        &:hover {
+            background-color: darken($primary-color, 10%);
+        }
+    }
+
+    .validate-button {
+        background-color: $success-color;
+        color: white;
+
+        &:hover {
+            background-color: darken($success-color, 10%);
+        }
+    }
+
+    .view-button {
+        // Styles spécifiques au bouton "Consulter"
+        background-color: $secondary-color; // Couleur de base
+        color: white;
+        border: 2px solid $secondary-color; // Bordure de la même couleur
+
+        &:hover {
+            background-color: lighten($secondary-color, 10%); // Légèrement plus clair au survol
+            border-color: lighten($secondary-color, 10%); // Assortir la bordure
+        }
+    }
+
+    // Styles spécifiques au bouton "Fermer"
+    & .close-button {
+        // Ajout d'une classe spécifique pour le bouton Fermer (important!)
+        background-color: $danger-color; // Rouge
+        color: white;
+        border: 2px solid $danger-color; // Bordure rouge
+
+        &:hover {
+            background-color: darken($danger-color, 10%); // Rouge plus foncé au survol
+            border-color: darken($danger-color, 10%); //Assortir la bordure
+        }
+    }
+
+
+
+    .validated-text {
+        color: $success-color;
+        font-weight: bold;
+    }
+
+    .toast-container {
+        position: fixed;
+        top: 1rem;
+        right: 1rem;
+        z-index: 1000;
+
+        .toast-message {
+            background-color: $success-color;
+            color: white;
+            padding: 1rem;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+    }
+
+    .no-attachments-text {
+        color: $secondary-color;
+    }
+
+    .pdf-preview {
+        margin-top: 1rem;
+        border: 1px solid $light-gray;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+}
+
+
+.reviews-list {
+    max-height: 300px; // Définir une hauteur maximale pour le conteneur
+    overflow-y: auto; // Ajouter une barre de défilement verticale si nécessaire
+    border: 1px solid $light-gray; // Ajouter une bordure subtile (optionnel)
+    padding: 1rem;
+}
+
+.review-card {
+    background-color: $light-gray;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+    .star-rating {
+        // Style pour les étoiles dans les avis
+        i {
+            color: #ffc107; // Couleur dorée pour les étoiles
+            font-size: 0.8rem; // Ajuster la taille si nécessaire
+        }
+    }
+}
+
+.delete-review-button {
+    padding: 0.4rem 0.8rem;
+    background-color: $danger-color;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+
+    &:hover {
+        background-color: darken($danger-color, 10%);
+    }
+}
+
+
+.add-review-section {
+    margin-bottom: 2rem;
+
+    .section-title {
+        font-size: 1.8rem;
+        font-weight: bold;
+        margin-bottom: 1rem;
+        color: $dark-gray;
+
+        .lucide {
+            margin-right: 0.5rem;
+            color: $primary-color;
+        }
+    }
+
+    .review-form {
+        .form-group {
+            margin-bottom: 1rem;
+
+            .form-label {
+                display: block;
+                margin-bottom: 0.5rem;
+                font-weight: bold;
+                color: $dark-gray;
+            }
+
+            // Styles pour les étoiles Font Awesome
+            .rating {
+                display: flex;
+                align-items: center;
+
+                i {
+                    margin-right: 2px;
+                    cursor: pointer;
+                    font-size: 1rem;
+                    transition: transform 0.1s ease-in-out;
+
+                    &.fa-star {
+                        color: #ffc107;
+                    }
+
+                    &.fa-star-o {
+                        color: #e4e5e9;
+                    }
+
+                    &:hover {
+                        transform: scale(1.2);
+                    }
+                }
+            }
+
+            .form-control {
+                width: 100%;
+                padding: 0.75rem;
+                font-size: 1rem;
+                border: 1px solid $secondary-color;
+                border-radius: 5px;
+                transition: border-color 0.3s ease;
+
+                &:focus {
+                    border-color: $primary-color;
+                    outline: none;
+                    box-shadow: 0 0 5px rgba($primary-color, 0.5);
+                }
+            }
+        }
+
+        .submit-review-button {
+            padding: 0.6rem 1.2rem;
+            background-color: $success-color;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+
+            &:hover {
+                background-color: darken($success-color, 10%);
+            }
+        }
+    }
+}
+
+.back-button-container {
+    text-align: center;
+    margin-top: 2rem;
+
+    .back-button {
+        padding: 0.6rem 1.2rem;
+        background-color: $primary-color;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        text-decoration: none;
+
+        &:hover {
+            background-color: darken($primary-color, 10%);
+        }
+
+        .lucide {
+            margin-right: 0.5rem;
+        }
+    }
+}

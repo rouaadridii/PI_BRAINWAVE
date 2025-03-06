@@ -9,10 +9,10 @@ import { CoursesListComponent } from './components/courses-list/courses-list.com
 import { AdminCoursesComponent } from './components/admin-courses/admin-courses.component';
 import { DashboardStatisticsComponent } from './components/dashboard-statistics/dashboard-statistics.component';
 import { AddDetailsCourseComponent } from './components/add-details-course/add-details-course.component';
-import { UpdateCourseComponent } from './components/update-course/update-course.component';
-import { CoursesStudentsComponent } from './components/courses-students/courses-students.component';
-import { AttachmentComponent } from './components/attachment/attachment.component';
-import { CourseAttachmentsPageComponent } from './components/course-attachments-page/course-attachments-page.component';
+import { DetailsCourseComponent } from './components/details-course/details-course.component';
+import { FavoritCoursesComponent } from './favorit-courses/favorit-courses.component';
+import { CoursesSoonComponent } from './courses-soon/courses-soon.component';
+import { CoursesTeachersComponent } from './components/courses-teachers/courses-teachers.component';
 
 const routes: Routes = [
 
@@ -20,17 +20,22 @@ const routes: Routes = [
   {path:'dashboard',component:DashboardComponent, children: [
     {path: 'statcours', component: DashboardStatisticsComponent },
     {path: 'coursAdmin', component: AdminCoursesComponent },
+    {path: 'Admindetailcourses/:id', component: AddDetailsCourseComponent },
+    {path:'teachercourses',component:TeacherCoursesComponent},
+    {path: 'coursteacher', component: AdminCoursesComponent },
+
+
   ]},
   {path:'front_header',component:FrontHeaderComponent},
   {path:'front_footer',component:FrontFooterComponent},
-  {path:'teachercourses',component:TeacherCoursesComponent},
-  {path: 'courses-list', component: CoursesListComponent },
-  {path: 'detail-cours/:id', component: AddDetailsCourseComponent },
-  { path: 'modifier-cours/:idCourse', component: UpdateCourseComponent },
-  { path: 'coursesStudent', component: CoursesStudentsComponent },
-  { path: 'attchment/:idCourse', component: AttachmentComponent },
-  { path: 'course-attachments/:id', component: CourseAttachmentsPageComponent } ,
-  
+  {path: 'courses', component: CoursesListComponent },
+  {path: 'adddetailCours', component: AddDetailsCourseComponent },
+  {path: 'details/:id', component: DetailsCourseComponent },
+  {path: 'courses/my-courses', component: FavoritCoursesComponent },
+  {path: 'courses-coming-soon', component: CoursesSoonComponent },
+  {path: 'courses-teachers', component: CoursesTeachersComponent },
+  {path: 'Admindetailcourses/:id', component: AddDetailsCourseComponent },
+
 
 
   

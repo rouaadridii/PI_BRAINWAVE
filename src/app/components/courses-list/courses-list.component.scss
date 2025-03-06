@@ -1,530 +1,504 @@
-/* courses-list.component.scss - CODE MODIFIÉ ET FIXÉ (Option 1: Suppression de max-width) */
-
 :host {
-  /* --- Styles pour le fond de page (inchangés) --- */
   background-image: url('/assets/templatefront/assets/images/meetings-bg.jpg');
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center center;
+  background-attachment: fixed;
   display: block;
   min-height: 100vh;
-  color: white;
+  color: #333;
   margin-bottom: 0;
   padding-bottom: 0;
 }
-/* --- Fin des styles pour la couleur de fond de la page --- */
 
-/* --- Styles pour centrer le conteneur principal (MODIFIÉS - Ajout de margin-bottom) --- */
-.list-cours-container {
-  /* max-width: 1200px; - ou width: 100%; selon votre configuration finale */
+.main-content {
   margin-left: auto;
   margin-right: auto;
   padding: 20px;
+  margin-top: 60px;
+  margin-bottom: 60px;
+  position: relative;
+  z-index: 1;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #040404;
+  margin-top: 0;
   background-image: url('/assets/templatefront/assets/images/meetings-bg.jpg');
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center center;
-  margin-top: 60px;
-  /* --- AJOUT IMPORTANT : Réintroduction de margin-bottom pour séparer du footer --- */
-  margin-bottom: 60px; /* AJOUTER cette ligne - Marge inférieure de 60px (ajustable) */
-  /* padding-bottom: 0; - Vous pouvez laisser cette ligne ou la commenter, cela dépend de votre besoin de padding interne en bas du conteneur */
-  /* Superposition optionnelle (laissez comme c'était) */
-  /* background-color: rgba(0, 0, 0, 0.5); */
-  /* blend-mode: multiply; */
+  background-attachment: fixed;
 }
-/* --- Fin des styles pour le centrage --- */
 
-/* --- Vos styles existants (inchangés) --- */
-.filters-bar {
+// Style des boutons de filtrage
+.filter-buttons {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+  justify-content: center;
   margin-bottom: 20px;
+
+  .btn-filter {
+    background-color: #f8f9fa;
+    border: 1px solid #ddd;
+    color: #333;
+    padding: 0.5rem 1rem;
+    margin: 0 0.5rem;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+
+    &:hover {
+      background-color: #e9ecef;
+      transform: translateY(-2px); // Légère animation au survol
+    }
+
+    &.active {
+      background-color: #007bff;
+      color: white;
+      border-color: #007bff;
+    }
+  }
 }
 
 .search-container {
-  width: 100%;
+  position: relative;
   max-width: 400px;
-  margin-bottom: 10px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0 10px;
+
+  .input-group {
+    border-radius: 25px;
+    overflow: hidden;
+  }
+
+ .suggestions-list {
+    position: absolute;
+    top: 100%;  // Position directly below the input
+    left: 0;
+    right: 0;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-top: none; // Remove top border to connect visually with input
+    border-radius: 0 0 25px 25px;  // Rounded bottom corners
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    z-index: 10;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); // More pronounced shadow
+    max-height: 250px;  // Limit height, add scroll
+    overflow-y: auto;   // Add vertical scrollbar if needed
+    overflow-x: hidden; // Prevent horizontal scrollbar
+
+     li {
+        padding: 10px 15px;
+        cursor: pointer;
+        transition: background-color 0.2s ease, color 0.2s ease; // Smooth transition
+        border-bottom: 1px solid #eee; // Subtle separator
+
+      &:last-child {
+        border-bottom: none; // Remove border from last item
+       }
+
+      &:hover,
+      &.highlighted {
+        background-color: #e9f1ff; // Lighter blue for better contrast
+        color: #0056b3;  // Darker blue for text
+      }
+    }
+}
+
 
   .search-input {
-    border-radius: 20px 0 0 20px; /* Rounded left corners */
-    border-right: none; /* Remove right border to connect with button */
+    border-radius: 25px;
+    padding: 0.75rem 1.25rem;
+    padding-right: 3rem;
+    font-size: 1rem;
+    border: 2px solid #ddd;
+    background-color: white;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    width: 100%;
+     border-top-right-radius: 25px;
+      border-bottom-right-radius: 25px;
+      border-bottom-left-radius: 25px;
+
+
+    &:focus {
+      border-color: #007bff;
+      outline: none;
+      box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+      & + .suggestions-list { //Style when input focus
+        border-color: #007bff;
+      }
+    }
+      & + .suggestions-list {
+        border-top: none; // Remove the top border
+    }
   }
 
-  .mic-btn, .btn-ai {
-    border-radius: 0 20px 20px 0; /* Rounded right corners */
-    border-left: none; /* Remove left border to connect with input */
+
+  .input-group-text {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 4;
+    color: #007bff;
+    border: 2px solid transparent;
+    border-radius: 25px;
+    padding-right: 0.6rem;
+    padding-left: 0.6rem;
+      &:hover{
+        color: darken(#007bff, 20%);
+        }
   }
-  .btn-ai {
-    border-radius: 20px;
-    margin-left: 5px; /* Space between mic and AI button */
-  }
-}
 
-
-.category-filters {
-  display: flex;
-  justify-content: flex-start; /* Align buttons to the start */
-  flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
-}
-
-.category-btn {
-  margin: 5px 5px 5px 0; /* Spacing around buttons */
-  padding: 0.5rem 1rem; /* Padding inside buttons */
-  border-radius: 20px;
-  border: 1px solid #ced4da; /* Couleur de bordure par défaut de Bootstrap */
-  background-color: white;
-  color: #495057; /* Couleur de texte par défaut de Bootstrap */
-  &.active {
-    background-color: #007bff; /* Couleur primaire de Bootstrap pour l'état actif */
-    color: white;
+    .btn-primary {
+    background-color: #007bff;
     border-color: #007bff;
+    color: white;
+
+      &:hover {
+        background-color: #0056b3;
+        border-color: #0056b3;
+      }
   }
 }
 
-
-.row.row-cols-md-3 { /* Target the row containing course cards */
-  margin-top: 20px; /* Add some space above the course cards */
-}
-
+/* Cartes de cours */
 .course-card {
-  display: flex;
-  flex-direction: column;
-  overflow: hidden; /* Clip corners properly */
-  border-radius: 10px; /* Rounded corners for the card */
-  background-color: #fff; /* White card background */
-  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.08); /* Subtle shadow */
-  transition: transform 0.2s ease-in-out; /* Smooth hover effect */
+  border: 1px solid #dee2e6 !important;
+  border-radius: 20px;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  height: 100%;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  position: relative;
+  z-index: 1;
+ background-color: rgba(255, 255, 255, 0.7);
 
   &:hover {
-    transform: scale(1.03); /* Slightly scale up on hover */
-    box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.12); /* Slightly stronger shadow on hover */
+    transform: scale(1.03);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
   }
-}
 
-.course-image {
-  height: 200px;
-  object-fit: cover;
-  border-top-left-radius: 10px; /* Match card border-radius */
-  border-top-right-radius: 10px; /* Match card border-radius */
-  border-bottom-left-radius: 0; /* Ensure bottom corners are not rounded */
-  border-bottom-right-radius: 0;
-}
+  .course-image {
+      height: 220px;
+      object-fit: cover;
+      width: 100%;
+  }
 
-.card-body {
-  padding: 1.25rem; /* Standard card body padding */
-  display: flex;
-  flex-direction: column;
-}
+    .course-status-badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      padding: 0.3em 0.6em;
+      border-radius: 15px;
+      font-size: 0.8em;
+      font-weight: 600;
+      color: white;
+      z-index: 2;
 
-.course-header {
-  margin-bottom: 15px; /* More space below header */
-}
+      &.available {
+          background-color: #28a745;
+      }
+      &.unavailable {
+          background-color: #dc3545;
+      }
+    }
 
-.course-price, .course-category {
-  font-size: 0.85rem; /* Slightly smaller font size for badges */
-  font-weight: 500; /* Semi-bold font weight */
-  padding: 0.4rem 0.7rem; /* Adjust padding in badges */
-  text-transform: uppercase; /* Uppercase text for badges */
-  letter-spacing: 0.5px; /* Slight letter spacing for badges */
-}
 
-.course-category {
-  background-color: #e9ecef !important; /* Light gray category badge background */
-  color: #495057 !important; /* Darker text for category badge */
-}
-
-.course-title {
-  font-size: 1.3rem; /* Slightly larger title font */
-  font-weight: 600; /* Bold title font */
-  color: #343a40; /* Dark gray title text */
-  margin-bottom: 0.75rem; /* Space below title */
-}
-
-.course-description {
-  font-size: 1rem;
-  color: #6c757d; /* Muted description text */
-  line-height: 1.5; /* Improved line height for readability */
-}
-
-.course-details-list {
-  margin-top: 1rem; /* Space above details list */
-  li {
-    margin-bottom: 0.6rem; /* Spacing between list items */
-    font-size: 0.9rem;
-    color: #5a6268; /* Slightly darker details text */
+  .card-body {
     display: flex;
-    align-items: center;
-  }
-}
-
-.detail-icon {
-  margin-right: 10px; /* Space between icon and text */
-  color: #adb5bd; /* Light gray icons */
-  font-size: 0.9rem; /* Adjust icon size if needed */
-  width: 1rem; /* Ensure consistent icon width */
-  text-align: center; /* Center icons within their width */
-}
+    flex-direction: column;
+    padding: 1.25rem;
+    height: auto;
+    position: relative;
+      z-index: 1;
 
 
-.course-actions {
-  margin-top: 1.5rem; /* More space above action buttons */
-  padding-top: 1.25rem; /* Padding above the border */
-  border-top: 1px solid #dee2e6; /* Light border to separate actions */
-  display: flex;
-  justify-content: space-between; /* Space out rating and buttons */
-  align-items: center;
-}
-
-.rating {
-  i {
-    margin-right: 4px; /* Space between stars */
-    cursor: pointer; /* Indicate interactive stars */
-    font-size: 1rem; /* Adjust star size */
-  }
-}
-
-.action-buttons {
-  button, a {
-    margin-left: 8px; /* Spacing between action buttons */
-    font-size: 0.85rem; /* Slightly smaller button text */
-    padding: 0.4rem 0.8rem; /* Adjust button padding */
-  }
-}
-
-/* Responsive adjustments for smaller screens */
-@media (max-width: 768px) { /* For small screens and below (e.g., tablets, phones) */
-  .search-container, .category-filters {
-    max-width: 100%; /* Full width on smaller screens */
-  }
-  .category-filters {
-    flex-direction: column; /* Stack category buttons vertically on small screens */
-    align-items: stretch; /* Make buttons full width */
-  }
-  .category-btn {
-    margin: 5px 0; /* Vertical spacing for stacked buttons */
-    border-radius: 10px; /* Less rounded corners when stacked */
-  }
-  .row.row-cols-md-3 {
-    .col {
-      margin-bottom: 15px; /* More vertical space between course cards on smaller screens */
+    .course-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 0.75rem;
+      margin-top: 0 !important;
     }
-  }
-}
 
-/* ... Vos styles CSS précédents ... */
-
-/* Styles pour la date formatée joliment */
-.course-date-formatted {
-  display: flex; /* Pour aligner mois et jour verticalement */
-  flex-direction: column; /* Empile le mois et le jour */
-  align-items: center; /* Centre horizontalement le mois et le jour */
-  text-align: center; /* Assure que le texte est centré */
-  line-height: 0.9; /* Réduit l'interligne pour rapprocher mois et jour */
-}
-
-.course-date-month {
-  font-size: 0.9em; /* Taille de police pour le mois (légèrement plus petit) */
-  font-weight: bold; /* Mois en gras */
-  color: #555; /* Couleur du mois (gris moyen) - ajustez selon votre préférence */
-}
-
-.course-date-day {
-  font-size: 1.5em; /* Taille de police pour le jour (plus grand) */
-  font-weight: bolder; /* Jour en gras plus fort */
-  color: #333; /* Couleur du jour (gris foncé) - ajustez selon votre préférence */
-}
-
-/* --- Styles CSS précédents ... */
-
-/* --- Styles pour les boutons IA et Microphone --- */
-
-/* Styles communs aux boutons IA et Microphone pour base cohérente */
-.btn-ai, .mic-btn {
-  display: inline-flex; /* Pour aligner icône et texte verticalement */
-  align-items: center;
-  justify-content: center; /* Centrer le contenu */
-  padding: 0.6rem 1.2rem; /* Ajuster le padding pour un bouton plus moderne */
-  border: none; /* Supprimer la bordure par défaut */
-  border-radius: 25px; /* Coins plus arrondis pour un look moderne */
-  font-weight: 600; /* Texte plus épais */
-  cursor: pointer;
-  transition: all 0.3s ease; /* Transition douce pour les effets hover et actifs */
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15); /* Ombre légère pour donner du relief */
-  font-size: 0.9rem; /* Ajuster la taille de la police */
-}
-
-/* Styles spécifiques pour le bouton "Lire avec IA" (.btn-ai) */
-.btn-ai {
-  background-color: #667EEA; /* Couleur principale IA - un bleu-violet moderne */
-  color: white; /* Texte blanc pour contraste */
-
-  &:hover {
-    background-color: #5A67D8; /* Assombrir légèrement au hover */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Ombre plus prononcée au hover */
-    transform: translateY(-2px); /* Léger effet de soulèvement au hover */
-  }
-
-  &:active {
-    background-color: #4A55C6; /* Couleur encore plus sombre à l'activation */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Ombre réduite à l'activation */
-    transform: translateY(0); /* Retour à la position initiale à l'activation */
-  }
-
-  .icon {
-    margin-right: 0.6rem; /* Espace entre l'icône et le texte */
-  }
-
-  .text {
-    /* Styles pour le texte si nécessaire, déjà bien stylisé par les styles communs */
-  }
-}
-
-/* Styles spécifiques pour le bouton Microphone (.mic-btn) */
-.mic-btn {
-  background-color: #E0E7FF; /* Couleur secondaire IA - un bleu très clair/gris bleu */
-  color: #4B5563; /* Couleur de texte plus sombre pour contraste */
-  margin-left: 5px; /* Conserver l'espacement avec le bouton IA */
-
-  &:hover {
-    background-color: #CBD5E1; /* Légèrement assombrir au hover */
-    color: #374151; /* Assombrir légèrement le texte au hover */
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.18); /* Ombre légèrement plus prononcée au hover */
-    transform: translateY(-1px); /* Léger soulèvement au hover, moins que bouton IA */
-  }
-
-  &:active {
-    background-color: #A3B3C4; /* Couleur plus sombre à l'activation */
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18); /* Ombre réduite à l'activation */
-    transform: translateY(0); /* Retour à la position initiale à l'activation */
-  }
-}
-
-.mic-icon {
-  font-size: 1rem; /* Ajuster la taille de l'icône microphone si nécessaire */
-  /* La couleur de l'icône est gérée par la couleur de texte du bouton (.mic-btn color) */
-}
-
-/* --- Fin des styles pour les boutons IA et Microphone --- */
-/* --- Fin de vos styles existants --- */
-
-.btn-add-course {
-  background-color: #28a745; /* Vert Bootstrap succès (plus foncé) */
-  color: white;
-  border: 1px solid #28a745; /* Bordure verte assortie */
-  border-radius: 10px; /* Bords arrondis */
-  padding: 12px 25px; /* Padding confortable */
-  font-weight: 600; /* Texte en gras */
-  font-size: 1.1rem; /* Taille de police un peu plus grande */
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15); /* Ombre discrète */
-  transition: background-color 0.3s ease, transform 0.2s ease; /* Transitions douces */
-  display: inline-flex; /* Pour aligner l'icône et le texte horizontalement */
-  align-items: center; /* Centrer verticalement l'icône et le texte */
-  justify-content: center; /* Centrer horizontalement (au cas où) */
-  gap: 8px; /* Espace entre l'icône et le texte */
-}
-
-.btn-add-course:hover {
-  background-color: #218838; /* Vert Bootstrap succès (encore plus foncé) au hover */
-  border-color: #218838;
-  transform: translateY(-2px); /* Léger effet de soulèvement au survol */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Ombre un peu plus prononcée au survol */
-}
-
-.btn-add-course:active {
-  background-color: #1e7e34; /* Vert Bootstrap succès (encore plus foncé) à l'activation */
-  border-color: #1e7e34;
-  transform: translateY(0); /* Retour à la position normale à l'activation */
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15); /* Ombre de base à l'activation */
-}
-
-.btn-add-course i.fas.fa-plus-circle {
-  font-size: 1.2rem; /* Taille de l'icône "plus-circle" */
-  opacity: 0.9; /* Légère transparence pour adoucir l'icône */
-}
-
-
-/* ... tous vos styles CSS précédents ... */
-
-/* --- Styles pour la pagination --- */
-.pagination-container {
-  margin-top: 25px; /* Espace au-dessus des contrôles de pagination */
-  display: flex;
-  justify-content: center; /* Centrer les contrôles horizontalement */
-  align-items: center; /* Centrer verticalement */
-}
-
-.pagination-btn {
-  background-color: #f8f9fa; /* Fond gris très clair */
-  color: #495057; /* Couleur de texte standard */
-  border: 1px solid #ced4da; /* Bordure légère */
-  border-radius: 8px; /* Bords arrondis */
-  padding: 0.6rem 1rem; /* Padding bouton pagination */
-  margin: 0 4px; /* Marge horizontale entre les boutons */
-  cursor: pointer;
-  transition: background-color 0.2s ease, color 0.2s ease;
-  font-size: 0.9rem; /* Taille de police pagination réduite */
-
-  &:hover:enabled {
-    background-color: #e9ecef; /* Légèrement plus foncé au hover */
-    color: #343a40; /* Texte légèrement plus foncé au hover */
-  }
-
-  &:disabled {
-    opacity: 0.6; /* Opacité réduite pour les boutons désactivés */
-    cursor: default; /* Cursor par défaut pour les boutons désactivés */
-  }
-
-  &.active {
-    background-color: #007bff; /* Couleur primaire Bootstrap pour la page active */
-    color: white;
-    border-color: #007bff;
-    font-weight: 600; /* Texte en gras pour la page active */
-  }
-
-  &.prev-btn, &.next-btn {
-    i {
-      margin: 0 4px; /* Marge pour les icônes chevron */
+      .course-price {
+        background-color: #007bff;
+        color: white;
+        padding: 0.3em 0.6em;
+        border-radius: 15px;
+        font-weight: 600;
+        font-size: 1em;
+        margin-bottom: 0.5rem;
+        align-self: flex-start;
     }
-  }
 
-  &.page-number-btn {
-    min-width: 2.2rem; /* Largeur minimale pour les boutons numérotés */
-    text-align: center;
+    .btn-ia {
+        background-color: #f8f9fa;
+        color: #6c757d;
+        border: 1px solid #ced4da;
+        padding: 0.3em 0.6em;
+          border-radius: 15px;
+        font-size: 0.9em;
+
+        &:hover{
+            background-color: #6c757d;
+            color: #f8f9fa;
+        }
+
+      }
+
+    .course-category {
+        background-color: #6c757d;
+        color: white;
+        padding: 0.3em 0.6em;
+        border-radius: 15px;
+        font-size: 0.8em;
+        font-weight: 600;
+    }
+
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: #333;
+      text-align: left;
+      height: auto;
+    }
+
+    .course-description {
+        color: #555;
+        margin-bottom: 0.75rem;
+        flex-grow: 1;
+        overflow: hidden;
+        text-align: left;
+        font-size: 0.9rem;
+    }
+      .course-details {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+        flex-direction: column;
+        align-items: flex-start;
+
+        .course-date-formatted {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f8f9fa;
+            padding: 0.25rem 0.5rem;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            margin-bottom: 0.5rem;
+        }
+
+        .course-date-month {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            font-weight: bold;
+            color: #007bff;
+            margin-right: 0;
+        }
+
+        .course-date-day {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #333;
+          }
+        .course-info{
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 5px;
+        }
+        .course-level{
+            margin-bottom: 0 !important;
+            font-size: 0.9rem;
+          }
+    }
+
+    .btn-details {
+        background-color: #007bff;
+        border-color: #007bff;
+        color: white;
+        border-radius: 20px;
+        padding: 0.5rem 1rem;
+        transition: background-color 0.3s ease;
+          font-size: 0.9rem;
+
+        &:hover {
+            background-color: #0056b3;
+            border-color: #0056b3;
+        }
+    }
+
+.btn-favorite {
+        background: none;
+        border: none;
+        padding: 0;
+        font-size: 1.2rem;
+        color: #888;
+        transition: color 0.3s;
+        cursor: pointer;
+
+        &:hover,
+        & .text-danger {  /* Style quand le cours est un favori */
+            color: #dc3545;
+            transform: scale(1.1);
+        }
   }
+    }
+}
+// Animation de déplacement vers le haut
+.animate-up {
+  animation: moveUp 0.5s ease-out forwards;
 }
 
-.page-numbers {
-  display: flex;
-  align-items: center;
-  margin: 0 10px; /* Marge horizontale pour le conteneur des numéros de page */
-}
-
-
-/* Responsive pour petits écrans (pagination) */
-@media (max-width: 576px) { /* Pour écrans très petits (e.g., petits téléphones) */
-  .pagination-container {
-    flex-direction: column; /* Pagination en colonne sur très petits écrans */
-    align-items: center;
-  }
-
-  .pagination-btn {
-    margin: 5px 0; /* Marge verticale entre les boutons en colonne */
-    width: 100%; /* Boutons pagination prennent toute la largeur sur petits écrans */
-    text-align: center; /* Texte centré dans les boutons pagination */
-  }
-
-  .page-numbers {
-    margin: 10px 0; /* Marge verticale pour les numéros de page en colonne */
-    flex-wrap: wrap; /* Permettre aux numéros de page de passer à la ligne si trop nombreux */
-    justify-content: center; /* Centrer les numéros de page */
-  }
-
-  .pagination-btn.page-number-btn {
-    margin: 3px; /* Marge autour des boutons de numéro de page en wrap */
-    min-width: 1.8rem; /* Réduire la largeur minimale des boutons de numéro de page sur petits écrans */
-    font-size: 0.8rem; /* Réduire la taille de la police sur petits écrans */
-    padding: 0.4rem 0.8rem; /* Réduire le padding sur petits écrans */
-  }
-}
-.mic-btn {
-  /* ... vos styles existants pour .mic-btn ... */
-}
-
-.mic-icon {
-  /* ... vos styles existants pour .mic-icon ... */
-}
-
-.mic-icon.listening {
-  color: #007bff; /* Exemple: Changer la couleur en bleu quand actif */
-  /* Vous pouvez ajouter d'autres styles comme une animation ici */
-  animation: pulse 1.5s infinite; /* Exemple d'animation pulsée */
-}
-
-@keyframes pulse {
+@keyframes moveUp {
   0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.1);
+    transform: translateY(0);
   }
   100% {
-    transform: scale(1);
-  }
-}
-.average-rating {
-  display: flex;
-  align-items: center;
-  .star-icon {
-      font-size: 0.8em;
-      margin-left: 0.2em;
-      color: orange;
+    transform: translateY(-20px); // Ajustez la distance du déplacement
+    opacity: 0; // Optionnel: faire disparaître l'élément à la fin
   }
 }
 
-.review-form-popup {
-  position: fixed; /* Stay in place */
-  z-index: 1; /* Sit on top */
-  left: 0;
-  top: 0;
-  width: 100%; /* Full width */
-  height: 100%; /* Full height */
-  overflow: auto; /* Enable scroll if needed */
-  background-color: rgb(0,0,0); /* Fallback color */
-  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+
+.pagination-container {
   display: flex;
   justify-content: center;
   align-items: center;
+  margin-top: 1rem;
 
-  .review-form-content {
-      background-color: #fefefe;
-      margin: 15% auto; /* 15% from the top and centered */
-      padding: 20px;
-      border: 1px solid #888;
-      width: 60%; /* Could be more or less, depending on screen size */
-      border-radius: 10px;
-      box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
 
-      h3 {
-          margin-top: 0;
-          margin-bottom: 15px;
-          color: #333;
-      }
+  .pagination-btn {
+    border: 1px solid #ddd;
+    padding: 0.5rem 0.75rem;
+    margin: 0 0.25rem;
+    border-radius: 0.25rem;
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+    cursor: pointer;
+    background-color: #f8f9fa;
+    color: #4caf50;
 
-      p.text-muted {
-          font-size: 0.9em;
-          color: #777;
-          margin-bottom: 20px;
-      }
+    &:hover {
+      background-color: #4caf50;
+      color: #fff;
+      border-color: #4caf50;
+    }
 
-      .stars {
-          margin-bottom: 20px;
-          i.fa-star {
-              cursor: pointer;
-              color: #ccc;
-              &.active {
-                  color: orange;
-              }
-              &:hover {
-                  color: orange;
-              }
-          }
-      }
+    &:disabled {
+      background-color: #f8f9fa;
+      color: #6c757d;
+      border-color: #ddd;
+      cursor: not-allowed;
+    }
+    &.prev-btn,
+    &.next-btn {
 
-      .form-label {
-          font-weight: bold;
-          margin-top: 10px;
-      }
+        color: #007bff;
+        &:hover{
+        background-color: #007bff;
+        color: #fff;
+        border-color: #007bff;
+        }
+    }
+  }
 
-      textarea.form-control {
-          margin-bottom: 15px;
-      }
+  .page-number-btn {
+    &.active {
+      background-color: #007bff;
+      color: #ffffff;
+      border-color: #007bff;
+    }
+  }
 
-      .form-buttons {
-          display: flex;
-          justify-content: flex-end;
-          gap: 10px;
-      }
+  .page-numbers {
+      display: flex;
+      gap: 5px;
+  }
+}
+// Remove this block, as it's replaced by the styles within .search-container
+/*
+.autocomplete-suggestions {
+  position: absolute;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  max-height: 150px;
+  overflow-y: auto;
+  z-index: 1000;
+  width: 100%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.autocomplete-suggestions ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.autocomplete-suggestions li {
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.autocomplete-suggestions li:hover {
+  background-color: #f8f9fa;
+}
+*/
+.price-range-filter,
+.sorting-options {
+  label {
+    color: #eaedf1;
+    font-size: 1rem;
+  }
+
+  select {
+    background: white;
+    border: 2px solid #3498db;
+    color: #2c3e50;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.1);
+
+    &:hover {
+      border-color: #2980b9;
+      box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.15);
+    }
+
+    &:focus {
+      border-color: #1abc9c;
+      outline: none;
+      box-shadow: 0px 3px 15px rgba(26, 188, 156, 0.5);
+    }
+  }
+}
+
+// Ajustement pour la disposition
+.d-flex {
+  gap: 1.5rem; // Espacement entre les éléments
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .d-flex {
+    flex-direction: column;
+    align-items: stretch;
+
+    .price-range-filter,
+    .sorting-options {
+      width: 100%;
+    }
   }
 }

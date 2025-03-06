@@ -1,189 +1,253 @@
-.detail-course-container {
+/* Variables pour les couleurs (palette plus douce) */
+$primary-color: #4e89ae;   // Bleu-gris plus doux
+$secondary-color: #a9b4c2; // Gris clair
+$success-color: #71a95a;   // Vert olive doux
+$danger-color: #c75959;    // Rouge brique doux
+$warning-color: #e6b85c;  // Jaune moutarde
+$info-color: #59a5c7;     // Bleu clair
+$light-gray: #f5f5f5;      // Gris très clair (presque blanc)
+$medium-gray: #e1e1e1;     //Gris un peut plus foncé que le light-gray
+$dark-gray: #333333;      // Gris foncé (pour le texte principal)
+$font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+body {
+  font-family: $font-family;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: white; // Fond blanc
+}
+
+.container {
+  max-width: 1200px;
+}
+
+/* Styles pour l'en-tête */
+app-front-header {
+  width: 100%;
+  z-index: 1000;
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08); // Ombre plus légère
+  // padding: 15px 0; // Ajoutez du padding si nécessaire
+}
+
+.course-details {
+  flex: 1;
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+/* Bannière du cours */
+.course-banner {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08); // Ombre plus légère
+
+
+  img {
+    width: 100%;
+    display: block;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+
+  .overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); // Fond semi-transparent (légèrement moins opaque)
+    color: white;
     display: flex;
     flex-direction: column;
-    min-height: 100vh; /* Assure que le conteneur prend au moins toute la hauteur de l'écran */
-    background-color: #f8f9fa; /* Fond gris très clair */
-    font-family: 'Arial', sans-serif; /* Police moderne et lisible */
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 20px;
+    border-radius: 8px;
 
-    .detail-course-content {
-        flex-grow: 1; /* Permet au contenu de s'étendre et de pousser le footer vers le bas */
-        padding: 2rem;
-        margin-top: 60px; /* Espace pour le header fixe */
-        margin-bottom: 40px; /* Espace au-dessus du footer */
-        max-width: 960px; /* Largeur maximale pour un meilleur confort de lecture */
-        margin-left: auto;
-        margin-right: auto;
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      font-weight: bold;
     }
 
-    .course-info {
-        background-color: white;
-        padding: 2rem;
-        border-radius: 10px;
-        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.05); /* Ombre légère pour relever la section */
-        margin-bottom: 2rem;
+    p {
+      font-size: 1.2rem;
+      max-width: 80%;
+    }
+  }
+}
 
-        .course-header {
-            margin-bottom: 1.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px solid #eee; /* Ligne de séparation subtile */
-            padding-bottom: 1rem;
+.course-info,
+.attachments,
+.reviews,
+.course-sidebar,
+.add-attachment,
+.edit-attachment-form {
+  background-color: white;
+  border-radius: 8px;
+  margin-bottom: 25px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.06); // Ombre très légère
+}
 
-            .course-title {
-                font-size: 2.5rem;
-                color: #343a40; /* Gris foncé pour le titre */
-                margin: 0;
-            }
+/* Détails du cours, Attachments, Reviews, etc. */
+.course-info,
+.attachments,
+.reviews,
+.course-sidebar,
+.add-attachment,
+.edit-attachment-form {
+  padding: 20px;
+  margin-bottom: 20px;
 
-            .course-badges {
-                display: flex;
-                gap: 0.5rem; /* Espacement entre les badges */
-            }
-        }
-
-        .course-badges .badge {
-            padding: 0.5rem 0.8rem;
-            border-radius: 0.3rem;
-            font-weight: 500;
-            &.course-category {
-                background-color: #007bff; /* Bleu Bootstrap pour la catégorie */
-                color: white;
-            }
-            &.status-published {
-                background-color: #28a745; /* Vert Bootstrap pour publié */
-                color: white;
-            }
-            &.status-draft {
-                background-color: #ffc107; /* Jaune Bootstrap pour brouillon */
-                color: #212529; /* Texte sombre pour le contraste sur jaune */
-            }
-        }
+  h3,
+  h4 {
+    color: $dark-gray;
+    border-bottom: 2px solid $primary-color; // Ligne de séparation avec la couleur primaire
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+    display: inline-block;
+  }
+}
 
 
-        .course-media {
-            margin-bottom: 1.5rem;
-            border-radius: 8px;
-            overflow: hidden; /* Pour que l'image respecte le border-radius */
-            box-shadow: 0 0.2rem 0.5rem rgba(0, 0, 0, 0.1); /* Ombre légère sur l'image */
 
-            .course-image {
-                display: block; /* Important pour éviter l'espace sous l'image */
-                width: 100%;
-                height: auto;
-                object-fit: cover; /* Pour que l'image remplisse l'espace */
-                object-position: center;
-            }
-        }
+/* Liste des Attachments */
+.list-group-item {
+  border: none; // Enlève les bordures par défaut de Bootstrap
+  padding: 15px;
+  margin-bottom: 8px;
+  border-radius: 4px;
+  background-color: $light-gray; // Fond gris très clair
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); // Ombre très subtile
+  transition: background-color 0.3s ease;
 
-        .course-details-info {
-            p {
-                margin-bottom: 0.75rem;
-                color: #495057; /* Gris moyen pour le texte principal */
-                i {
-                    margin-right: 0.5rem;
-                    color: #007bff; /* Icônes bleues */
-                }
-                strong {
-                    font-weight: 600; /* Gras plus marqué pour les labels */
-                    color: #343a40;
-                }
-            }
-        }
+  &:hover {
+    background-color: $medium-gray; // Gris légèrement plus foncé au survol
+  }
+
+  .badge {
+    padding: 5px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    margin-left: 10px;
+  }
+
+  .btn {
+    padding: 5px 10px;
+    font-size: 0.8rem;
+  }
+}
+
+/* Liste des Reviews */
+.review-item {
+  padding: 15px 0;
+  border-bottom: 1px solid $medium-gray;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  .star-rating {
+    .fa-star {
+      font-size: 1.2em;
+      &.text-warning {
+        color: $warning-color;
+      }
+
+      &.text-muted {
+        color: $secondary-color; // Gris clair pour les étoiles non sélectionnées
+      }
+    }
+  }
+
+  p {
+    margin-left: 15px;
+    color: $dark-gray;
+  }
+}
+
+/* Liste des reviews (scrollable) */
+.reviews-list {
+    max-height: 300px;  // Hauteur maximale avant que le scroll apparaisse.
+    overflow-y: auto;   // Active le scroll vertical si le contenu dépasse la hauteur maximale.
+    overflow-x: hidden; // Masque le scroll horizontal.
+    padding-right: 10px; // Espace pour la scrollbar
+
+    &::-webkit-scrollbar {
+        width: 8px;
     }
 
-    .attachment-section {
-        background-color: white;
-        padding: 2rem;
-        border-radius: 10px;
-        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.05);
+    &::-webkit-scrollbar-track {
+        background: $light-gray;
+        border-radius: 4px;
+    }
 
-        h2 {
-            font-size: 2rem;
-            color: #343a40;
-            margin-bottom: 1.5rem;
-        }
-
-        .attachment-form {
-            .form-group {
-                margin-bottom: 1.5rem;
-
-                .form-label {
-                    display: block;
-                    margin-bottom: 0.5rem;
-                    font-weight: 500;
-                    color: #343a40;
-                    &.required::after {
-                        content: " *";
-                        color: red;
-                    }
-                }
-
-                .form-control, .form-control-file {
-                    padding: 0.75rem;
-                    border: 1px solid #ced4da;
-                    border-radius: 0.3rem;
-                    width: 100%;
-                    font-size: 1rem;
-                    &:focus {
-                        outline: none;
-                        border-color: #007bff;
-                        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-                    }
-                }
-                .form-control-file {
-                    padding-top: 0.5rem; /* Ajuste le padding vertical pour les inputs de fichier */
-                    padding-bottom: 0.5rem;
-                }
-
-                .form-text {
-                    font-size: 0.875rem;
-                    color: #6c757d; /* Couleur de texte muted */
-                }
-            }
-
-            .form-actions {
-                display: flex;
-                gap: 1rem;
-                align-items: center;
-
-                .btn-primary {
-                    background-color: #007bff;
-                    border-color: #007bff;
-                    &:hover, &:focus {
-                        background-color: #0056b3;
-                        border-color: #0056b3;
-                        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.5);
-                    }
-                }
-
-                .btn-secondary {
-                    color: #fff;
-                    background-color: #6c757d;
-                    border-color: #6c757d;
-                    &:hover, &:focus {
-                        background-color: #545b62;
-                        border-color: #4e555b;
-                        box-shadow: 0 0 0 0.2rem rgba(108, 117, 125, 0.5);
-                    }
-                }
-
-                .form-alert {
-                    margin-left: 1rem;
-                    padding: 0.75rem 1.25rem;
-                    border-radius: 0.3rem;
-                    &.success {
-                        background-color: #d4edda;
-                        color: #155724;
-                        border-color: #c3e6cb;
-                    }
-                    &.error {
-                        background-color: #f8d7da;
-                        color: #721c24;
-                        border-color: #f5c6cb;
-                    }
-                }
-            }
+    &::-webkit-scrollbar-thumb {
+        background-color: $primary-color;
+        border-radius: 4px;
+        &:hover{
+            background-color: darken($primary-color, 10%);
         }
     }
+}
+
+/* Sidebar */
+.course-sidebar {
+  background-color: $light-gray; // Fond gris très clair
+  border-radius: 8px;
+
+  h3 {
+    color: $primary-color; // Titre avec la couleur primaire
+  }
+}
+
+/* Formulaire d'ajout d'attachment */
+.add-attachment {
+  input[type="text"],
+  input[type="file"] {
+    border-radius: 4px;
+    padding: 8px;
+    border: 1px solid $secondary-color; // Bordure gris clair
+    background-color: white; // Fond blanc pour les inputs
+
+    &:focus {
+      outline: none;
+      border-color: $primary-color; // Couleur primaire au focus
+      box-shadow: 0 0 3px rgba($primary-color, 0.5); // Légère ombre au focus
+    }
+  }
+}
+
+.edit-attachment-form {
+  input,
+  select {
+    border: 1px solid $secondary-color;
+    border-radius: 4px;
+    background-color: white; // Fond blanc pour les inputs du formulaire d'édition
+
+    &:focus {
+      outline: none;
+      border-color: $primary-color;
+      box-shadow: 0 0 3px rgba($primary-color, 0.5);
+    }
+  }
+}
+
+
+/* Styles pour le footer */
+app-front-footer {
+  margin-top: auto;
+  width: 100%;
+  background-color: $primary-color; // Fond de couleur primaire
+  color: white; // Texte blanc
+  padding: 20px 0;
+  text-align: center;
 }

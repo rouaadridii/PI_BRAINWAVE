@@ -1,74 +1,118 @@
-<div class="detail-course-container">
+<body>
   <app-front-header></app-front-header>
+  <div class="course-details container">
+      <div class="course-banner">
+          <img [src]="course.picture ? 'http://localhost:8087/cours/courses/images/' + course.picture : 'assets/default-image.jpg'"
+               alt="{{ course.title }}">
+          <div class="overlay">
+              <h1>{{ course.title }}</h1>
+              <p>{{ course.description }}</p>
+          </div>
+      </div>
 
-  <main class="detail-course-content">
-      <section *ngIf="courseDetails" class="course-info">
-          <div class="course-header">
-              <h1 class="course-title">{{ courseDetails.title }}</h1>
-              <div class="course-badges">
-                  <span class="badge course-category">{{ courseDetails.categorie }}</span>
-                  <span *ngIf="courseDetails.status" class="badge status-published">Publié</span>
-                  <span *ngIf="!courseDetails.status" class="badge status-draft">Brouillon</span>
+      <div class="row mt-4">
+          <div class="col-md-8">
+              <div class="course-info p-4 shadow-sm">
+                  <h3>À propos de ce cours</h3>
+                  <p><strong>Description :</strong> {{ course.description }}</p>
+                  <p><strong>Date :</strong> {{ course.date | date: 'longDate' }}</p>
+                  <p><strong>Niveau :</strong> {{ course.level }}</p>
+                  <p><strong>Status :</strong>
+                      <span [ngClass]="{'badge bg-success': course.status, 'badge bg-danger': !course.status}">
+                          {{ course.status ? 'Disponible' : 'Indisponible' }}
+                      </span>
+                  </p>
+              </div>
+
+              <div class="attachments mt-4 p-4 shadow-sm">
+                  <h3>Ressources du cours</h3>
+                  <div *ngIf="attachments.length > 0; else noAttachments">
+                      <ul class="list-group">
+                          <li *ngFor="let attachment of attachments"
+                              class="list-group-item d-flex justify-content-between align-items-center">
+                              <div>
+                                  <h5>{{ attachment.chapterTitle }}</h5>
+                                  <span class="badge bg-info">{{ attachment.type }}</span>
+                              </div>
+                              <div>
+                                  <a [href]="'http://localhost:8087/cours/attachments/attachment/' + attachment.idAttachment"
+                                     class="btn btn-sm btn-primary me-2" target="_blank">📂 Telecharger</a>
+                                  <button class="btn btn-sm btn-warning" (click)="openEditForm(attachment)">✏️
+                                      Modifier</button>
+                                  <button class="btn btn-sm btn-danger ms-2"
+                                          (click)="deleteAttachment(attachment.idAttachment)">🗑️ Supprimer</button>
+                              </div>
+                          </li>
+                      </ul>
+                  </div>
+                  <ng-template #noAttachments>
+                      <p class="text-muted">Aucune ressource ajoutée.</p>
+                  </ng-template>
+              </div>
+
+              <div *ngIf="isEditing && editingAttachment" class="edit-attachment-form mt-4 p-4 shadow-sm">
+                  <h4>Modifier l'Attachment</h4>
+                  <form (ngSubmit)="updateAttachment()">
+                      <div class="mb-3">
+                          <label for="editChapterTitle" class="form-label">Titre du chapitre</label>
+                          <input type="text" [(ngModel)]="editingAttachment.chapterTitle" class="form-control"
+                                 id="editChapterTitle" name="editChapterTitle" required>
+                      </div>
+                      <div class="mb-3">
+                          <label for="editVisibility" class="form-label">Visibilité</label>
+                          <select [(ngModel)]="editingAttachment.visible" class="form-control" id="editVisibility"
+                                  name="editVisibility">
+                              <option [value]="true">Visible</option>
+                              <option [value]="false">Masqué</option>
+                          </select>
+                      </div>
+                      <div class="mb-3">
+                          <label for="editFile" class="form-label">Fichier</label>
+                          <input type="file" class="form-control" id="editFile" (change)="onEditFileSelected($event)">
+                      </div>
+                      <button type="submit" class="btn btn-primary me-2">Enregistrer</button>
+                      <button type="button" class="btn btn-secondary" (click)="cancelEdit()">Annuler</button>
+                  </form>
+              </div>
+
+              <div class="reviews mt-4 p-4 shadow-sm">
+                  <h3>Ce que disent les étudiants</h3>
+                  <div *ngIf="reviews.length > 0; else noReviews">
+                      <div class="reviews-list">
+                          <ul class="list-unstyled">
+                              <li *ngFor="let review of reviews" class="review-item mb-3">
+                                  <div class="d-flex align-items-center">
+                                      <span class="star-rating me-2">
+                                          <i *ngFor="let star of [1,2,3,4,5]" class="fa fa-star"
+                                             [ngClass]="{'text-warning': review.rating >= star, 'text-muted': review.rating < star}"></i>
+                                      </span>
+                                      <p class="mb-0">{{ review.comment }}</p>
+                                  </div>
+                              </li>
+                          </ul>
+                      </div>
+                  </div>
+                  <ng-template #noReviews>
+                      <p class="text-muted">Aucune évaluation pour l’instant.</p>
+                  </ng-template>
               </div>
           </div>
 
-          <div class="course-media">
-              <img [src]="courseDetails.picture
-                  ? courseDetails.picture.startsWith('http')
-                      ? courseDetails.picture
-                      : 'http://localhost:8087/cours/courses/download-image/' + courseDetails.picture
-                  : 'assets/default-image.jpg'"
-                   alt="Image du cours" class="course-image">
+          <div class="col-md-4">
+              <div class="course-sidebar p-4 shadow-sm">
+                  <h3 class="text-center">{{ course.price | currency }}</h3>
+                  <button class="btn btn-primary w-100 mt-3">S'inscrire</button>
+              </div>
+
+              <div class="add-attachment mt-4 p-4 shadow-sm">
+                  <h4>Ajouter un Attachment</h4>
+                  <input type="text" [(ngModel)]="chapterTitle" class="form-control my-2"
+                         placeholder="Titre du chapitre">
+                  <input type="file" class="form-control my-2" (change)="onFileSelected($event)">
+                  <button class="btn btn-success w-100" (click)="addAttachment()">➕ Ajouter</button>
+              </div>
           </div>
-
-          <div class="course-details-info">
-              <p class="description"><i class="fas fa-book-open"></i> {{ courseDetails.description || 'Pas de description disponible.' }}</p>
-              <p class="price"><i class="fas fa-tag"></i> <strong>Prix:</strong> ${{ courseDetails.price | number: '1.2-2' }}</p>
-              <p class="date"><i class="fas fa-calendar-alt"></i> <strong>Date:</strong> {{ courseDetails.date | date: 'MMM d, y' }}</p>
-          </div>
-      </section>
-
-      <section *ngIf="!courseDetails" class="loading-indicator">
-          <p>Chargement des détails du cours...</p>
-      </section>
-
-      <section *ngIf="courseDetails" class="attachment-section">
-          <h2>Ajouter des Ressources au Chapitre</h2>
-          <form [formGroup]="attachmentForm" (ngSubmit)="onSubmitAttachment()" class="attachment-form">
-              <div class="form-group">
-                  <label for="chapterTitle" class="form-label">Titre du Chapitre <span class="required">*</span>:</label>
-                  <input type="text" id="chapterTitle" class="form-control" formControlName="chapterTitle" required>
-              </div>
-
-              <div class="form-group">
-                  <label for="pdfFile" class="form-label">Fichier PDF:</label>
-                  <input type="file" id="pdfFile" class="form-control-file" (change)="onPdfFileSelected($event)" formControlName="pdf">
-              </div>
-
-              <div class="form-group">
-                  <label for="pictureFile" class="form-label">Image:</label>
-                  <input type="file" id="pictureFile" class="form-control-file" (change)="onPictureFileSelected($event)" formControlName="picture">
-              </div>
-
-              <div class="form-group">
-                  <label for="videoFile" class="form-label">Vidéo (URL Embed ou fichier):</label>
-                  <input type="file" id="videoFile" class="form-control-file" (change)="onVideoFileSelected($event)" formControlName="video">
-                  <small class="form-text text-muted">Vous pouvez uploader un fichier vidéo ou insérer une URL d'embed (YouTube, Vimeo, etc.).</small>
-              </div>
-
-              <div class="form-actions">
-                  <button type="submit" class="btn btn-primary" [disabled]="attachmentForm.invalid || uploadingAttachment">
-                      <span *ngIf="!uploadingAttachment">Ajouter la Ressource</span>
-                      <span *ngIf="uploadingAttachment" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                      <span *ngIf="uploadingAttachment">Envoi...</span>
-                  </button>
-                  <button type="button" routerLink="/courses-list" class="btn btn-secondary">Annuler</button>
-                  <div *ngIf="uploadSuccessMessage" class="form-alert success">{{ uploadSuccessMessage }}</div>
-                  <div *ngIf="uploadErrorMessage" class="form-alert error">{{ uploadErrorMessage }}</div>
-              </div>
-          </form>
-      </section>
-  </main>
-
+      </div>
+  </div>
   <app-front-footer></app-front-footer>
-</div>
+</body>

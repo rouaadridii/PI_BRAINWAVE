@@ -1,110 +1,178 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { AttachementService } from 'src/app/services/attachement.service';
-import { Course } from '../course';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { CoursesService } from 'src/app/services/courses.service';
+import { Attachment } from 'src/app/Core/Model/Attachment';
+import { Course } from 'src/app/Core/Model/Course';
+import { Review } from 'src/app/Core/Model/Review';
+import { AttachmentService } from 'src/app/Core/services/attachement.service';
+import { CoursesService } from 'src/app/Core/services/courses.service';
+import { ReviewService } from 'src/app/Core/services/review.service';
 
 @Component({
   selector: 'app-add-details-course',
   templateUrl: './add-details-course.component.html',
   styleUrls: ['./add-details-course.component.scss']
 })
-export class AddDetailsCourseComponent implements OnInit{
-
-  courseDetails: any;
-  attachmentForm!: FormGroup;
-  uploadingAttachment: boolean = false;
-  uploadSuccessMessage: string | null = null;
-  uploadErrorMessage: string | null = null;
-  selectedPdfFile: File | null = null;
-  selectedPictureFile: File | null = null;
-  selectedVideoFile: File | null = null;
-
+export class AddDetailsCourseComponent implements OnInit {
+  idCourse!: number;
+  attachments: Attachment[] = [];
+  chapterTitle = '';
+  selectedFile!: File | null;
+  reviews: Review[] = [];
+  averageRating: number = 0;
+  newReview: Review = { rating: 1, comment: '' }; // Initialisation
+  course!: Course; // Stocke les détails du cours
+  isEditing: boolean = false; // Pour afficher ou masquer le formulaire de modification
+  editingAttachment: Attachment | null = null; // L'attachment en cours de modification
+  selectedEditFile: File | null = null; // Le fichier sélectionné pour la modification
+  isEditingCourse: boolean = false;
+  editingCourse: Course | null = null;
+  selectedEditImage: File | null = null;
+  
   constructor(
     private route: ActivatedRoute,
-    private coursesService: CoursesService,
-    private fb: FormBuilder
-  ) { }
+    private attachmentService: AttachmentService,
+    private courseService: CoursesService,
+    private reviewService: ReviewService
+  ) {}
 
   ngOnInit(): void {
+    this.idCourse = Number(this.route.snapshot.paramMap.get('id'));
     this.loadCourseDetails();
-    this.initAttachmentForm();
+    this.loadAttachments(this.idCourse); // Charger les attachments
+    this.loadReviews(); // Charger les reviews
   }
 
-  loadCourseDetails(): void {
-    const idCourse = this.route.snapshot.paramMap.get('id');
-    if (idCourse) {
-      this.coursesService.getCourseById(Number(idCourse)).subscribe(details => {
-        this.courseDetails = details;
-      });
-    }
-  }
-
-  initAttachmentForm(): void {
-    this.attachmentForm = this.fb.group({
-      chapterTitle: ['', Validators.required], // Titre du chapitre, obligatoire
-      pdf: [null], // Fichier PDF
-      picture: [null], // Image
-      video: [null]  // Vidéo
-      // Vous pouvez ajouter des validateurs pour les types de fichiers si nécessaire
+  // 📌 Charger les attachments d’un cours
+  loadAttachments(courseId: number): void {
+    this.attachmentService.getAttachmentsByCourse(courseId).subscribe({
+      next: (data) => {
+        this.attachments = data;
+      },
+      error: (err) => {
+        console.error("Erreur lors du chargement des attachments :", err);
+      }
     });
   }
 
-  onPdfFileSelected(event: any): void {
-    this.selectedPdfFile = event.target.files[0];
+
+
+  
+  // 📌 Sélectionner un fichier
+  onFileSelected(event: any): void {
+    if (event.target.files.length > 0) {
+      this.selectedFile = event.target.files[0];
+    }
   }
 
-  onPictureFileSelected(event: any): void {
-    this.selectedPictureFile = event.target.files[0];
-  }
+  // 📌 Ajouter un attachment
+  addAttachment(): void {
+    if (!this.selectedFile) {
+      alert('Veuillez sélectionner un fichier');
+      return;
+    }
 
-  onVideoFileSelected(event: any): void {
-    this.selectedVideoFile = event.target.files[0];
-  }
-
-
-  onSubmitAttachment(): void {
-    if (this.attachmentForm.valid && this.courseDetails && this.courseDetails.idCourse) {
-      this.uploadingAttachment = true;
-      this.uploadSuccessMessage = null;
-      this.uploadErrorMessage = null;
-
-      const formData = new FormData();
-      formData.append('chapterTitle', this.attachmentForm.get('chapterTitle')?.value);
-
-      if (this.selectedPdfFile) {
-        formData.append('pdf', this.selectedPdfFile, this.selectedPdfFile.name);
-      }
-      if (this.selectedPictureFile) {
-        formData.append('picture', this.selectedPictureFile, this.selectedPictureFile.name);
-      }
-      if (this.selectedVideoFile) {
-        formData.append('video', this.selectedVideoFile, this.selectedVideoFile.name);
-      }
-
-      const courseId = this.courseDetails.idCourse;
-
-      this.coursesService.addAttachmentToCourse(courseId, formData).subscribe({ // Assurez-vous que votre service gère l'ID du cours
-        next: (response) => {
-          console.log('Pièce jointe ajoutée avec succès', response);
-          this.uploadSuccessMessage = 'Pièce jointe ajoutée avec succès!';
-          this.uploadErrorMessage = null;
-          this.uploadingAttachment = false;
-          this.attachmentForm.reset(); // Réinitialiser le formulaire après succès
-          this.selectedPdfFile = null;
-          this.selectedPictureFile = null;
-          this.selectedVideoFile = null;
+    this.attachmentService.addAttachment(this.idCourse, this.selectedFile, this.chapterTitle)
+      .subscribe({
+        next: () => {
+          alert('Détail ajouté avec succès !');
+          this.loadAttachments(this.idCourse); // Recharger la liste
         },
-        error: (error) => {
-          console.error('Erreur lors de l\'ajout de la pièce jointe', error);
-          this.uploadErrorMessage = 'Erreur lors de l\'ajout de la pièce jointe. Veuillez réessayer.';
-          this.uploadSuccessMessage = null;
-          this.uploadingAttachment = false;
+        error: (err) => {
+          console.error("Erreur lors de l'ajout :", err);
         }
       });
-    } else {
-      console.log('Formulaire d\'attachement invalide ou détails du cours non chargés.');
-      alert('Veuillez remplir correctement le formulaire et vous assurer que les détails du cours sont chargés.');
+  }
+
+  // 📌 Supprimer un attachment
+  deleteAttachment(id: number): void {
+    if (confirm('Voulez-vous vraiment supprimer cet attachment ?')) {
+      this.attachmentService.deleteAttachment(id).subscribe({
+        next: () => {
+          alert('Attachment supprimé avec succès !');
+          this.loadAttachments(this.idCourse); // Recharger la liste
+        },
+        error: (err) => {
+          console.error("Erreur lors de la suppression :", err);
+        }
+      });
     }
-  }}
+  }
+
+  // 📌 Modifier la visibilité d’un attachment
+  toggleVisibility(attachment: Attachment): void {
+    this.attachmentService.updateVisibility(attachment.idAttachment, !attachment.visible)
+      .subscribe({
+        next: () => {
+          attachment.visible = !attachment.visible;
+        },
+        error: (err) => {
+          console.error("Erreur lors de la mise à jour de la visibilité :", err);
+        }
+      });
+  }
+
+  // 📌 Ouvrir le formulaire de modification
+  openEditForm(attachment: Attachment): void {
+    this.isEditing = true;
+    this.editingAttachment = { ...attachment }; // Copie de l'attachment pour éviter la modification directe
+  }
+
+  // 📌 Gérer la sélection du fichier pour la modification
+  onEditFileSelected(event: any): void {
+    if (event.target.files.length > 0) {
+      this.selectedEditFile = event.target.files[0];
+    }
+  }
+
+  // 📌 Enregistrer les modifications
+  updateAttachment(): void {
+    if (!this.editingAttachment) return;
+
+    this.attachmentService.updateAttachment(
+      this.editingAttachment.idAttachment,
+      this.selectedEditFile,
+      this.editingAttachment.chapterTitle,
+      this.editingAttachment.visible
+    ).subscribe({
+      next: () => {
+        alert('Attachment mis à jour avec succès !');
+        this.isEditing = false; // Masquer le formulaire
+        this.loadAttachments(this.idCourse); // Recharger la liste des attachments
+      },
+      error: (err) => {
+        console.error("Erreur lors de la mise à jour :", err);
+      }
+    });
+  }
+
+  // 📌 Annuler la modification
+  cancelEdit(): void {
+    this.isEditing = false;
+    this.editingAttachment = null;
+    this.selectedEditFile = null;
+  }
+
+  // 📌 Charger les détails du cours
+  loadCourseDetails(): void {
+    this.courseService.getCourseById(this.idCourse).subscribe({
+      next: (data) => {
+        this.course = data;
+      },
+      error: (err) => {
+        console.error("Erreur lors du chargement du cours :", err);
+      }
+    });
+  }
+
+  // 📌 Charger les reviews
+  loadReviews(): void {
+    this.reviewService.getReviewsByCourse(this.idCourse).subscribe({
+      next: (data) => {
+        this.reviews = data;
+      },
+      error: (err) => {
+        console.error("Erreur lors du chargement des reviews :", err);
+      }
+    });
+  }
+}

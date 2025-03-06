@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { CoursesService } from 'src/app/services/courses.service';
+import { CoursesService } from 'src/app/Core/services/courses.service';
 
 @Component({
   selector: 'app-teacher-courses',
@@ -21,7 +21,7 @@ export class TeacherCoursesComponent implements OnInit {
 
   ngOnInit(): void {
     this.initForm();
-    this.loadCategories();
+   // this.loadCategories();
   }
 
   initForm() {
@@ -38,11 +38,11 @@ export class TeacherCoursesComponent implements OnInit {
     });
   }
 
-  loadCategories() {
-    this.courseService.getCategories().subscribe(data => {
-      this.categories = data;
-    });
-  }
+  // loadCategories() {
+  //   this.courseService.getCategories().subscribe(data => {
+  //     this.categories = data;
+  //   });
+  // }
 
   onFileSelected(event: any) {
     if (event.target.files.length > 0) {
@@ -50,36 +50,44 @@ export class TeacherCoursesComponent implements OnInit {
     }
   }
 
+  // onSubmit() {
+  //   if (this.courseForm.invalid) {
+  //     alert('Veuillez remplir tous les champs obligatoires.');
+  //     return;
+  //   }
+
+  //   const formData = new FormData();
+  //   formData.append('title', this.courseForm.get('title')?.value);
+  //   formData.append('description', this.courseForm.get('description')?.value);
+  //   formData.append('date', this.courseForm.get('date')?.value);
+  //   formData.append('level', this.courseForm.get('level')?.value);
+  //   formData.append('status', this.courseForm.get('status')?.value);
+  //   formData.append('price', this.courseForm.get('price')?.value);
+  //   formData.append('liked', this.courseForm.get('liked')?.value);
+  //   formData.append('categorie', this.courseForm.get('categorie')?.value);
+
+  //   if (this.selectedFile) {
+  //     formData.append('image', this.selectedFile);
+  //   }
+
+  //   this.courseService.createCourse(formData).subscribe(
+  //     (response) => {
+  //       console.log('Cours ajouté:', response);
+  //       alert('Cours ajouté avec succès.');
+  //       this.router.navigate(['/courses-list']);
+  //     },
+  //     (error) => {
+  //       console.error('Erreur:', error);
+  //       alert('Une erreur est survenue.');
+  //     }
+  //   );
+  // }
   onSubmit() {
-    if (this.courseForm.invalid) {
-      alert('Veuillez remplir tous les champs obligatoires.');
-      return;
+    if (this.courseForm.valid) {
+      console.log("Form submitted:", this.courseForm.value);
+      // Handle form submission (e.g., send the data to the backend)
+    } else {
+      console.log("Form is not valid");
     }
-
-    const formData = new FormData();
-    formData.append('title', this.courseForm.get('title')?.value);
-    formData.append('description', this.courseForm.get('description')?.value);
-    formData.append('date', this.courseForm.get('date')?.value);
-    formData.append('level', this.courseForm.get('level')?.value);
-    formData.append('status', this.courseForm.get('status')?.value);
-    formData.append('price', this.courseForm.get('price')?.value);
-    formData.append('liked', this.courseForm.get('liked')?.value);
-    formData.append('categorie', this.courseForm.get('categorie')?.value);
-
-    if (this.selectedFile) {
-      formData.append('image', this.selectedFile);
-    }
-
-    this.courseService.createCourse(formData).subscribe(
-      (response) => {
-        console.log('Cours ajouté:', response);
-        alert('Cours ajouté avec succès.');
-        this.router.navigate(['/courses-list']);
-      },
-      (error) => {
-        console.error('Erreur:', error);
-        alert('Une erreur est survenue.');
-      }
-    );
   }
 }

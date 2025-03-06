@@ -18,9 +18,12 @@ import { AdminCoursesComponent } from './components/admin-courses/admin-courses.
 import { DetailsCourseComponent } from './components/details-course/details-course.component';
 import { AddDetailsCourseComponent } from './components/add-details-course/add-details-course.component';
 import { DashboardStatisticsComponent } from './components/dashboard-statistics/dashboard-statistics.component';
-import { UpdateCourseComponent } from './components/update-course/update-course.component';
-import { CoursesStudentsComponent } from './components/courses-students/courses-students.component';
-import { AttachmentComponent } from './components/attachment/attachment.component';
+import { ListReviewComponent } from './list-review/list-review.component';
+import { AddCourseAdminComponent } from './add-course-admin/add-course-admin.component';
+import { FavoritCoursesComponent } from './favorit-courses/favorit-courses.component';
+import { CoursesSoonComponent } from './courses-soon/courses-soon.component';
+import { SafePipe } from './safe-pipe.pipe';
+import { CoursesTeachersComponent } from './components/courses-teachers/courses-teachers.component';
 
 
 
@@ -39,9 +42,12 @@ import { AttachmentComponent } from './components/attachment/attachment.componen
     DetailsCourseComponent,
     AddDetailsCourseComponent,
     DashboardStatisticsComponent,
-    UpdateCourseComponent,
-    CoursesStudentsComponent,
-    AttachmentComponent,
+    ListReviewComponent,
+    AddCourseAdminComponent,
+    FavoritCoursesComponent,
+    CoursesSoonComponent,
+    SafePipe,
+    CoursesTeachersComponent
    
   ],
   imports: [
@@ -50,7 +56,6 @@ import { AttachmentComponent } from './components/attachment/attachment.componen
     BrowserModule,
     AppRoutingModule,
    HttpClientModule,
-   
 
     
   ],

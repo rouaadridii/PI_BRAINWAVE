@@ -1,118 +1,268 @@
-<!-- Affichage du formulaire de mise à jour si un cours est sélectionné -->
-<main>
-  <div *ngIf="selectedCourse; else coursesList">
-    <div class="card shadow-lg border-light rounded">
-      <div class="card-body">
-        <h5 class="card-title">Modifier le cours : {{ selectedCourse.title }}</h5>
-        <form (ngSubmit)="updateCourse()">
-          <div class="form-group">
-            <label for="title">Titre</label>
-            <input type="text" id="title" [(ngModel)]="selectedCourse.title" name="title" class="form-control" required>
-          </div>
-
-          <div class="form-group">
-          <label for="description">Description</label>
-            <input type="text" id="description" [(ngModel)]="selectedCourse.description" name="description"
-              class="form-control" required>
-          </div>
-
-          <div class="form-group">
-            <label for="price">Prix</label>
-            <input type="number" id="price" [(ngModel)]="selectedCourse.price" name="price" class="form-control"
-              required>
-          </div>
-
-          <!-- Catégorie -->
-          <div class="mb-3">
-            <label for="categorie" class="form-label">Catégorie :</label>
-            <select id="categorie" class="form-select" formControlName="categorie" required>
-              <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
-            </select>
-          </div>
-
-          <!-- Niveau -->
-          <div class="mb-3">
-            <label for="level" class="form-label">Niveau :</label>
-            <select id="level" class="form-select" [(ngModel)]="selectedCourse.level" name="level" required>
-              <option value="Débutant">Débutant</option>
-              <option value="Intermédiaire">Intermédiaire</option>
-              <option value="Avancé">Avancé</option>
-            </select>
-          </div>
-
-          <button type="submit" class="btn btn-primary mt-2">Mettre à jour</button>
-          <button type="button" class="btn btn-secondary mt-2" (click)="cancelUpdate()">Annuler</button>
-        </form>
-      </div>
+<div class="container mt-4">
+  <!-- Barre de recherche et ajout de cours -->
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="input-group search-container w-75">
+      <input type="text" class="form-control search-input" placeholder="Rechercher un cours..."
+             [(ngModel)]="searchQuery" (input)="searchCourses()">
+      <button class="btn btn-outline-secondary" (click)="startSpeechRecognition()" title="Recherche vocale">
+        <i class="fa fa-microphone"></i>
+      </button>
+     
+    </div>
+    <div class="d-flex gap-2">
+      <button class="btn btn-success" (click)="openAddCoursePopup()">
+        <i class="fa fa-plus"></i> Ajouter un Cours
+      </button>
+      <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCourseWithDateModal">
+        Ajouter un cours à une date
+      </button>
     </div>
   </div>
 
   <!-- Affichage de la liste des cours -->
-  <ng-template #coursesList>
-    <div *ngIf="courses.length > 0; else noCourses">
-      <div class="row row-cols-1 row-cols-md-3 g-4">
-        <div *ngFor="let course of sortedCourses(); let i = index" class="col" [attr.id]="'course-' + course.idCourse">
-          <div class="card shadow-lg border-light rounded">
-            <!-- Image du cours -->
-             <img
-              [src]="course.picture ? (course.picture.startsWith('http') ? course.picture : 'http://localhost:8087/cours/courses/download-image/' + course.picture) : 'assets/default-image.jpg'"
-              class="card-img-top course-image rounded-top" alt="Image du cours">
+  <div *ngIf="filteredCourses.length > 0; else noCourses" class="row row-cols-1 row-cols-md-3 g-4">
+    <div *ngFor="let course of sortedCourses()" class="col">
+      <div class="card course-card h-100">
+        <!-- Image du cours -->
+        <img [src]="course.picture ? 'http://localhost:8087/cours/courses/images/' + course.picture : 'assets/default-image.jpg'" 
+             class="card-img-top" alt="Image du cours">
+        
+        <div class="card-body">
+          <h5 class="card-title">{{ course.title }}</h5>
+          <p class="card-text text-muted">{{ course.description || 'Aucune description disponible' }}</p>
+          <ul class="list-unstyled">
+            <li><strong>Date :</strong> {{course.date}} </li>
+            <li><strong>Catégorie :</strong> {{ course.category || 'Non spécifiée' }}</li>
+            <li><strong>Prix :</strong> {{ course.price | currency }}</li>
+            <li><strong>Niveau :</strong> {{ course.level }}</li>
+            <li>
+              <strong>Status :</strong> 
+              <span [ngClass]="{'text-success fw-bold': course.status, 'text-danger fw-bold': !course.status}">
+                {{ course.status ? 'Disponible' : 'Indisponible' }}
+              </span>
+            </li>
+          </ul>
+        </div>
 
-              <div class="card-body">
-                <!-- Titre du cours -->
-                <h5 class="card-title text-dark">{{ course.title }}</h5>
-                <!-- Description du cours -->
-                <p class="card-text text-muted">{{ course.description || 'Description non disponible' }}</p>
-
-                <ul class="list-unstyled">
-                  <li><strong>Date :</strong> {{ course.date | date: 'shortDate' }}</li>
-                  <li><strong>Catégorie :</strong> {{ course.categorie }}</li>
-                  <li><strong>Prix :</strong> {{ course.price | currency }}</li>
-                  <li><strong>Niveau :</strong> {{ course.level }}</li>
-                  <li><strong>Status :</strong>
-                    <span [ngClass]="{'text-success': course.status, 'text-danger': !course.status}">
-                      {{ course.status ? 'Disponible' : 'Indisponible' }}
-                    </span>
-                  </li>
-                </ul>
-
-                <button (click)="toggleFavorite(course)">
-                  <svg *ngIf="course.liked" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="red"
-                    viewBox="0 0 24 24">
-                    <path
-                      d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-                  </svg>
-                  <svg *ngIf="!course.liked" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="gray"
-                    viewBox="0 0 24 24">
-                    <path
-                      d="M16.5 3c-1.74 0-3.41.81-4.5 2.09C10.91 3.81 9.24 3 7.5 3 4.42 3 2 5.42 2 8.5c0 3.78 3.4 6.86 8.55 11.54L12 21.35l1.45-1.32C18.6 15.36 22 12.28 22 8.5 22 5.42 19.58 3 16.5 3zM12 19.06l-1.14-1.03C6.05 13.79 4 11.4 4 8.5 4 6.5 5.5 5 7.5 5c1.54 0 3.04.99 3.57 2.36h1.87C13.46 5.99 14.96 5 16.5 5 18.5 5 20 6.5 20 8.5c0 2.9-2.05 5.29-6.86 9.53L12 19.06z" />
-                  </svg>
-                </button>
-
-
-                <!-- Lien vers les détails du cours -->
-                <a [routerLink]="['/course-detail', course.idCourse]" class="btn btn-primary mt-2">
-                  Voir Détails
-                </a>
-
-                <!-- Bouton pour modifier -->
-
-
-                <!-- Bouton pour supprimer -->
-                <button class="btn btn-danger mt-2" (click)="confirmerEtSupprimerCours(course)">
-                  Supprimer
-                </button>
-              </div>
-          </div>
+        <div class="card-footer d-flex justify-content-between">
+          <button class="btn btn-outline-primary btn-sm" (click)="textToSpeech(course)">
+            <i class="fas fa-volume-up"></i> {{ course.isSpeaking ? 'Arrêter' : 'Lire avec IA' }}
+          </button>
+          <a [routerLink]="['/dashboard','Admindetailcourses', course.idCourse]" class="btn btn-info btn-sm">
+            <i class="fa fa-eye"></i> Voir Détails
+          </a>
+          <button class="btn btn-danger btn-sm" (click)="confirmerEtSupprimerCours(course)">
+            <i class="fa fa-trash"></i> Supprimer
+          </button>
+          <!-- Bouton Modifier -->
+          <button class="btn btn-warning btn-sm" (click)="openEditModal(course)">
+            <i class="fa fa-pencil-alt"></i> Modifier
+          </button>
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- Message affiché si aucun cours n'est disponible -->
-    <ng-template #noCourses>
-      <div class="alert alert-warning text-center mt-4" role="alert">
-        Aucun cours disponible.
-      </div>
-    </ng-template>
+  <!-- Message si aucun cours n'est trouvé -->
+  <ng-template #noCourses>
+    <div class="text-center p-4">
+      <img src="assets/no-data.svg" alt="Aucun cours trouvé" style="width: 150px;">
+      <p class="mt-3 text-muted">Aucun cours disponible pour le moment.</p>
+    </div>
   </ng-template>
-</main>
+</div>
+
+<!-- Modal pour ajouter un cours -->
+<div class="modal fade" id="addCourseModal" tabindex="-1" aria-labelledby="addCourseModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addCourseModalLabel">Ajouter un Cours</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form #courseForm="ngForm" (ngSubmit)="addCourse(courseForm.value)">
+          <div class="mb-3">
+            <label for="title" class="form-label">Titre</label>
+            <input type="text" id="title" class="form-control" name="title" ngModel required>
+          </div>
+          <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea id="description" class="form-control" name="description" ngModel required></textarea>
+          </div>
+          <div class="form-group">
+            <label for="date">Date</label>
+            <input type="date" id="date" name="date" ngModel class="form-control">
+          </div>
+          
+          <div class="mb-3">
+            <label for="category" class="form-label">Catégorie</label>
+            <select id="category" class="form-control" name="category" ngModel required>
+              <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="price" class="form-label">Prix</label>
+            <input type="number" id="price" class="form-control" name="price" ngModel required>
+          </div>
+          <div class="mb-3">
+            <label for="level" class="form-label">Niveau</label>
+            <input type="text" id="level" class="form-control" name="level" ngModel required>
+          </div>
+          <div class="mb-3">
+            <label for="file" class="form-label">Image</label>
+            <input type="file" id="file" class="form-control" (change)="onFileSelected($event)">
+          </div>
+          <div class="mb-3">
+            <label for="status" class="form-label">Disponible</label>
+            <input type="checkbox" id="status" name="status" ngModel>
+          </div>
+          <div class="mb-3">
+            <label for="liked" class="form-label">Favori</label>
+            <input type="checkbox" id="liked" name="liked" ngModel>
+          </div>
+          <button type="submit" class="btn btn-primary">Ajouter</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal pour ajouter un cours avec une date spécifique -->
+<!-- Bouton pour ouvrir la modal -->
+<!-- Bouton d'ouverture de la modal -->
+<!-- <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCourseWithDateModal">
+  Ajouter un cours à une date
+</button> -->
+
+<!-- Modal -->
+<div class="modal fade" id="addCourseWithDateModal" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalTitle">Ajouter un Cours</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      
+      <div class="modal-body">
+        <form (ngSubmit)="onSubmit()">
+          <div class="mb-3">
+            <label for="title" class="form-label">Titre du Cours</label>
+            <input type="text" id="title" [(ngModel)]="courseData.title" name="title" class="form-control" required>
+          </div>
+
+          <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea id="description" [(ngModel)]="courseData.description" name="description" class="form-control" required></textarea>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="level" class="form-label">Niveau</label>
+              <input type="text" id="level" [(ngModel)]="courseData.level" name="level" class="form-control" required>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="category" class="form-label">Catégorie</label>
+              <select id="category" [(ngModel)]="courseData.category" name="category" class="form-select" required>
+                <option *ngFor="let category of categories" [value]="category">{{ category }}</option>
+              </select>
+            </div>
+            
+            
+          </div>
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="price" class="form-label">Prix</label>
+              <input type="number" id="price" [(ngModel)]="courseData.price" name="price" class="form-control" required>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="scheduledPublishDate" class="form-label">Date et Heure de Publication Programmée</label>
+              <input type="datetime-local" id="scheduledPublishDate" step="1" [(ngModel)]="courseData.scheduledPublishDate" name="scheduledPublishDate" class="form-control">
+            </div>
+          </div>
+
+          <div class="form-check mb-3">
+            <input type="checkbox" id="status" [(ngModel)]="courseData.status" name="status" class="form-check-input">
+            <label for="status" class="form-check-label">Statut</label>
+          </div>
+
+          <div class="form-check mb-3">
+            <input type="checkbox" id="liked" [(ngModel)]="courseData.liked" name="liked" class="form-check-input">
+            <label for="liked" class="form-check-label">Aimer</label>
+          </div>
+
+          <div class="mb-3">
+            <label for="file" class="form-label">Fichier</label>
+            <input type="file" id="file" (change)="onFileChange($event)" class="form-control">
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+            <button type="submit" class="btn btn-primary">Soumettre</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+<!-- Modal pour modifier un cours -->
+<!-- Modal pour modifier un cours -->
+<div class="modal fade" id="editCourseModal" tabindex="-1" aria-labelledby="editCourseModalLabel" aria-hidden="true" *ngIf="isEditModalOpen">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editCourseModalLabel">Modifier le Cours</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="closeEditModal()"></button>
+      </div>
+      <div class="modal-body">
+        <form #editCourseForm="ngForm" (ngSubmit)="updateCourse()">
+          <div class="mb-3">
+            <label for="editTitle" class="form-label">Titre</label>
+            <input type="text" class="form-control" id="editTitle" [(ngModel)]="selectedCourse.title" name="title" required>
+          </div>
+        
+          <div class="mb-3">
+            <label for="editDescription" class="form-label">Description</label>
+            <textarea class="form-control" id="editDescription" [(ngModel)]="selectedCourse.description" name="description"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="date">Date</label>
+            <input type="date" id="date" name="date" [(ngModel)]="selectedCourse.date" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="level">Level</label>
+            <input type="text" id="level" name="level" [(ngModel)]="selectedCourse.level" class="form-control">
+          </div>
+          
+          <div class="mb-3">
+            <label for="category" class="form-label">Catégorie</label>
+            <select id="category" name="category" [(ngModel)]="selectedCourse.category" class="form-control" required>
+              <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+            </select>
+            
+          </div>
+          
+          <div class="mb-3">
+            <label for="editPrice" class="form-label">Prix</label>
+            <input type="number" class="form-control" id="editPrice" [(ngModel)]="selectedCourse.price" name="price">
+          </div>
+          <div class="mb-3">
+            <label for="editFile" class="form-label">Image</label>
+            <input type="file" class="form-control" id="editFile" (change)="onFileSelected($event)">
+          </div>
+          <div class="mb-3">
+            <label for="status" class="form-label">Disponible</label>
+            <input type="checkbox" id="status" name="status" [(ngModel)]="selectedCourse.status">
+          </div>
+          <button type="submit" class="btn btn-primary">Mettre à jour</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+

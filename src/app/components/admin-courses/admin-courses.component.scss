@@ -1,215 +1,97 @@
-/* cours-admin.component.scss - STYLES MODIFIÉS POUR LES CARTES DE COURS */
-
-:host {
-    display: block;
+body {
+    background-color: #121212; /* Noir profond */
+    color: #ffffff; /* Texte blanc */
+  }
+  
+  .container {
+    max-width: 1200px;
     padding: 20px;
-    background-color: #f8f9fa; /* Fond gris très clair pour le dashboard (inchangé) */
   }
   
-  main {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
+  .search-input {
+    background-color: #333;
+    color: #fff;
+    border: 1px solid #555;
+    border-radius: 10px;
   }
   
-  /* Styles pour la carte conteneur (formulaire de modification) - INCHANGÉS */
-  .card.shadow-lg.border-light.rounded {
-    border-color: #e0e7ff !important;
-    border-width: 1px;
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.05) !important;
-    margin-bottom: 20px;
+  .search-input::placeholder {
+    color: #bbb;
   }
   
-  .card-body {
-    padding: 25px;
-  }
-  
-  .card-title {
-    color: #343a40;
-    margin-bottom: 20px;
-    font-weight: 600;
-    font-size: 1.75rem;
-  }
-  
-  /* Styles pour le formulaire de modification - INCHANGÉS */
-  form {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-  }
-  
-  .form-group {
-    margin-bottom: 0;
-  }
-  
-  label {
-    font-weight: 500;
-    color: #495057;
-    margin-bottom: 5px;
-    display: block;
-  }
-  
-  .form-control, .form-select { /* Styles pour les inputs et selects du formulaire - INCHANGÉS */
-    border-radius: 0.25rem;
-    border: 1px solid #ced4da;
-    padding: 0.75rem 1rem;
-    font-size: 1rem;
-    line-height: 1.5;
-    color: #495057;
-    background-color: #fff;
-    background-clip: padding-box;
-    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-  
-    &:focus {
-      color: #495057;
-      background-color: #fff;
-      border-color: #80bdff;
-      outline: 0;
-      box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-    }
-  }
-  
-  .form-select { /* Styles spécifiques au select - INCHANGÉS */
-    @extend .form-control;
-    padding-right: 2.25rem;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
-    background-repeat: no-repeat;
-    background-position: right 0.75rem center;
-    background-size: 16px 12px;
-  }
-  
-  .btn.btn-primary.mt-2, .btn.btn-secondary.mt-2 { /* Boutons du formulaire - INCHANGÉS */
-    background-color: #007bff;
-    border-color: #007bff;
+  .btn-outline-light,
+  .btn-outline-info,
+  .btn-outline-secondary {
     color: white;
-    padding: 0.75rem 1.5rem;
-    border-radius: 0.25rem;
-    font-weight: 500;
-    transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
-  
-    &:hover {
-      background-color: #0056b3;
-      border-color: #0056b3;
-    }
+    border-color: #444;
   }
   
-  .btn.btn-secondary.mt-2 { /* Bouton "Annuler" du formulaire - INCHANGÉ */
-    background-color: #6c757d;
-    border-color: #6c757d;
-    &:hover {
-      background-color: #545b62;
-      border-color: #4e555b;
-    }
+  .btn-outline-light:hover,
+  .btn-outline-info:hover,
+  .btn-outline-secondary:hover {
+    background-color: #17a2b8;
+    color: #fff;
   }
   
-  
-  /* --- STYLES MODIFIÉS POUR LES CARTES DE COURS DANS LA LISTE --- */
-  .row.row-cols-md-3.g-4 {
-    margin-top: 20px;
+  .course-card {
+    background-color: #1e1e1e;
+    color: #fff;
+    border: 1px solid #333;
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
   }
   
-  /* **CARTES DE COURS - STYLES PRINCIPAUX MODIFIÉS** */
-  .card.shadow-lg.border-light.rounded {
-    background-color: #fffefc; /* NOUVELLE COULEUR DE FOND: Blanc cassé très léger, chaleureux */
-    border: none !important; /* Suppression de la bordure pour un look plus épuré */
-    box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.09); /* Ombre légèrement plus prononcée mais toujours douce */
-    transition: transform 0.2s ease-in-out; /* Garde l'effet de hover */
-  
-    &:hover {
-      transform: scale(1.02); /* Léger zoom au hover (ajusté) */
-      box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.12); /* Ombre un peu plus forte au hover */
-    }
+  .course-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(255, 255, 255, 0.3);
   }
   
-  .card-img-top {
-    height: 220px; /* Légèrement plus haute pour un meilleur visuel (ajustez si nécessaire) */
+  .course-card .card-img-top {
+    height: 200px;
     object-fit: cover;
-    border-top-left-radius: 0.25rem;
-    border-top-right-radius: 0.25rem;
-    border-bottom-left-radius: 0; /* Assure que les coins inférieurs ne sont pas arrondis */
-    border-bottom-right-radius: 0;
+    border-radius: 5px;
   }
   
-  .card-body {
-    padding: 1.5rem; /* Padding légèrement augmenté pour plus d'espace intérieur */
-    display: flex;
-    flex-direction: column;
+  .card-body .btn {
+    font-size: 0.9rem;
+    padding: 0.5rem;
   }
   
-  .card-title.text-dark {
-    color: #2d3748 !important; /* Titre en gris plus foncé et chaleureux */
-    font-size: 1.4rem; /* Taille du titre légèrement réduite (ajustez selon besoin) */
-    font-weight: 600;
-    margin-bottom: 8px; /* Réduit l'espace sous le titre */
+  .card-footer .btn {
+    width: 48%;
   }
   
-  .card-text.text-muted {
-    color: #5a677d !important; /* Description en gris légèrement plus foncé et moins "muted" */
-    font-size: 1rem;
-    margin-bottom: 12px; /* Réduit l'espace sous la description */
-    line-height: 1.4; /* Interligne légèrement réduit pour description plus compacte */
+  .alert-warning {
+    background-color: #ffcc00;
+    color: #222;
+    border-radius: 5px;
   }
   
-  .list-unstyled {
-    list-style: none;
-    padding-left: 0;
-    margin-bottom: 15px;
-  
-    li {
-      margin-bottom: 6px; /* Réduit l'espace entre les lignes de détails */
-      font-size: 0.9rem;
-      color: #4a5568; /* Détails en gris légèrement plus foncé */
-      strong {
-        font-weight: 500;
-        margin-right: 4px; /* Réduit l'espace après "Date:", "Catégorie:", etc. */
-      }
-    }
+  .modal-content {
+    border-radius: 8px;
   }
   
-  button svg { /* Icônes "like" - INCHANGÉS */
-    width: 24px;
-    height: 24px;
-    cursor: pointer;
-    transition: fill 0.2s ease-in-out;
+  .modal-header {
+    background-color: #333;
+    color: #fff;
   }
   
-  button svg[fill="red"]:hover {
-    fill: #c82333;
+  .modal-body {
+    background-color: #222;
   }
   
-  button svg[fill="gray"]:hover {
-    fill: #868e96;
+  input, select, textarea {
+    background-color: #333;
+    color: #fff;
+    border: 1px solid #444;
+    border-radius: 8px;
   }
   
-  
-  .btn.btn-primary.mt-2 { /* Bouton "Voir Détails" - INCHANGÉ */
-    /* Réutilise les styles du bouton "Mettre à jour" */
+  input:focus, select:focus, textarea:focus {
+    border-color: #17a2b8;
+  }
+  #editCourseModal {
+    display: block !important;
+    opacity: 1 !important;
   }
   
-  .btn.btn-warning.mt-2 { /* Bouton "Modifier" - INCHANGÉ */
-    background-color: #ffc107;
-    border-color: #ffc107;
-    color: #212529;
-    &:hover {
-      background-color: #ffca2b;
-      border-color: #ffc720;
-    }
-  }
-  
-  .btn.btn-danger.mt-2 { /* Bouton "Supprimer" - INCHANGÉ */
-    background-color: #dc3545;
-    border-color: #dc3545;
-    &:hover {
-      background-color: #c82333;
-      border-color: #bd2130;
-    }
-  }
-  
-  .alert.alert-warning.text-center.mt-4 { /* Message "Aucun cours disponible" - INCHANGÉ */
-    background-color: #fff3cd;
-    border-color: #ffeeba;
-    color: #85640a;
-  }

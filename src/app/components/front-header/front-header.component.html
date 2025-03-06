@@ -5,7 +5,7 @@
     <meta name="description" content="">
     <meta name="author" content="TemplateMo">
     <link href="/assets/templatefront/assets/css/googleFonts.css" rel="stylesheet">
-    
+
 
     <!-- Bootstrap core CSS -->
     <link href="/assets/templatefront/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -38,9 +38,19 @@
             <ul class="nav">
                 <li class="scroll-to-section"><a href="#top" class="active">Home</a></li>
                 <li><a href="#articles">articles</a></li>
-                <li><a routerLink="/courses-list">Courses</a></li>
-                <li><a href="#reclamation">reclamation</a></li>
+                <li class="dropdown">
+                  <a href="#" class="dropbtn">Courses</a>
+                  <ul class="dropdown-content">
+                      <li><a routerLink="/courses">All Courses</a></li>
+                      <li><a routerLink="/courses-coming-soon">Coming Soon</a></li>
+                      <li><a routerLink="/courses/my-courses">My FAVORITE COURSES</a></li>
+                  </ul>
+              </li>                <li><a href="#reclamation">reclamation</a></li>
                 <li class="scroll-to-section"><a href="#contact">Contact Us</a></li>
+                <li><a routerLink="/dashboard">Admin</a></li>
+                <li><a routerLink="/courses-teachers">Teacher</a></li>
+
+
               </ul>
             <a class="menu-trigger">
               <span>Menu</span>

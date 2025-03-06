@@ -1,0 +1,455 @@
+/* courses-teachers.component.scss or courses.component.scss */
+
+/* General Styles */
+:host {
+  background-image: url('/assets/templatefront/assets/images/meetings-bg.jpg'); //  Make sure path is correct
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-attachment: fixed;
+  display: block;
+  min-height: 100vh;
+  color: #333;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.main-content {
+  margin-left: auto;
+  background-image: url('/assets/templatefront/assets/images/meetings-bg.jpg'); 
+  margin-right: auto;
+  padding: 20px;
+  margin-top: 60px;
+  margin-bottom: 60px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Search Bar */
+.search-container {
+  border-radius: 25px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.search-input {
+  border: none;
+  padding: 10px 15px;
+  font-size: 16px;
+  border-top-right-radius: 0; /* Remove top-right radius */
+  border-bottom-right-radius: 0; /* Remove bottom-right radius */
+}
+
+.search-input:focus {
+  box-shadow: none;
+  border: none;
+  outline: none;
+}
+
+.search-button {
+  background-color: #f8f9fa;
+  border: none;
+  border-radius: 0 25px 25px 0; /* Apply radius to right side only */
+  padding: 10px 15px;
+  color: #6c757d;
+}
+
+.search-button:hover {
+  background-color: #e9ecef;
+  color: #343a40;
+}
+
+/* Add and Schedule Buttons */
+.btn-add-course {
+  background-color: #28a745; /* Green */
+  border: none;
+  color: white;
+  padding: 10px 15px;
+  border-radius: 20px; /* Rounded corners */
+  transition: background-color 0.3s ease;
+}
+
+.btn-add-course:hover {
+  background-color: #218838; /* Darker green */
+}
+
+.btn-schedule-course {
+  background-color: #007bff; /* Blue */
+  border: none;
+  color: white;
+  padding: 10px 15px;
+  border-radius: 20px; /* Rounded corners */
+  transition: background-color 0.3s ease;
+}
+
+.btn-schedule-course:hover {
+  background-color: #0056b3; /* Darker blue */
+}
+
+
+/* Course Card */
+.course-card {
+  border: none;
+  border-radius: 15px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease-in-out;
+  overflow: hidden;
+  height: 100%;  /* Make cards fill their column */
+}
+
+.course-card:hover {
+  transform: translateY(-5px);
+}
+
+.image-container {
+  position: relative;
+  width: 100%;
+  height: 0;
+  padding-bottom: 60%; /* 5:3 aspect ratio */
+  overflow: hidden;
+}
+
+.course-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.status-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 5px 10px;
+  border-radius: 15px;
+  font-size: 0.8em;
+  font-weight: 600;
+  color: white;
+  z-index: 2;
+}
+
+.status-badge.available {
+  background-color: #28a745; /* Green */
+}
+
+.status-badge.unavailable {
+  background-color: #dc3545; /* Red */
+}
+
+.card-body {
+    padding: 1.25rem;
+    display: flex;          /* Use flexbox */
+    flex-direction: column; /* Stack content vertically */
+}
+
+.card-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: #333;
+}
+
+// .card-text {
+//   color: #555;
+//   margin-bottom: 0.75rem;
+//   flex-grow: 1; /* Allow description to take up remaining space */
+// }
+
+.course-details {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 0; /* Remove bottom margin */
+}
+
+.course-details li {
+    margin-bottom: 0.25rem;
+}
+
+.card-footer {
+    padding: 1rem 1.25rem;
+    background-color: transparent; /* No background */
+    border-top: none; /* Remove top border */
+    display:flex; /*Added*/
+    justify-content: center;/*Added*/
+}
+.button-group {
+    display: flex;
+    flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
+    justify-content: space-between; /* Distribute buttons evenly */
+    gap: 5px; /* Space between buttons */
+    align-items: center;/* Added */
+}
+
+.button-group > * {
+    margin: 0; /* Remove default button margins */
+    flex-shrink: 0; /* Prevent buttons from shrinking */
+
+}
+
+/* Button Styles */
+.btn-read-ai,
+.btn-details,
+.btn-delete,
+.btn-edit,
+.btn-fav
+ {
+  padding: 8px 12px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  display: inline-flex; /* Use inline-flex for icon alignment */
+  align-items: center; /* Center icon and text vertically */
+  justify-content: center; /* Center icon and text horizontally */
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+  margin: 2px; /* Add small margin around each button */
+
+}
+.btn-read-ai i,
+.btn-details i,
+.btn-delete i,
+.btn-edit i,
+.btn-fav i{
+    margin-right: 4px;
+}
+
+
+.btn-read-ai {
+  background-color: #6c757d; /* Gray */
+  color: white;
+}
+
+.btn-read-ai:hover {
+  background-color: #5a6268; /* Darker gray */
+}
+.btn-read-ai:active{
+    scale: 0.95;
+}
+
+.btn-details {
+  background-color: #007bff; /* Blue */
+  color: white;
+}
+
+.btn-details:hover {
+  background-color: #0056b3; /* Darker blue */
+}
+.btn-details:active{
+    scale: 0.95;
+}
+
+.btn-delete {
+  background-color: #dc3545; /* Red */
+  color: white;
+}
+
+.btn-delete:hover {
+  background-color: #c82333; /* Darker red */
+}
+.btn-delete:active{
+    scale: 0.95;
+}
+
+.btn-edit {
+  background-color: #ffc107; /* Yellow */
+  color: #212529;
+}
+
+.btn-edit:hover {
+  background-color: #e0a800; /* Darker yellow */
+}
+.btn-edit:active{
+    scale: 0.95;
+}
+.btn-fav {
+    color: #888;
+    background-color: transparent; /* Add a background color */
+
+}
+
+.btn-fav:hover,
+.btn-fav .fa-heart.fas { /* Style when favorited */
+    color: #dc3545;
+}
+.btn-fav:active{
+    scale: 0.95;
+}
+
+
+/* No Courses Message */
+.text-center {
+  text-align: center;
+}
+
+.p-4 {
+  padding: 1rem;
+}
+
+.mt-3 {
+  margin-top: 1rem;
+}
+
+.text-muted {
+  color: #6c757d;
+}
+/* Modal style*/
+.modal-header{
+    background-color: #0d6efd;
+    color: white;
+}
+.modal-title{
+    color: white;
+}
+/* Animation de déplacement vers le haut */
+.animate-up {
+    animation: moveUp 0.5s ease-out forwards;
+}
+
+@keyframes moveUp {
+    0% {
+        transform: translateY(0);
+    }
+
+    100% {
+        transform: translateY(-20px);
+        /* Ajustez la distance du déplacement */
+        opacity: 0;
+        /* Optionnel: faire disparaître l'élément à la fin */
+    }
+}
+
+
+/* Pagination Styles */
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+
+  .btn {
+      margin: 0 5px;
+      border-radius: 5px; // Rounded corners for buttons
+      // Other button styles (colors, padding, etc.) can be added here
+  }
+
+   // Style the active page button differently
+   .btn-primary { // Assuming you're using Bootstrap's .btn-primary for active
+      background-color: #007bff;
+      border-color: #007bff;
+      color: white;
+
+      &:hover {
+          background-color: darken(#007bff, 10%);
+          border-color: darken(#007bff, 10%);
+      }
+  }
+
+}
+
+
+/* Date formatting */
+.course-date-formatted {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #f8f9fa;
+    padding: 0.25rem 0.5rem;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    margin-bottom: 0.5rem;
+    width: fit-content; /* Important: Fit to content */
+}
+
+.course-date-month {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    font-weight: bold;
+    color: #007bff;
+    margin-right: 0;
+}
+
+.course-date-day {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #333;
+}
+    .course-info{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 5px;
+}
+    .course-level{
+    margin-bottom: 0 !important;
+    font-size: 0.9rem;
+}
+
+/*------*/
+.course-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start; /* Align items to the top */
+    margin-bottom: 0.75rem; /* Space between header and description */
+    margin-top: 0 !important;
+}
+
+.course-price {
+    background-color: #007bff; /* Blue background */
+    color: white;
+    padding: 0.3em 0.6em;
+    border-radius: 15px;
+    font-weight: 600;
+    font-size: 1em;
+    margin-bottom: 0.5rem; /* Add some spacing */
+    align-self: flex-start; /* Align to the top */
+
+}
+
+.course-category {
+    background-color: #6c757d; /* Gray background */
+    color: white;
+    padding: 0.3em 0.6em;
+    border-radius: 15px;
+    font-size: 0.8em; /* Slightly smaller font */
+    font-weight: 600;
+}
+.course-description {
+  color: #555;
+  margin-bottom: 0.75rem;
+  flex-grow: 1; /* Allow description to take up remaining space */
+  overflow: hidden; /* Hide overflowing text */
+  text-align: left; /* Justify text */
+  font-size: 0.9rem; /* Adjust font size if needed */
+}
+/* Correct the display issues with !important.  Only use if necessary */
+  #editCourseModal {
+    display: block !important;
+    opacity: 1 !important;
+}
+
+/* Style pour la pagination */
+.d-flex.justify-content-center.mt-4 {
+  .btn-outline-primary {
+      color: #007bff;
+      border-color: #007bff;
+
+      &:hover {
+          color: #fff;
+          background-color: #007bff;
+          border-color: #007bff;
+      }
+
+      &:disabled {
+          color: #6c757d;
+          border-color: #6c757d;
+          background-color: transparent;
+      }
+  }
+
+  .align-self-center {
+    color:#0056b3;
+      margin: 0 10px; // Add some spacing
+  }
+}

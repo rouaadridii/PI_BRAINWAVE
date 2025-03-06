@@ -1,0 +1,126 @@
+// Variables (personnalisez-les !)
+$primary-color: #007bff; // Bleu, modifiable
+$secondary-color: #ffc107; // Jaune, modifiable
+$text-color: #333;
+$light-gray: #f8f9fa;
+$font-family: 'Arial', sans-serif; // Changez la police si vous voulez
+
+body {
+    font-family: $font-family;
+    color: $text-color;
+    background-image: url('/assets/templatefront/assets/images/meetings-bg.jpg');
+    background-size: cover; // Image couvre tout l'arrière-plan
+    background-attachment: fixed; // L'image reste fixe lors du scroll
+    background-position: center;  // Centre l'image
+    margin: 0; // Important pour éviter les marges par défaut
+    padding: 0; // Important pour éviter les paddings par défaut
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; // Assure que le footer reste en bas, même si peu de contenu
+}
+
+
+.main-content {
+  flex: 1; // Permet au contenu principal de prendre tout l'espace disponible
+  //padding: 20px; // Un peu d'espace autour du contenu
+  // Pour assurer que le contenu ne soit pas caché par le header/footer fixe:
+  //margin-top: /* Hauteur de votre header */;
+  //margin-bottom: /* Hauteur de votre footer */;
+    background-color: rgba(255, 255, 255, 0.9); // Légère transparence
+    padding: 3rem 0;
+     border-radius:  25px 25px 0 0 ;
+
+}
+
+.courses-section {
+  //padding: 2rem 0;
+
+  .section-title {
+    color: darken($primary-color, 15%); // Un bleu plus foncé
+    font-weight: bold;
+      margin-bottom: 2rem;
+  }
+
+  .course-card {
+    border: none; // Supprime les bordures par défaut de Bootstrap
+    border-radius: 15px; // Coins arrondis
+    overflow: hidden; // Pour que l'image respecte les coins arrondis
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); // Ombre légère
+    transition: transform 0.3s ease-in-out; // Animation subtile
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    height: 100%; // Important pour que les cartes aient la même hauteur
+
+    &:hover {
+      transform: translateY(-5px); // Légère élévation au survol
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); // Ombre plus prononcée au survol
+    }
+
+    &__image {
+      //height: 200px; // Hauteur fixe, ou utilisez aspect-ratio
+      //aspect-ratio: 16 / 9; // Pour garder un ratio d'aspect
+       //width:  100%;
+      img {
+        //width: 100%;
+        //height: 100%; // Pour remplir le conteneur
+        object-fit: cover; // L'image couvre l'espace sans être déformée
+      }
+    }
+
+    &__body {
+        padding: 1.25rem;
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+      .course-card__title {
+        color: $primary-color;
+        font-size: 1.25rem; // Titre un peu plus grand
+        font-weight: bold;
+        margin-bottom: 0.5rem; // Espace sous le titre
+      }
+
+      .course-card__description {
+        color: $text-color;
+        margin-bottom: 1rem; // Espace sous la description
+          flex-grow: 1;
+      }
+
+      .course-card__details {
+        list-style: none; // Pas de puces
+        padding: 0;
+        margin-bottom: 1rem;
+
+        li {
+          margin-bottom: 0.25rem; // Petit espace entre les éléments
+            color: #6c757d;
+
+          strong {
+            color: $text-color; // Pour mettre en valeur les labels
+            margin-right: 0.5rem;
+          }
+        }
+      }
+
+      .course-card__actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        //margin-top: auto; // Pousse les boutons vers le bas
+
+        .btn {
+          // Style des boutons, si vous n'utilisez pas Bootstrap
+          padding: 0.375rem 0.75rem;
+          border-radius: 0.25rem;
+          text-decoration: none; // Pas de soulignement pour les liens
+          // ... autres styles de bouton
+        }
+      }
+    }
+  }
+}
+
+// Styles pour le message "Aucun cours"
+.alert-warning {
+  // Si vous utilisez Bootstrap, il a déjà des styles, vous pouvez les surcharger ici
+}

@@ -280,7 +280,7 @@
     </div>
   </section>
 
-  <section class="our-courses" id="courses">
+  <!-- <section class="our-courses" id="courses">
     <div class="container">
       <div class="row">
         <div class="col-lg-12">
@@ -555,8 +555,62 @@
         </div>
       </div>
     </div>
-  </section>
+  </section> -->
 
+  <section class="our-courses" id="courses">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="section-heading">
+                    <h2>Our Popular Courses</h2>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="course-carousel-wrapper">
+                <button class="scroll-button left" (click)="scrollLeft()">&#10094;</button>
+                <div class="course-carousel">
+                    <div class="course-item" *ngFor="let course of courses" (click)="navigateToCourseDetails(course.idCourse)">  <div class="course-card">
+                            <img [src]="course.picture ? 'http://localhost:8087/cours/courses/images/' + course.picture : '/assets/templatefront/assets/images/course-01.jpg'" alt="{{ course.title }}" class="course-image">
+                            <div class="course-content">
+                                <h4>{{ course.title }}</h4>
+                                <p class="course-description">{{ course.description | slice:0:100 }}...</p>
+                                <div class="course-info">
+                                     
+                                    <div class="course-price">
+                                        <span>${{ course.price }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button class="scroll-button right" (click)="scrollRight()">&#10095;</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+  
+  
+  
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+  
   <section class="our-facts">
     <div class="container">
       <div class="row">

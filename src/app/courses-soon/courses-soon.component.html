@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cours à Venir</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+  <style>
+    .btn[disabled] {
+      pointer-events: none;
+      opacity: 0.65;
+    }
+  </style>
+</head>
+<body>
+  <app-front-header></app-front-header> <main class="main-content">
+    <section class="courses-section">
+      <div class="container mt-4">
+        <h2 class="section-title text-center text-uppercase mb-4">Cours à venir (Non publiés)</h2>
+
+        <div *ngIf="courses.length > 0; else noCourses" class="row row-cols-1 row-cols-md-3 g-4">
+          <div *ngFor="let course of courses" class="col">
+            <div class="course-card">
+              <div class="course-card__image">
+                <img [src]="course.picture ? 'http://localhost:8087/cours/courses/images/' + course.picture : 'assets/default-image.jpg'"
+                     alt="Image du cours"
+                     class="img-fluid">  </div>
+
+              <div class="course-card__body">
+                <h5 class="course-card__title">{{ course.title }}</h5>
+                <p class="course-card__description">{{ course.description || 'Aucune description disponible' }}</p>
+
+                <ul class="course-card__details">
+                  <li><strong>Date prévue :</strong> {{ course.scheduledPublishDate | date: 'short' }}</li>
+                  <li><strong>Catégorie :</strong> {{ course.category || 'Non spécifiée' }}</li>
+                  <li><strong>Prix :</strong> {{ course.price | currency }}</li>
+                  <li><strong>Niveau :</strong> {{ course.level }}</li>
+                </ul>
+
+                <div class="course-card__actions">
+                  <button (click)="addToFavorites(course.idCourse)"
+                          class="btn btn-outline-warning"
+                          [ngClass]="{'text-danger': course.liked}">
+                    <i class="fas fa-heart"></i> Ajouter aux favoris  </button>
+                  <a  class="btn btn-outline-primary" disabled>
+                    <i class="fas fa-info-circle"></i> Voir Détails
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+       
+        <ng-template #noCourses>
+          <div class="alert alert-warning text-center">
+            Aucun cours à venir trouvé.
+          </div>
+        </ng-template>
+      </div>
+    </section>
+  </main>
+
+  <app-front-footer></app-front-footer> <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+
+</body>
+</html>

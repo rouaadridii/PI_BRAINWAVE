@@ -1,0 +1,154 @@
+
+.course-carousel-wrapper {
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    position: relative;
+    margin-top: 30px; /* Ajoute un espace au-dessus du carrousel */
+}
+
+/* Conteneur du carrousel */
+.course-carousel {
+    display: flex;
+    transition: transform 0.5s ease-in-out; /* Transition fluide lors du défilement */
+    will-change: transform; /* Optimisation des performances lors du défilement */
+}
+
+/* Élément de chaque carte de cours */
+.course-item {
+    flex: 0 0 25%; /* 4 éléments par ligne (25% de la largeur) */
+    padding: 10px;
+    box-sizing: border-box; /* Assure que le padding ne dépasse pas la largeur */
+    display: flex;
+    justify-content: center; /* Centre les cartes */
+}
+
+/* Style de chaque carte de cours */
+.course-card {
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Image du cours */
+.course-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 12px 12px 0 0;
+    transition: transform 0.3s ease;
+}
+
+/* Contenu de la carte du cours */
+.course-content {
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: calc(100% - 200px); /* Ajuste la hauteur de la carte */
+}
+
+/* Titre du cours */
+.course-content h4 {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 10px;
+    transition: color 0.3s ease;
+}
+
+/* Description du cours */
+.course-description {
+    font-size: 0.9rem;
+    color: #777;
+    margin-bottom: 10px;
+}
+
+/* Informations du cours (évaluation et prix) */
+.course-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Evaluation des cours */
+.course-rating ul {
+    display: flex;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+.course-rating li {
+    color: #FFD700; /* Couleur dorée pour les étoiles */
+}
+
+/* Prix du cours */
+.course-price {
+    font-size: 1rem;
+    font-weight: bold;
+    color: #333;
+}
+
+/* Effet de survol pour les cartes */
+.course-card:hover {
+    transform: translateY(-5px); /* Légère remontée de la carte */
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15); /* Ombre plus marquée */
+}
+
+.course-card:hover .course-image {
+    transform: scale(1.05); /* Zoom sur l'image au survol */
+}
+
+/* Boutons de défilement (gauche et droite) */
+.scroll-button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    border: none;
+    font-size: 2rem;
+    cursor: pointer;
+    padding: 15px;
+    border-radius: 50%;
+    z-index: 1;
+    transition: background-color 0.3s ease;
+}
+
+.scroll-button:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+.scroll-button.left {
+    left: 10px;
+}
+
+.scroll-button.right {
+    right: 10px;
+}
+
+/* Responsivité - Adaptation pour les écrans plus petits */
+@media (max-width: 1199px) {
+    .course-item {
+        flex: 0 0 33.33%; /* 3 éléments par ligne pour les écrans moyens */
+    }
+}
+
+@media (max-width: 767px) {
+    .course-item {
+        flex: 0 0 50%; /* 2 éléments par ligne pour les petits écrans */
+    }
+}
+
+@media (max-width: 575px) {
+    .course-item {
+        flex: 0 0 100%; /* 1 élément par ligne pour les très petits écrans */
+    }
+}

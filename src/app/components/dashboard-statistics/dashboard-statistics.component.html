@@ -1,10 +1,12 @@
-<div class="card">
-  <div class="card-body">
-    <h2 class="text-center">📊 Statistiques des Cours par Catégorie</h2>
+<div class="statistics-container">
+  <h2>Statistiques des Cours</h2>
+  
 
-    <!-- Chart.js Canvas -->
-    <canvas id="courseChart" width="400" height="200"></canvas>
+  <div class="chart-legend" id="legend"></div>
 
-    <p class="text-muted text-center mt-3">Données mises à jour en temps réel</p>
+  <div class="chart-container">
+      <canvas id="myChart"></canvas>
   </div>
+
+  <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
 </div>
