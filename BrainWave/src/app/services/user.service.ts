@@ -49,6 +49,16 @@ export class UserService {
     );
   }
 
+  verify2FA(email: string, code: string, password: string): Observable<any> {
+    return this.http.post<any>(`${this.apiUrlogin}/verify-2fa`, { email, code, password }).pipe(
+      tap(response => {
+        if (response && response.token) {
+          localStorage.setItem('jwt', response.token);
+        }
+      })
+    );
+  }
+
   logout() {
     localStorage.removeItem('jwt');
     this.router.navigate(['/login']);

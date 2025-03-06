@@ -53,6 +53,20 @@
     </form>
   </div>
 
+  <div class="modal two-fa-modal" *ngIf="show2FAModal">
+    <div class="modal-content">
+      <h4>Verify Your identity</h4>
+      <div class="form-group">
+        <input type="text" placeholder="Verification Code" [(ngModel)]="twoFACode">
+      </div>
+      <p>Verification code expires in: {{ remainingTime }} seconds</p>
+      <div class="modal-buttons">
+          <button (click)="verify2FA()"  style="margin-right: 15px;">Verify</button>
+          <button (click)="close2FAModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
   <!-- "Don't have an account?" and "Create one" button in one line -->
   <div class="account-options">
       <p>Don't have an account?</p>

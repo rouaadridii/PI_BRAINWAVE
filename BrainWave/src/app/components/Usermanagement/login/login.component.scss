@@ -175,3 +175,38 @@
   .modal-content button:hover {
     background-color: #d32f2f; /* Darker red on hover */
   }
+/* ... (Your existing CSS) ... */
+
+.two-fa-modal .modal-content {
+    width: 400px; /* Reduced width */
+    max-width: 90%;
+    height: auto;
+    padding: 25px; /* Reduced padding */
+    display: block;
+    text-align: center;
+  }
+  
+  .two-fa-modal .modal-content h6 {
+    font-size: 1.6em; /* Slightly reduced title size */
+    margin-bottom: 20px;
+  }
+  
+  .two-fa-modal .modal-content .form-group {
+    margin-bottom: 18px; /* Slightly reduced margin */
+  }
+  
+  .two-fa-modal .modal-content .modal-buttons {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px; /* Slightly reduced margin */
+  }
+  
+  .two-fa-modal .modal-content .modal-buttons button {
+    padding: 10px 20px; /* Slightly reduced button padding */
+    font-size: 0.95em; /* Slightly reduced button font size */
+  }
+  
+  .two-fa-modal .modal-content p {
+    font-size: 1em; /* Slightly reduced timer font size */
+    margin-bottom: 18px; /* Slightly reduced margin */
+  }

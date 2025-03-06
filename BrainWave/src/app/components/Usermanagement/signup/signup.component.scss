@@ -184,4 +184,31 @@ body {
   }
   
   
-    
+  .verification-button {
+    background-color: #8eaf4c;
+    border: none;
+    color: white;
+    padding: 8px 16px; /* Reduced padding for smaller button */
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px; /* Reduced font size for smaller button */
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+  
+  .verification-button:hover {
+    background-color: #3e8e41;
+  }
+  
+  .verification-button:active {
+      background-color: #2e6a30;
+  }
+  
+  .ml-2{
+    margin-left: 0.5rem;
+  }
+  

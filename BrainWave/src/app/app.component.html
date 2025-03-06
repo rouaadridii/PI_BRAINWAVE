@@ -1,4 +1,6 @@
+<app-back-menu-admin *ngIf="!isback"></app-back-menu-admin>
 <router-outlet></router-outlet>
 <!--[isProfilePage]="isProfilePage"-->
+
 <app-front-header *ngIf="!isAuthPage"></app-front-header>
 <app-front-footer *ngIf="!isAuthPage"></app-front-footer>

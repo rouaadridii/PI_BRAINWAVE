@@ -54,6 +54,7 @@ export class ProfileComponent {
 
   openPasswordModal() {
     this.isPasswordModalOpen = true;
+    this.errorMessage = null;
   }
 
   closePasswordModal() {
@@ -61,32 +62,15 @@ export class ProfileComponent {
   }
 
   showConfirmationModal() {
-    // Ensure the passwords match before asking for confirmation
     if (this.passwordData.newPassword !== this.passwordData.confirmPassword) {
       this.errorMessage = 'New password and confirmation do not match!';
       return;
     }
-
-    const passwordUpdateRequest = {
-      oldPassword: this.passwordData.oldPassword,
-      newPassword: this.passwordData.newPassword
-    };
-
-    this.userService.updateUserProfile(passwordUpdateRequest).subscribe(
-      (response) => {
-        console.log('Password verified successfully:', response);
-        this.isPasswordModalOpen = false;
-        this.isConfirmationModalOpen = true;
-        this.errorMessage = null; // Clear error message if password is correct
-      },(error) => {
-        console.error('Error validating password:', error);
-        if (error.error && error.error === 'Old password is incorrect!') {
-          this.errorMessage = 'The old password is incorrect. Please try again.';
-        } else {
-          this.errorMessage = 'The old password is incorrect. Please try again.';
-        }
-      }
-    );
+  
+    // Don't send password update request here
+    this.isPasswordModalOpen = false;
+    this.isConfirmationModalOpen = true;
+    this.errorMessage = null;
   }
 
   closeConfirmationModal() {
@@ -111,6 +95,7 @@ export class ProfileComponent {
       oldPassword: this.passwordData.oldPassword,
       newPassword: this.passwordData.newPassword
     };
+    console.log('Old Password:', passwordUpdateRequest.oldPassword); // Add this line
 
     // Call the service to update the password
     this.userService.updateUserProfile(passwordUpdateRequest).subscribe(
