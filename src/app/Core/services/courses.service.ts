@@ -115,4 +115,18 @@ getCourseRating(idCourse: number): Observable<number> {
   return this.http.get<number>(`http://localhost:8087/cours/reviews/courses/${idCourse}/rating`);
 }
 
+getTotalCourses(): Observable<number> {
+  return this.http.get<number>(`${this.baseUrl}/count`);
+}
+
+
+getFavoriteCourses(): Observable<number> {
+  return this.http.get<number>(`${this.baseUrl}/favorites/count`);
+}
+// NOUVELLE méthode pour les statistiques par catégorie
+getCategoryStatistics(): Observable<any> {
+  // Utilise l'URL que vous avez fournie
+  return this.http.get<any>(`${this.baseUrl}/statistics/category`);
+}
+
 }

@@ -2,15 +2,22 @@
 
 <div class="course-detail-container">
     <div class="course-card-wrapper">
-        <div class="course-card">
+        <div class="course-card" *ngIf="course">
 
             <div class="course-image-container">
-                <img [src]="course.picture ? 'http://localhost:8087/cours/courses/images/' + course.picture : 'assets/default-image.jpg'" class="course-image" alt="Image du cours">
+                <img [src]="course.picture ? 'http://localhost:8087/cours/courses/images/' + course.picture : 'assets/default-image.jpg'" class="course-image" alt="Image du cours {{ course.title }}">
+                <div class="image-title-overlay">
+                    <h2 class="overlay-course-title">{{ course.title }}</h2>
+                </div>
             </div>
 
             <div class="course-info">
-                <h2 class="course-title">{{ course.title }}</h2>
-                <p class="course-description">{{ course.description }}</p>
+                <div class="course-description-container">
+                    <p class="course-description">
+                        <span class="detail-label">Description :</span>
+                        {{ course.description }}
+                    </p>
+                </div>
 
                 <div class="course-details-grid">
                     <div class="course-details-item">
@@ -24,7 +31,7 @@
                     <div class="course-details-item">
                         <i class="lucide lucide-badge-check detail-icon"></i>
                         <span class="detail-label">Statut :</span>
-                        <span [ngClass]="{'status-available': course.status, 'status-unavailable': !course.status}">
+                        <span class="status-text" [ngClass]="{'status-available': course.status, 'status-unavailable': !course.status}">
                             {{ course.status ? 'Disponible' : 'Indisponible' }}
                         </span>
                     </div>
@@ -36,31 +43,38 @@
                         <i class="lucide lucide-folder detail-icon"></i>
                         <span class="detail-label">Catégorie :</span> {{ course.category }}
                     </div>
+
                     <div class="course-details-item">
                         <i class="lucide lucide-star detail-icon text-warning"></i>
                         <span class="detail-label">Score :</span>
-                        <div class="progress-circle" [attr.data-value]="courseScore">
-                            <span class="progress-left">
-                                <span class="progress-bar"></span>
-                            </span>
-                            <span class="progress-right">
-                                <span class="progress-bar"></span>
-                            </span>
+                        <div class="progress-circle"
+                             [style.--progress-percent]="courseScore"
+                             role="progressbar"
+                             [attr.aria-valuenow]="courseScore | number:'1.0-0'"
+                             aria-valuemin="0"
+                             aria-valuemax="100"
+                             [title]="'Score du cours: ' + (courseScore | number:'1.0-0') + '%'">
                             <div class="progress-value">{{ courseScore | number:'1.0-0' }}%</div>
                         </div>
+                    </div>
+
+                    <div class="course-details-item">
+                        <i class="lucide lucide-clock detail-icon"></i>
+                        <span class="detail-label">Temps Passé :</span>
+                        {{ totalTimeSpentOnCourse | formatDuration }}
                     </div>
                 </div>
 
                 <div class="attachments-section">
-                    <h3 class="section-title"><i class="lucide lucide-paperclip"></i> Attachments</h3>
+                    <h3 class="section-title"><i class="lucide lucide-paperclip"></i> Pièces Jointes</h3>
                     <div *ngIf="attachments.length > 0; else noAttachments">
                         <table class="attachments-table">
                             <thead>
                                 <tr>
                                     <th>Titre</th>
                                     <th>Type</th>
-                                    <th>Source</th>
-                                    <th>Actions</th>
+                                    <th>Télécharger</th>
+                                    <th>Validation</th>
                                     <th>Consulter</th>
                                 </tr>
                             </thead>
@@ -73,18 +87,23 @@
                                             Télécharger
                                         </a>
                                     </td>
-                                    <td>
-                                        <button *ngIf="!attachment.validated" class="validate-button" (click)="validateAttachment(attachment.idAttachment)">
-                                            Valider
+                                    <td class="validation-cell">
+                                        <button
+                                            class="validation-toggle-button"
+                                            [ngClass]="{ 'validated': attachment.validated, 'not-validated': !attachment.validated }"
+                                            (click)="attachment.validated ? invalidateAttachment(attachment.idAttachment) : validateAttachment(attachment.idAttachment)"
+                                            [title]="attachment.validated ? 'Annuler la validation' : (isValidationDisabled(attachment) ? 'Consultez pendant 2 min pour valider' : 'Valider cette pièce jointe')"
+                                            [disabled]="isValidationDisabled(attachment)">
+                                            <i *ngIf="!attachment.validated" class="lucide lucide-circle"></i>
+                                            <i *ngIf="attachment.validated" class="lucide lucide-check-circle-2"></i>
                                         </button>
-                                        <span *ngIf="attachment.validated" class="validated-text">Validé</span>
-                                    </td>
+                                        </td>
                                     <td>
-                                        <button *ngIf="attachment && viewedAttachmentId !== attachment.idAttachment" class="view-button" (click)="$event.stopImmediatePropagation(); viewPDF(attachment)">
-                                            Consulter
+                                        <button *ngIf="viewedAttachmentId !== attachment.idAttachment" class="view-button" (click)="viewPDF(attachment)">
+                                            <i class="lucide lucide-eye"></i> Consulter
                                         </button>
-                                         <button *ngIf="viewedAttachmentId === attachment.idAttachment" class="view-button close-button" (click)="closePDF()">
-                                            Fermer
+                                        <button *ngIf="viewedAttachmentId === attachment.idAttachment" class="view-button close-button" (click)="closePDF()">
+                                            <i class="lucide lucide-x-circle"></i> Fermer
                                         </button>
                                     </td>
                                 </tr>
@@ -97,25 +116,32 @@
                         </div>
                     </div>
                     <ng-template #noAttachments>
-                        <p class="no-attachments-text">Aucun attachment trouvé.</p>
+                        <p class="no-attachments-text">Aucune pièce jointe trouvée pour ce cours.</p>
                     </ng-template>
                     <div *ngIf="pdfUrl" class="pdf-preview">
-                      <iframe [src]="pdfUrl" width="100%" height="500px"></iframe>
+                        <button class="close-pdf-preview-button" (click)="closePDF()">
+                            <i class="lucide lucide-x"></i> Fermer la prévisualisation
+                        </button>
+                        <iframe [src]="pdfUrl" width="100%" height="600px" title="Prévisualisation PDF"></iframe>
                     </div>
-
                 </div>
-
 
                 <div class="reviews-section">
                     <h3 class="section-title"><i class="lucide lucide-message-circle"></i> Avis des utilisateurs</h3>
-
                     <div *ngIf="averageRating > 0; else noReviews">
                         <p class="average-rating">
-                            <i class="lucide lucide-star text-warning"></i> <strong>Note Moyenne :</strong> ⭐ {{ averageRating.toFixed(1) }} / 5
+                            <i class="lucide lucide-star icon-average-rating"></i>
+                            <strong>Note Moyenne :</strong>
+                            <span class="star-rating-display">
+                                <i *ngFor="let star of [1, 2, 3, 4, 5]; let i = index"
+                                   class="fa"
+                                   [ngClass]="i < averageRating ? 'fa-star' : (i < averageRating + 0.5 ? 'fa-star-half-o' : 'fa-star-o')"></i>
+                            </span>
+                            ({{ averageRating.toFixed(1) }} / 5) - {{ reviews.length }} avis
                         </p>
                     </div>
                     <ng-template #noReviews>
-                        <p class="no-reviews-text">Aucun avis pour ce cours.</p>
+                        <p class="no-reviews-text">Aucun avis pour ce cours pour le moment.</p>
                     </ng-template>
 
                     <div class="reviews-list" *ngIf="reviews.length > 0">
@@ -124,54 +150,56 @@
                                 <span class="star-rating">
                                     <i *ngFor="let star of [1, 2, 3, 4, 5]; let i = index"
                                        class="fa"
-                                       [ngClass]="i < review.rating ? 'fa-star' : 'fa-star-o'">
-                                    </i>
+                                       [ngClass]="i < review.rating ? 'fa-star' : 'fa-star-o'"></i>
                                 </span>
                             </p>
                             <p><strong>Commentaire:</strong> {{ review.comment }}</p>
                             <button class="delete-review-button" (click)="deleteReview(review.idReview)">
-                                Supprimer
+                                <i class="lucide lucide-trash-2"></i> Supprimer
                             </button>
                         </div>
                     </div>
                 </div>
 
-
                 <div class="add-review-section">
-                    <h3 class="section-title"><i class="lucide lucide-edit"></i> Ajouter un avis</h3>
+                    <h3 class="section-title"><i class="lucide lucide-edit"></i> Laissez votre avis</h3>
                     <form (ngSubmit)="submitReviewn()" #reviewForm="ngForm" class="review-form">
-                        <div class="form-group">
-                            <label for="rating" class="form-label">Note (1 à 5) :</label>
+                        <div class="form-group rating-group">
+                            <label for="rating" class="form-label">Votre note :</label>
                             <div class="rating">
-                                <i
-                                    *ngFor="let star of [1, 2, 3, 4, 5]; let i = index"
-                                    class="fa"
-                                    [ngClass]="i < newReview.rating || i < hoveredStar ? 'fa-star' : 'fa-star-o'"
-                                    (mouseenter)="hoverStar(i + 1)"
-                                    (mouseleave)="hoverStar(newReview.rating)"
-                                    (click)="setRating(star)"
-                                    style="cursor: pointer;"
-                                ></i>
+                                <i *ngFor="let star of [1, 2, 3, 4, 5]; let i = index"
+                                   class="fa rating-star"
+                                   [ngClass]="{
+                                       'fa-star': i < newReview.rating || i < hoveredStar,
+                                       'fa-star-o': i >= newReview.rating && i >= hoveredStar,
+                                       'hovered': i < hoveredStar
+                                   }"
+                                   (mouseenter)="hoverStar(i + 1)"
+                                   (mouseleave)="hoverStar(0)"
+                                   (click)="setRating(star)"></i>
                             </div>
                             <input type="hidden" id="rating" [(ngModel)]="newReview.rating" name="rating" required>
                         </div>
-
                         <div class="form-group">
-                            <label for="comment" class="form-label">Commentaire :</label>
-                            <textarea id="comment" class="form-control" [(ngModel)]="newReview.comment" name="comment" required></textarea>
+                            <label for="comment" class="form-label">Votre commentaire :</label>
+                            <textarea id="comment" class="form-control" [(ngModel)]="newReview.comment" name="comment" required rows="4" placeholder="Décrivez votre expérience..."></textarea>
                         </div>
-
-                        <button type="submit" class="submit-review-button" [disabled]="reviewForm.invalid">Ajouter l'avis</button>
+                        <button type="submit" class="submit-review-button" [disabled]="reviewForm.invalid || newReview.rating === 0">
+                            <i class="lucide lucide-send"></i> Envoyer l'avis
+                        </button>
                     </form>
                 </div>
             </div>
 
             <div class="back-button-container">
                 <button class="back-button" [routerLink]="['/courses']">
-                    <i class="lucide lucide-arrow-left"></i> Retour à la liste
+                    <i class="lucide lucide-arrow-left"></i> Retour à la liste des cours
                 </button>
             </div>
 
+        </div>
+        <div *ngIf="!course" class="loading-indicator">
+            <p>Chargement des détails du cours...</p>
         </div>
     </div>
 </div>

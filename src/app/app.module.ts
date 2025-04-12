@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { LOCALE_ID, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -24,7 +24,9 @@ import { FavoritCoursesComponent } from './favorit-courses/favorit-courses.compo
 import { CoursesSoonComponent } from './courses-soon/courses-soon.component';
 import { SafePipe } from './safe-pipe.pipe';
 import { CoursesTeachersComponent } from './components/courses-teachers/courses-teachers.component';
-
+import localeFr from '@angular/common/locales/fr';
+import { registerLocaleData } from '@angular/common';
+import { FormatDurationPipe } from './pipes/format-duration.pipe';
 
 
 @NgModule({
@@ -47,7 +49,8 @@ import { CoursesTeachersComponent } from './components/courses-teachers/courses-
     FavoritCoursesComponent,
     CoursesSoonComponent,
     SafePipe,
-    CoursesTeachersComponent
+    CoursesTeachersComponent,
+    FormatDurationPipe
    
   ],
   imports: [
@@ -57,9 +60,14 @@ import { CoursesTeachersComponent } from './components/courses-teachers/courses-
     AppRoutingModule,
    HttpClientModule,
 
+
     
   ],
-  providers: [],
+  providers: [    { provide: LOCALE_ID, useValue: 'fr-FR' }],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {
+  constructor() {
+    registerLocaleData(localeFr);
+  }
+ }

@@ -8,5 +8,6 @@ export interface Attachment {
   visible: boolean;
   courseId: number; // Association avec un cours
   filename: string;  // Si vous voulez l'utiliser dans le template
+  timeSpentOnCourse?: number;
 
 }

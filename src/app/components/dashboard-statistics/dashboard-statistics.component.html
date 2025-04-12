@@ -1,12 +1,30 @@
-<div class="statistics-container">
-  <h2>Statistiques des Cours</h2>
-  
-
-  <div class="chart-legend" id="legend"></div>
-
-  <div class="chart-container">
-      <canvas id="myChart"></canvas>
+<div class="dashboard-statistics">
+  <div *ngIf="isLoading" class="loading-message">Chargement des statistiques...</div>
+  <div *ngIf="errorMessage && !isLoading" class="error-message">
+    {{ errorMessage }}
+    <button (click)="loadAllStatistics()">Réessayer</button>
   </div>
 
-  <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
+  <div *ngIf="!isLoading && !errorMessage">
+    <div class="chart-card overall-chart">
+       <h2>Statistiques Globales</h2>
+       <div class="chart-container">
+         <div class="chart-center-text">
+           <span class="center-text-line1">{{ centerTextLine1 }}</span>
+           <span class="center-text-line2">{{ centerTextLine2 }}</span>
+         </div>
+         <canvas id="overallChart"></canvas>
+       </div>
+       </div>
+
+    <div class="chart-card category-distribution-chart">
+       <h2>Répartition par Catégorie</h2>
+       <div *ngIf="categoryDistributionData.length === 0 && !isLoading" class="no-data-message">
+         Aucune donnée de catégorie à visualiser.
+       </div>
+       <div class="category-distribution-container" *ngIf="categoryDistributionData.length > 0">
+         <canvas id="categoryDistributionChart"></canvas>
+       </div>
+       </div>
+  </div>
 </div>
