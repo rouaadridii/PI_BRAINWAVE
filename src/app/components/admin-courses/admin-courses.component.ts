@@ -70,10 +70,10 @@ export class AdminCoursesComponent implements OnInit {
   
   
   // Ouvrir la popup d'ajout de cours
-  openAddCoursePopup(): void {
-    const modal = new bootstrap.Modal(document.getElementById('addCourseModal')!);
-    modal.show();
-  }
+    openAddCoursePopup(): void {
+      const modal = new bootstrap.Modal(document.getElementById('addCourseModal')!);
+      modal.show();
+    }
 
   // Mettre à jour un cours
   updateCourse(): void {

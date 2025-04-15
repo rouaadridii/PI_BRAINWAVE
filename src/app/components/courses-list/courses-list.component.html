@@ -1,177 +1,147 @@
 <app-front-header></app-front-header>
+
 <div class="main-content">
-    <div class="filter-buttons">
-        <button class="btn btn-filter" [class.active]="filter === 'all'" (click)="setFilter('all')">All Courses</button>
+
+  <div class="course-controls">
+
+    <div class="controls-row controls-row-main">
+      <div class="filter-buttons">
+        <button class="btn btn-filter" [class.active]="filter === 'all'" (click)="setFilter('all')">Tous les cours</button>
         <button class="btn btn-filter" [class.active]="filter === 'favorites'" (click)="setFilter('favorites')">
-            <i class="fa fa-heart"></i> Favorites
+          <i class="fa fa-heart"></i> Favoris
         </button>
-    </div>
-    <div class="search-bar me-3">
+      </div>
+
+      <div class="search-bar">
         <div class="input-group search-container">
-            <input
-                type="text"
-                class="form-control search-input"
-                placeholder="Rechercher un cours par titre..."
-                [(ngModel)]="searchQuery"
-                (input)="onSearchInput()"
-                (focus)="showSuggestions = true"
-                (blur)="onSearchBlur()"
-                (keydown.escape)="hideSuggestionsList()"
-             />
-            <ul class="suggestions-list" *ngIf="showSuggestions && suggestions.length > 0"
-                (mouseenter)="onMouseEnterSuggestions()" (mouseleave)="onMouseLeaveSuggestions()">
-                <li
-                    *ngFor="let suggestion of suggestions"
-                    (click)="selectSuggestion(suggestion)"
-                    (mouseenter)="highlightSuggestion(suggestion)"
-                    [class.highlighted]="highlightedSuggestion === suggestion"
-                >
-                    {{ suggestion.title }}
-                </li>
-            </ul>
-            <span class="input-group-text" (click)="startSpeechRecognition()" id="basic-addon1">
-                <i class="fa fa-microphone"></i>
-            </span>
+          <input
+            type="text"
+            class="form-control search-input"
+            placeholder="Rechercher un cours..."
+            [(ngModel)]="searchQuery"
+            (input)="onSearchInput()"
+            (focus)="onSearchFocus()"
+            (blur)="onSearchBlur()"
+            (keydown.escape)="hideSuggestionsList()"
+          />
+          <ul class="suggestions-list" *ngIf="showSuggestions && suggestions.length > 0"
+              (mouseenter)="onMouseEnterSuggestions()" (mouseleave)="onMouseLeaveSuggestions()">
+            <li *ngFor="let suggestion of suggestions"
+                (click)="selectSuggestion(suggestion)"
+                (mouseenter)="highlightSuggestion(suggestion)"
+                [class.highlighted]="highlightedSuggestion === suggestion">
+              {{ suggestion.title }}
+            </li>
+          </ul>
+          <span class="input-group-text" (click)="openVoiceModal()" id="basic-addon1" title="Recherche vocale">
+            <i class="fa fa-microphone"></i>
+          </span>
         </div>
+      </div>
+    </div><div class="controls-row controls-row-secondary">
+      <div class="price-range-filter form-group">
+        <label for="priceRange" class="form-label">Prix :</label>
+        <select id="priceRange" class="form-select"
+                [(ngModel)]="selectedPriceRange"
+                (ngModelChange)="handlePriceChange()">
+          <option value="all">Tous</option>
+          <option value="free">Gratuit</option>
+          <option value="under50">&lt; 50 €</option>
+          <option value="50to100">50-100 €</option>
+          <option value="above100">&gt; 100 €</option>
+        </select>
+      </div>
+
+      <div class="sorting-options form-group">
+        <label for="sortOption" class="form-label">Trier par :</label>
+        <select id="sortOption" class="form-select"
+                [(ngModel)]="sortOption"
+                (change)="onSortOptionChange(sortOption)">
+          <option value="default">Défaut</option>
+          <option value="priceAsc">Prix &uarr;</option>
+          <option value="priceDesc">Prix &darr;</option>
+          <option value="popularity">Popularité</option>
+          <option value="rating">Note</option>
+        </select>
+      </div>
+    </div></div> <div *ngIf="filteredCourses && filteredCourses.length > 0; else noCourses"
+       class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="courses-list">
+       <div *ngFor="let course of paginatedCourses()" class="col d-flex align-items-stretch" [id]="'course-' + course.idCourse">
+      <div class="card h-100 shadow-lg border-0 rounded overflow-hidden course-card">
+        <div class="card-img-top position-relative">
+           <img [src]="course.picture ? 'http://localhost:8087/cours/courses/images/' + course.picture : 'assets/default-image.jpg'"
+               alt="Image du cours {{ course.title }}"
+               class="w-100 course-image"
+               onerror="this.src='assets/default-image.jpg';" />
+          <span class="course-status-badge" [ngClass]="{'available': course.status, 'unavailable': !course.status}">
+            {{ course.status ? 'Disponible' : 'Indisponible' }}
+          </span>
+        </div>
+        <div class="card-body d-flex flex-column">
+          <div class="course-header">
+            <span class="course-price">{{ course.price | currency:'EUR':'symbol':'1.2-2':'fr' }}</span>
+            <span class="course-category">{{ course.category }}</span>
+             <ng-container *ngIf="averageRating[course.idCourse] !== undefined && averageRating[course.idCourse] > 0">
+                <span class="course-rating" title="Note moyenne">
+                    {{ averageRating[course.idCourse] | number:'1.1-1' }} <i class="fa fa-star"></i>
+                </span>
+             </ng-container>
+             <ng-container *ngIf="!averageRating[course.idCourse] || averageRating[course.idCourse] === 0">
+                 <span class="course-rating text-muted" title="Pas encore noté">0.0 <i class="fa fa-star"></i></span>
+             </ng-container>
+            <button class="btn btn-sm btn-ia" (click)="textToSpeech(course)" title="Lire la description">
+              <i class="fas fa-volume-up"></i> {{ isSpeaking ? 'Arrêter' : '' }}
+            </button>
+          </div>
+          <h5 class="card-title mt-2">{{ course.title }}</h5>
+          <p class="card-text course-description">{{ course.description || 'Aucune description disponible.' }}</p>
+          <div class="course-details">
+            <div class="course-date-formatted" title="Date">
+              <span class="course-date-month">{{ course.date | date: 'MMM' | uppercase }}</span>
+              <span class="course-date-day">{{ course.date | date: 'd' }}</span>
+            </div>
+            <span class="course-level" title="Niveau">Niveau: {{ course.level }}</span>
+          </div>
+          <div class="mt-auto d-flex justify-content-between align-items-center">
+            <a [routerLink]="['/details', course.idCourse]" class="btn btn-details"><i class="fas fa-eye"></i> Détails</a>
+            <button (click)="toggleFavorite(course)" class="btn btn-favorite" [class.text-danger]="course.liked" [title]="course.liked ? 'Retirer des favoris' : 'Ajouter aux favoris'">
+              <i class="fa fa-heart"></i>
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 
-    <div class="d-flex align-items-center">
-      <div class="price-range-filter me-3">
-          <label for="priceRange" class="form-label fw-bold">Filtrer par prix :</label>
-          <select id="priceRange" class="form-select border-primary rounded-pill" [(ngModel)]="selectedPriceRange" (change)="onPriceRangeChange(selectedPriceRange)">
-              <option value="all">Tous les prix</option>
-              <option value="free">Gratuit</option>
-              <option value="under50">Moins de $50</option>
-              <option value="50to100">$50 - $100</option>
-              <option value="above100">Plus de $100</option>
-          </select>
-      </div>
+  <ng-template #noCourses>
+    <div class="alert alert-warning text-center mt-4">Aucun cours trouvé correspondant à vos critères.</div>
+  </ng-template>
 
-      <div class="sorting-options me-3">
-          <label for="sortOption" class="form-label fw-bold">Trier par :</label>
-          <select id="sortOption" class="form-select border-primary rounded-pill" [(ngModel)]="sortOption" (change)="onSortOptionChange(sortOption)">
-              <option value="default">Par défaut</option>
-              <option value="priceAsc">Prix croissant</option>
-              <option value="priceDesc">Prix décroissant</option>
-              <option value="popularity">Popularité</option>
-              <option value="rating">Note</option>
-          </select>
-      </div>
+  <nav *ngIf="filteredCourses && filteredCourses.length > itemsPerPage" class="pagination-container" aria-label="Pagination">
+     <ul class="pagination">
+        <li class="page-item" [class.disabled]="currentPage === 1">
+            <a class="page-link pagination-btn prev-btn" (click)="prevPage()" aria-label="Précédent">&laquo;</a>
+        </li>
+        <li *ngFor="let page of getPages()" class="page-item" [class.active]="page === currentPage">
+            <a class="page-link pagination-btn" (click)="goToPage(page)">{{ page }}</a>
+        </li>
+        <li class="page-item" [class.disabled]="currentPage >= totalPages()">
+            <a class="page-link pagination-btn next-btn" (click)="nextPage()" aria-label="Suivant">&raquo;</a>
+        </li>
+     </ul>
+  </nav>
+
+</div> <div class="voice-modal-overlay" [class.active]="isVoiceModalOpen">
+  <div class="voice-modal-content">
+    <h5>Parlez maintenant...</h5>
+    <div class="voice-visualizer-container">
+      <div class="voice-circle" id="voice-visualization-circle"></div>
+    </div>
+    <p class="transcript" *ngIf="currentTranscript">Détecté : <em>{{ currentTranscript }}</em></p>
+    <p class="transcript-final" *ngIf="finalTranscript">Résultat : <strong>{{ finalTranscript }}</strong></p>
+    <p *ngIf="voiceError" class="text-danger voice-error-message">{{ voiceError }}</p>
+    <button class="btn btn-danger mt-3" (click)="closeVoiceModal()">Annuler</button>
   </div>
 </div>
 
-    <div
-        *ngIf="filteredCourses.length > 0; else noCourses"
-        class="row row-cols-1 row-cols-md-3 g-4" id="courses-list"
-    >
-    <div *ngFor="let course of paginatedCourses()" class="col" [id]="'course-' + course.idCourse" [class.animate-up]="course.animateUp">
-
-        <div class="card h-100 shadow-lg border-0 rounded overflow-hidden course-card">
-          <div class="card-img-top position-relative">
-            <img
-              [src]="
-                course.picture
-                  ? 'http://localhost:8087/cours/courses/images/' + course.picture
-                  : 'assets/default-image.jpg'
-              "
-              alt="Image du cours"
-              class="w-100 course-image"
-            />
-              <span class="course-status-badge" [ngClass]="{'available': course.status, 'unavailable': !course.status}">
-                {{ course.status ? 'Disponible' : 'Indisponible' }}
-              </span>
-          </div>
-
-          <div class="card-body d-flex flex-column">
-            <div class="course-header">
-              <span class="course-price">{{ course.price | currency }}</span>
-              <span class="course-category">{{ course.category }}</span>
-              <ng-container *ngIf="averageRating[course.idCourse] !== undefined">
-                <span class="course-rating">
-                  {{ averageRating[course.idCourse] }}
-                  <i class="fa fa-star text-warning"></i>
-                </span>
-              </ng-container>
-              <button class="btn btn-outline-secondary btn-sm btn-ia" (click)="textToSpeech(course)">
-                <i class="fas fa-volume-up"></i>
-                {{ course.isSpeaking ? 'Arrêter' : 'Lire' }}
-              </button>
-            </div>
-
-            <h5 class="card-title">{{ course.title }}</h5>
-            <p class="card-text course-description">
-              {{ course.description || 'Aucune description disponible' }}
-            </p>
-
-            <div class="course-details">
-                <div class="course-date-formatted">
-                    <span class="course-date-month">{{ course.date | date: 'MMM' | uppercase }}</span>
-                    <span class="course-date-day">{{ course.date | date: 'd' }}</span>
-                </div>
-                <div class="course-info">
-                    <span class="course-level"
-                  >Niveau: {{ course.level }}</span
-                >
-                </div>
-              </div>
-
-            <div class="mt-auto d-flex justify-content-between align-items-center">
-              <a
-                [routerLink]="['/details', course.idCourse]"
-                class="btn btn-primary btn-details"
-              >
-                <i class="fas fa-eye"></i> Détails
-              </a>
-             <button *ngIf="!course.liked" (click)="toggleFavorite(course)" class="btn btn-outline-danger btn-favorite">
-                <i class="fa fa-heart" [class.text-danger]="course.liked"></i>
-             </button>
-             <button *ngIf="course.liked" (click)="toggleFavorite(course)" class="btn btn-outline-danger btn-favorite">
-                <i class="fa fa-heart text-danger"></i>  </button>
-
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <nav class="d-flex justify-content-center mt-4 pagination-container">
-      <ul class="pagination">
-        <li class="page-item" [class.disabled]="currentPage === 1">
-          <a
-            class="page-link pagination-btn prev-btn"
-            (click)="prevPage()"
-            aria-label="Précédent"
-          >
-            &laquo;
-          </a>
-        </li>
-
-        <li
-          *ngFor="let page of getPages()"
-          class="page-item"
-          [class.active]="page === currentPage"
-        >
-          <a class="page-link pagination-btn page-number-btn" (click)="goToPage(page)"
-            >{{ page }}</a
-          >
-        </li>
-
-        <li
-          class="page-item"
-          [class.disabled]="currentPage >= totalPages()"
-        >
-          <a
-            class="page-link pagination-btn next-btn"
-            (click)="nextPage()"
-            aria-label="Suivant"
-          >
-            &raquo;
-          </a>
-        </li>
-      </ul>
-    </nav>
-
-    <ng-template #noCourses>
-      <div class="alert alert-warning text-center">Aucun cours trouvé.</div>
-    </ng-template>
 <app-front-footer></app-front-footer>

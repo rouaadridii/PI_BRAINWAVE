@@ -1,4 +1,4 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { catchError, map, Observable, throwError } from 'rxjs';
 import { Course } from '../Model/Course';
@@ -33,7 +33,7 @@ addCourse(courseData: FormData): Observable<Course> {
   return this.http.post<Course>(`${this.baseUrl}/add`, courseData);
 }
 
- // Méthode pour ajouter un cours avec une publication programmée
+  //Méthode pour ajouter un cours avec une publication programmée s7i7a
  scheduleCoursePublication(courseData: any): Observable<any> {
   const headers = new HttpHeaders();
   const formData = new FormData();
@@ -47,6 +47,10 @@ addCourse(courseData: FormData): Observable<Course> {
 
   return this.http.post(`${this.baseUrl}/createWithScheduledPublish`, formData, { headers });
 }
+
+
+
+
 getCoursesSoon(): Observable<Course[]> {
   return this.http.get<Course[]>(`${this.baseUrl}/soon`);  // L'URL de l'API pour récupérer les cours non publiés
 }
@@ -127,6 +131,13 @@ getFavoriteCourses(): Observable<number> {
 getCategoryStatistics(): Observable<any> {
   // Utilise l'URL que vous avez fournie
   return this.http.get<any>(`${this.baseUrl}/statistics/category`);
+}
+updateCourseStatus(idCourse: number, newStatus: boolean): Observable<any> {
+  const url = `${this.baseUrl}/${idCourse}/status`; // URL avec /status
+  // Créer les paramètres de requête
+  const params = new HttpParams().set('status', newStatus.toString());
+  // Envoyer en PUT, sans corps (null), mais avec les paramètres
+  return this.http.put(url, null, { params: params });
 }
 
 }

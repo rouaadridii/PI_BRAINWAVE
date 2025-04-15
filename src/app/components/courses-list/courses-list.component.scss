@@ -1,504 +1,229 @@
+// --- Variables ---
+$primary-color: #007bff;
+$secondary-color: #6c757d;
+$success-color: #28a745;
+$danger-color: #dc3545;
+$light-gray: #f8f9fa;
+$medium-gray: #dee2e6;
+$text-color-dark: #333;
+$text-color-muted: #555;
+$card-background-color: #ffffff;
+$max-content-width: 1200px;
+$card-border-radius: 50px; // Angles très courbés
+
+// --- Styles de Base ---
 :host {
   background-image: url('/assets/templatefront/assets/images/meetings-bg.jpg');
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: center center;
-  background-attachment: fixed;
-  display: block;
-  min-height: 100vh;
-  color: #333;
-  margin-bottom: 0;
-  padding-bottom: 0;
+  background-size: cover; background-repeat: no-repeat; background-position: center center;
+  background-attachment: fixed; display: block; min-height: 100vh; color: $text-color-dark;
+  margin-bottom: 0; padding-bottom: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .main-content {
-  margin-left: auto;
-  margin-right: auto;
-  padding: 20px;
-  margin-top: 60px;
-  margin-bottom: 60px;
-  position: relative;
-  z-index: 1;
+  margin-left: auto; margin-right: auto; padding: 20px; margin-top: 60px; margin-bottom: 60px;
+  position: relative; z-index: 1; max-width: $max-content-width; width: 100%;
 }
 
-body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #040404;
-  margin-top: 0;
-  background-image: url('/assets/templatefront/assets/images/meetings-bg.jpg');
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: center center;
-  background-attachment: fixed;
+// --- Barre de recherche (Centrée) ---
+.search-bar {
+   display: block; // Force à prendre sa propre ligne
+   max-width: 450px; // Largeur max de la barre
+   margin-left: auto; // Centrage horizontal
+   margin-right: auto; // Centrage horizontal
+   margin-bottom: 1.5rem; // Espace en dessous
+   position: relative; // Pour positionner l'icône et suggestions
+}
+// Styles internes de la barre de recherche (restent les mêmes)
+.search-container {
+  position: relative; // Nécessaire pour l'icône et suggestions
+  .suggestions-list {
+    position: absolute; top: 100%; left: 0; right: 0; background-color: white;
+    border: 1px solid $medium-gray; border-top: none; border-radius: 0 0 15px 15px;
+    list-style-type: none; padding: 0; margin: 0; z-index: 10;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); max-height: 250px;
+    overflow-y: auto; overflow-x: hidden;
+    li {
+      padding: 10px 15px; cursor: pointer; transition: background-color 0.2s ease, color 0.2s ease;
+      border-bottom: 1px solid #eee;
+      &:last-child { border-bottom: none; }
+      &:hover, &.highlighted { background-color: #e9f1ff; color: darken($primary-color, 10%); }
+    }
+  }
+  .search-input {
+    border-radius: 25px; padding: 0.75rem 3rem 0.75rem 1.25rem; font-size: 1rem;
+    border: 2px solid $medium-gray; background-color: white;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease; width: 100%;
+    &:focus { border-color: $primary-color; outline: none; box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); }
+  }
+  .input-group-text { // Icone micro
+    background-color: transparent; border: none; cursor: pointer; padding: 0;
+    position: absolute; right: 15px; top: 50%; transform: translateY(-50%);
+    z-index: 4; color: $primary-color;
+    &:hover { color: darken($primary-color, 20%); }
+  }
 }
 
-// Style des boutons de filtrage
+// --- Autres Contrôles (Revenant à l'ancien layout groupé horizontalement) ---
+
+// Style des boutons de filtrage (probablement groupés avec les dropdowns)
 .filter-buttons {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 20px;
+  display: flex; // Pour aligner les boutons entre eux
+  justify-content: center; // Centre les boutons s'ils sont seuls sur une ligne
+  margin-bottom: 1.5rem; // Espace s'ils sont sur leur propre ligne
 
   .btn-filter {
-    background-color: #f8f9fa;
-    border: 1px solid #ddd;
-    color: #333;
-    padding: 0.5rem 1rem;
-    margin: 0 0.5rem;
-    border-radius: 20px;
-    cursor: pointer;
+    background-color: $light-gray; border: 1px solid $medium-gray; color: $text-color-dark;
+    padding: 0.5rem 1rem; margin: 0 0.5rem; border-radius: 20px; cursor: pointer;
     transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
-
-    &:hover {
-      background-color: #e9ecef;
-      transform: translateY(-2px); // Légère animation au survol
-    }
-
-    &.active {
-      background-color: #007bff;
-      color: white;
-      border-color: #007bff;
-    }
+    &:hover { background-color: #e9ecef; transform: translateY(-2px); }
+    &.active { background-color: $primary-color; color: white; border-color: $primary-color; }
+     i { margin-right: 0.3em; }
   }
 }
 
-.search-container {
-  position: relative;
-  max-width: 400px;
-  margin-left: auto;
-  margin-right: auto;
-  padding: 0 10px;
+// Filtres Prix et Tri (probablement groupés ensemble ou avec filter-buttons)
+.price-range-filter,
+.sorting-options {
+  // Pas de style de positionnement spécifique ici, dépend du conteneur parent
+  min-width: 180px; // Garde une largeur min
 
-  .input-group {
-    border-radius: 25px;
-    overflow: hidden;
+  label { // Style des labels (potentiellement au dessus ou à côté selon HTML)
+      color: #eaedf1; font-size: 1rem; margin-bottom: 0.5rem; display: block; // Label au dessus par défaut
+      font-weight: 500; text-shadow: 1px 1px 2px rgba(0,0,0,0.6);
   }
+  select {
+    background: white; border: 1px solid $medium-gray; color: #495057; font-weight: 500;
+    padding: 0.5rem 1rem; transition: all 0.3s ease-in-out; box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    border-radius: 20px; width: 100%; // Prend la largeur du conteneur parent (.price-range-filter etc)
+    &:hover { border-color: #adb5bd; box-shadow: 0px 3px 7px rgba(0, 0, 0, 0.15); }
+    &:focus { border-color: lighten($primary-color, 25%); outline: none; box-shadow: 0 0 0 0.2rem rgba($primary-color, 0.25); }
+  }
+}
 
- .suggestions-list {
-    position: absolute;
-    top: 100%;  // Position directly below the input
-    left: 0;
-    right: 0;
-    background-color: white;
-    border: 1px solid #ddd;
-    border-top: none; // Remove top border to connect visually with input
-    border-radius: 0 0 25px 25px;  // Rounded bottom corners
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-    z-index: 10;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); // More pronounced shadow
-    max-height: 250px;  // Limit height, add scroll
-    overflow-y: auto;   // Add vertical scrollbar if needed
-    overflow-x: hidden; // Prevent horizontal scrollbar
-
-     li {
-        padding: 10px 15px;
-        cursor: pointer;
-        transition: background-color 0.2s ease, color 0.2s ease; // Smooth transition
-        border-bottom: 1px solid #eee; // Subtle separator
-
-      &:last-child {
-        border-bottom: none; // Remove border from last item
-       }
-
-      &:hover,
-      &.highlighted {
-        background-color: #e9f1ff; // Lighter blue for better contrast
-        color: #0056b3;  // Darker blue for text
-      }
-    }
+// Conteneur flex générique (potentiellement utilisé pour grouper les filtres/tri)
+.d-flex.align-items-center { // Cible le conteneur des dropdowns s'il existe
+  gap: 1.5rem;
+  justify-content: center; // Centre les éléments DANS ce conteneur
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem; // Espace sous ce groupe
 }
 
 
-  .search-input {
-    border-radius: 25px;
-    padding: 0.75rem 1.25rem;
-    padding-right: 3rem;
-    font-size: 1rem;
-    border: 2px solid #ddd;
-    background-color: white;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-    width: 100%;
-     border-top-right-radius: 25px;
-      border-bottom-right-radius: 25px;
-      border-bottom-left-radius: 25px;
-
-
-    &:focus {
-      border-color: #007bff;
-      outline: none;
-      box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
-      & + .suggestions-list { //Style when input focus
-        border-color: #007bff;
-      }
-    }
-      & + .suggestions-list {
-        border-top: none; // Remove the top border
-    }
-  }
-
-
-  .input-group-text {
-    background-color: transparent;
-    border: none;
-    cursor: pointer;
-    padding: 0;
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 4;
-    color: #007bff;
-    border: 2px solid transparent;
-    border-radius: 25px;
-    padding-right: 0.6rem;
-    padding-left: 0.6rem;
-      &:hover{
-        color: darken(#007bff, 20%);
-        }
-  }
-
-    .btn-primary {
-    background-color: #007bff;
-    border-color: #007bff;
-    color: white;
-
-      &:hover {
-        background-color: #0056b3;
-        border-color: #0056b3;
-      }
-  }
+/* Liste des cours */
+#courses-list {
+  margin-bottom: 1.5rem;
+  margin-top: 1.5rem; // Espace après les contrôles
 }
 
 /* Cartes de cours */
 .course-card {
-  border: 1px solid #dee2e6 !important;
-  border-radius: 20px;
-  overflow: hidden;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  height: 100%;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-  position: relative;
-  z-index: 1;
- background-color: rgba(255, 255, 255, 0.7);
-
-  &:hover {
-    transform: scale(1.03);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  border: 1px solid $medium-gray !important; overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease; height: 100%;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1); position: relative; z-index: 1;
+  display: flex; flex-direction: column; background-color: $card-background-color;
+  border-radius: $card-border-radius; // 50px
+  &:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15); }
+  // --- Styles internes inchangés ---
+  .course-image { height: 200px; object-fit: cover; width: 100%; display: block; }
+  .course-status-badge {
+    position: absolute; top: 15px; right: 15px; padding: 0.3em 0.8em;
+    border-radius: calc(#{$card-border-radius} / 2.5); font-size: 0.75em;
+    font-weight: 700; color: white; z-index: 2; text-shadow: 1px 1px 1px rgba(0,0,0,0.3);
+    &.available { background-color: $success-color; } &.unavailable { background-color: $danger-color; }
   }
-
-  .course-image {
-      height: 220px;
-      object-fit: cover;
-      width: 100%;
+  .card-body { display: flex; flex-direction: column; padding: 1.25rem; position: relative; z-index: 1; flex-grow: 1; }
+  .course-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem; }
+  .course-price { background-color: $primary-color; color: white; padding: 0.3em 0.8em; border-radius: 15px; font-weight: 700; font-size: 0.9em; }
+  .course-category { background-color: $secondary-color; color: white; padding: 0.3em 0.8em; border-radius: 15px; font-size: 0.8em; font-weight: 600; }
+  .btn-ia { background-color: $light-gray; color: $secondary-color; border: 1px solid $medium-gray; padding: 0.3em 0.6em; border-radius: 15px; font-size: 0.8em; &:hover { background-color: $secondary-color; color: white; } }
+  .course-rating { font-size: 0.9em; font-weight: 600; color: darken(#ffc107, 10%); display: flex; align-items: center; gap: 0.2rem; i { color: #ffc107; } }
+  .card-title { font-size: 1.15rem; font-weight: 700; margin-bottom: 0.5rem; color: $text-color-dark; line-height: 1.3; }
+  .course-description { color: $text-color-muted; margin-bottom: 1rem; flex-grow: 1; overflow: hidden; font-size: 0.9rem; line-height: 1.5; }
+  .course-details {
+    display: flex; align-items: center; margin-bottom: 1rem; justify-content: space-between;
+    padding-top: 0.75rem; border-top: 1px solid $medium-gray; gap: 1rem; color: $text-color-muted; font-size: 0.85em;
+    .course-date-formatted { display: flex; align-items: center; background-color: $light-gray; padding: 0.25rem 0.5rem; border-radius: 5px; border: 1px solid $medium-gray; gap: 0.3rem; }
+    .course-date-month { font-size: 0.7rem; text-transform: uppercase; font-weight: bold; color: $primary-color; }
+    .course-date-day { font-size: 1.2rem; font-weight: bold; color: $text-color-dark; }
+    .course-level { font-weight: 500; }
   }
-
-    .course-status-badge {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      padding: 0.3em 0.6em;
-      border-radius: 15px;
-      font-size: 0.8em;
-      font-weight: 600;
-      color: white;
-      z-index: 2;
-
-      &.available {
-          background-color: #28a745;
-      }
-      &.unavailable {
-          background-color: #dc3545;
-      }
-    }
-
-
-  .card-body {
-    display: flex;
-    flex-direction: column;
-    padding: 1.25rem;
-    height: auto;
-    position: relative;
-      z-index: 1;
-
-
-    .course-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 0.75rem;
-      margin-top: 0 !important;
-    }
-
-      .course-price {
-        background-color: #007bff;
-        color: white;
-        padding: 0.3em 0.6em;
-        border-radius: 15px;
-        font-weight: 600;
-        font-size: 1em;
-        margin-bottom: 0.5rem;
-        align-self: flex-start;
-    }
-
-    .btn-ia {
-        background-color: #f8f9fa;
-        color: #6c757d;
-        border: 1px solid #ced4da;
-        padding: 0.3em 0.6em;
-          border-radius: 15px;
-        font-size: 0.9em;
-
-        &:hover{
-            background-color: #6c757d;
-            color: #f8f9fa;
-        }
-
-      }
-
-    .course-category {
-        background-color: #6c757d;
-        color: white;
-        padding: 0.3em 0.6em;
-        border-radius: 15px;
-        font-size: 0.8em;
-        font-weight: 600;
-    }
-
-    .card-title {
-      font-size: 1.25rem;
-      font-weight: 700;
-      margin-bottom: 0.5rem;
-      color: #333;
-      text-align: left;
-      height: auto;
-    }
-
-    .course-description {
-        color: #555;
-        margin-bottom: 0.75rem;
-        flex-grow: 1;
-        overflow: hidden;
-        text-align: left;
-        font-size: 0.9rem;
-    }
-      .course-details {
-        display: flex;
-        align-items: center;
-        margin-bottom: 1rem;
-        flex-direction: column;
-        align-items: flex-start;
-
-        .course-date-formatted {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background-color: #f8f9fa;
-            padding: 0.25rem 0.5rem;
-            border-radius: 5px;
-            border: 1px solid #ddd;
-            margin-bottom: 0.5rem;
-        }
-
-        .course-date-month {
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            font-weight: bold;
-            color: #007bff;
-            margin-right: 0;
-        }
-
-        .course-date-day {
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: #333;
-          }
-        .course-info{
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            gap: 5px;
-        }
-        .course-level{
-            margin-bottom: 0 !important;
-            font-size: 0.9rem;
-          }
-    }
-
-    .btn-details {
-        background-color: #007bff;
-        border-color: #007bff;
-        color: white;
-        border-radius: 20px;
-        padding: 0.5rem 1rem;
-        transition: background-color 0.3s ease;
-          font-size: 0.9rem;
-
-        &:hover {
-            background-color: #0056b3;
-            border-color: #0056b3;
-        }
-    }
-
-.btn-favorite {
-        background: none;
-        border: none;
-        padding: 0;
-        font-size: 1.2rem;
-        color: #888;
-        transition: color 0.3s;
-        cursor: pointer;
-
-        &:hover,
-        & .text-danger {  /* Style quand le cours est un favori */
-            color: #dc3545;
-            transform: scale(1.1);
-        }
+  .btn-details {
+    background-color: $primary-color; border-color: $primary-color; color: white; border-radius: 20px;
+    padding: 0.5rem 1rem; transition: background-color 0.3s ease, border-color 0.3s ease; font-size: 0.9rem;
+    &:hover { background-color: darken($primary-color, 10%); border-color: darken($primary-color, 10%); }
+     i { margin-right: 0.4rem; }
   }
-    }
-}
-// Animation de déplacement vers le haut
-.animate-up {
-  animation: moveUp 0.5s ease-out forwards;
+  .btn-favorite {
+    background: none; border: none; padding: 0.25rem; font-size: 1.3rem;
+    color: $secondary-color; transition: color 0.3s, transform 0.2s; cursor: pointer;
+    &:hover { color: $danger-color; transform: scale(1.15); }
+     &.text-danger { color: $danger-color !important; }
+  }
+  .mt-auto { margin-top: auto; display: flex; justify-content: space-between; align-items: center; padding-top: 1rem; }
 }
 
-@keyframes moveUp {
-  0% {
-    transform: translateY(0);
-  }
-  100% {
-    transform: translateY(-20px); // Ajustez la distance du déplacement
-    opacity: 0; // Optionnel: faire disparaître l'élément à la fin
-  }
-}
+// Animation
+.animate-up { animation: moveUp 0.5s ease-out forwards; }
+@keyframes moveUp { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-20px); opacity: 0; } }
 
-
+// --- Pagination (CODE COPIÉ DE VOTRE VERSION) ---
 .pagination-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 1rem;
-
-
-  .pagination-btn {
-    border: 1px solid #ddd;
-    padding: 0.5rem 0.75rem;
-    margin: 0 0.25rem;
-    border-radius: 0.25rem;
-    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
-    cursor: pointer;
-    background-color: #f8f9fa;
-    color: #4caf50;
-
-    &:hover {
-      background-color: #4caf50;
-      color: #fff;
-      border-color: #4caf50;
-    }
-
-    &:disabled {
-      background-color: #f8f9fa;
-      color: #6c757d;
-      border-color: #ddd;
-      cursor: not-allowed;
-    }
-    &.prev-btn,
-    &.next-btn {
-
-        color: #007bff;
-        &:hover{
-        background-color: #007bff;
-        color: #fff;
-        border-color: #007bff;
-        }
-    }
-  }
-
-  .page-number-btn {
-    &.active {
-      background-color: #007bff;
-      color: #ffffff;
-      border-color: #007bff;
-    }
-  }
-
-  .page-numbers {
-      display: flex;
-      gap: 5px;
-  }
-}
-// Remove this block, as it's replaced by the styles within .search-container
-/*
-.autocomplete-suggestions {
-  position: absolute;
-  background-color: white;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  max-height: 150px;
-  overflow-y: auto;
-  z-index: 1000;
-  width: 100%;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+ display: flex; justify-content: center; align-items: center;
+ margin-top: 3rem; padding-bottom: 2rem;
+ .pagination-btn {
+   border: 1px solid #ddd; padding: 0.5rem 0.75rem; margin: 0 0.25rem;
+   border-radius: 0.25rem; transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+   cursor: pointer; background-color: #f8f9fa; color: #4caf50; text-decoration: none;
+   &:hover { background-color: #4caf50; color: #fff; border-color: #4caf50; }
+   &:disabled { background-color: #f8f9fa; color: #6c757d; border-color: #ddd; cursor: not-allowed; opacity: 0.65; }
+   &.prev-btn, &.next-btn { color: #007bff; &:hover { background-color: #007bff; color: #fff; border-color: #007bff; } }
+ }
+ .page-item.active .pagination-btn { background-color: #007bff; color: #ffffff; border-color: #007bff; z-index: 2; }
 }
 
-.autocomplete-suggestions ul {
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
-}
 
-.autocomplete-suggestions li {
-  padding: 8px 12px;
-  cursor: pointer;
-}
-
-.autocomplete-suggestions li:hover {
-  background-color: #f8f9fa;
-}
-*/
-.price-range-filter,
-.sorting-options {
-  label {
-    color: #eaedf1;
-    font-size: 1rem;
-  }
-
-  select {
-    background: white;
-    border: 2px solid #3498db;
-    color: #2c3e50;
-    font-weight: 500;
-    padding: 0.5rem 1rem;
-    transition: all 0.3s ease-in-out;
-    box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.1);
-
-    &:hover {
-      border-color: #2980b9;
-      box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.15);
-    }
-
-    &:focus {
-      border-color: #1abc9c;
-      outline: none;
-      box-shadow: 0px 3px 15px rgba(26, 188, 156, 0.5);
-    }
-  }
-}
-
-// Ajustement pour la disposition
-.d-flex {
-  gap: 1.5rem; // Espacement entre les éléments
-}
-
-// Responsive
+// --- Responsive ---
 @media (max-width: 768px) {
-  .d-flex {
-    flex-direction: column;
-    align-items: stretch;
-
-    .price-range-filter,
-    .sorting-options {
-      width: 100%;
-    }
+  // Centrer le groupe de filtres/tri en colonne sur mobile
+  .d-flex.align-items-center {
+    flex-direction: column; align-items: stretch;
+    .price-range-filter, .sorting-options { width: 100%; max-width: 400px; margin-left: auto; margin-right: auto; }
   }
+  // Centrer aussi les boutons filtres principaux sur mobile
+  .filter-buttons {
+      flex-direction: column;
+      align-items: stretch; // Pour que les boutons prennent toute la largeur limitée
+      max-width: 400px; // Limiter largeur des boutons empilés
+      margin-left: auto; // Centrer le bloc de boutons
+      margin-right: auto;
+       .btn-filter { margin: 0.25rem 0;} // Espacement vertical entre boutons empilés
+  }
+  // Centrer la barre de recherche aussi sur mobile
+  .search-bar { max-width: 90%; }
 }
+
+
+/* Styles pour le Modal Vocal */
+.voice-modal-overlay {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background-color: rgba(0, 0, 0, 0.7); display: flex; justify-content: center;
+  align-items: center; z-index: 1050; opacity: 0; visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0s linear 0.3s;
+  &.active { opacity: 1; visibility: visible; transition: opacity 0.3s ease; }
+}
+.voice-modal-content {
+  background-color: white; padding: 2rem; border-radius: 15px; text-align: center;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); transform: scale(0.9);
+  transition: transform 0.3s ease; min-width: 300px; max-width: 500px; width: 90%;
+  .voice-modal-overlay.active & { transform: scale(1); }
+  h5 { margin-bottom: 1.5rem; color: $text-color-dark; }
+}
+.voice-visualizer-container { margin: 2rem 0; display: flex; justify-content: center; align-items: center; min-height: 120px; }
+.voice-circle {
+  width: 80px; height: 80px; background-color: $primary-color; border-radius: 50%;
+  transition: transform 0.1s ease-out; transform: scale(1);
+  box-shadow: 0 0 0 0 rgba(0, 123, 255, 0.4);
+}
+.transcript { margin-top: 1rem; color: $secondary-color; font-style: italic; }
+.transcript-final { margin-top: 0.5rem; color: $success-color; font-weight: bold; }
+.voice-error-message { font-size: 0.9em; margin-top: 1rem; color: $danger-color; }

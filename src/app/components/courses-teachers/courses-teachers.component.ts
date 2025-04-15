@@ -1,11 +1,13 @@
 import { HttpClient } from '@angular/common/http';
-import { ChangeDetectorRef, Component, OnInit, ElementRef, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { NgForm } from '@angular/forms';
 import * as bootstrap from 'bootstrap';
 import { Course } from 'src/app/Core/Model/Course';
 import { CourseCategory } from 'src/app/Core/Model/Coursecategory';
 import { CoursesService } from 'src/app/Core/services/courses.service';
 import { DatePipe } from '@angular/common';
 import Swal from 'sweetalert2';
+import { Router } from '@angular/router'; // <-- IMPORT Router
 
 @Component({
     selector: 'app-courses-teachers',
@@ -16,396 +18,432 @@ import Swal from 'sweetalert2';
 export class CoursesTeachersComponent implements OnInit {
 
     courses: any[] = [];
-    selectedCourse: any = {};
+    selectedCourse: any = {}; // Pour édition
     filteredCourses: any[] = [];
     searchQuery: string = '';
     isSpeaking: boolean = false;
 
-    selectedFile: File | null = null;
+    selectedFile: File | null = null; // Pour ajout/édition
     categories = Object.values(CourseCategory) as string[];
-    isEditModalOpen = false;
-    courseData = {
-        title: '',
-        description: '',
-        level: '',
-        category: '',
-        price: null,
-        status: false,
-        liked: false,
-        scheduledPublishDate: '',
-        file: null
+    levels = ['Débutant', 'Intermédiaire', 'Avancé'];
+    isEditModalOpen = false; // Contrôle l'état du modal d'édition
+
+    // Données pour le formulaire d'ajout immédiat
+    newCourseData = {
+        title: '', description: '', level: '', category: '',
+        price: null, status: false, liked: false, date: null, file: null
     };
 
-    courseToDelete: any; // Store the course to be deleted
-    private deleteModal: bootstrap.Modal | null = null; // Use null, not undefined
+    // Données pour le formulaire d'ajout planifié
+    scheduledCourseData = {
+        title: '', description: '', level: '', category: '',
+        price: null, status: false, liked: false, // Status sera forcé à true logiquement
+        scheduledPublishDate: '', file: null
+    };
 
-    @ViewChild('deleteConfirmationModal', { static: true }) deleteModalElement!: ElementRef; // Use ViewChild
+    courseToDelete: any;
 
     // --- Pagination Properties ---
     currentPage: number = 1;
-    itemsPerPage: number = 6; // Number of courses per page
+    itemsPerPage: number = 6; // 6 cartes par page
 
-    constructor(private courseService: CoursesService, private cdr: ChangeDetectorRef, private http: HttpClient, private datePipe: DatePipe) { }
+    constructor(
+        private courseService: CoursesService,
+        private cdr: ChangeDetectorRef,
+        private http: HttpClient,
+        private datePipe: DatePipe,
+        private router: Router // <-- INJECT Router
+    ) { }
 
     ngOnInit(): void {
         this.loadCourses();
     }
 
-    ngAfterViewInit(): void {
-        // Initialize the modal *after* the view is initialized
-        this.deleteModal = new bootstrap.Modal(this.deleteModalElement.nativeElement);
-
-        // Listen for the hidden event (no need for a subscription)
-        this.deleteModalElement.nativeElement.addEventListener('hidden.bs.modal', () => {
-            this.courseToDelete = null; // Clear the course to delete
+    // --- Chargement des cours ---
+    loadCourses() {
+        this.courseService.getCourses().subscribe(data => {
+            this.courses = data.map(course => ({
+                ...course,
+                date: course.date ? new Date(course.date).toISOString().split('T')[0] : null, // Format YAML-MM-DD
+                title: course.title || 'Titre non disponible',
+                category: course.category || 'Catégorie non définie',
+                price: course.price ?? 0,
+                status: course.status ?? false,
+                liked: course.liked ?? false,
+                formattedMonth: course.date ? this.datePipe.transform(course.date, 'MMM', 'UTC', 'fr-FR')?.toUpperCase() : '',
+                formattedDay: course.date ? this.datePipe.transform(course.date, 'd', 'UTC', 'fr-FR') : ''
+            }));
+            this.filteredCourses = [...this.courses];
+            this.currentPage = 1; // Reset à la page 1 après chargement
+            this.cdr.detectChanges();
         });
     }
 
-    onSubmit(): void {
-        if (this.courseData.category) {
-            this.courseData.category = this.courseData.category as CourseCategory; // Conversion en Enum
-        } if (this.courseData.scheduledPublishDate && this.courseData.scheduledPublishDate !== '') {
-            this.courseData.scheduledPublishDate = this.courseData.scheduledPublishDate.replace("T", " ") + ":00";
-            this.courseService.scheduleCoursePublication(this.courseData).subscribe(
-                (response) => {
-                    console.log('Course scheduled successfully:', response);
-                    // You can redirect the user or display a success message here
-                    this.loadCourses(); // Reloads the course list after adding
+    // --- Helpers Date ---
+    getTodayDate(): string {
+        return new Date().toISOString().split('T')[0];
+    }
+    getCurrentDateTimeLocal(): string {
+      const now = new Date();
+      const offset = now.getTimezoneOffset() * 60000;
+      const localISOTime = new Date(now.getTime() - offset).toISOString().slice(0, 16);
+      return localISOTime;
+    }
 
-                },
-                (error) => {
-                    console.error('Error scheduling course:', error);
-                    // You can display an error message here
-                }
-            );
-        } else {
-            console.log('Please specify a scheduled publish date.');
+    // --- Gestion Modals Bootstrap ---
+    openModal(modalId: string): void {
+        const modalElement = document.getElementById(modalId);
+        if (modalElement) {
+            const modal = new bootstrap.Modal(modalElement);
+            modal.show();
+        }
+    }
+    closeModal(modalId: string): void {
+        const modalElement = document.getElementById(modalId);
+        if (modalElement) {
+            const modalInstance = bootstrap.Modal.getInstance(modalElement);
+            modalInstance?.hide();
+             // Nettoyage des états
+             if (modalId === 'editCourseModal') {
+                 this.isEditModalOpen = false;
+                 this.selectedCourse = {};
+                 this.selectedFile = null;
+             }
+             if (modalId === 'addCourseModal') {
+                 this.newCourseData = { title: '', description: '', level: '', category: '', price: null, status: false, liked: false, date: null, file: null };
+                 this.selectedFile = null;
+             }
+             if (modalId === 'addCourseWithDateModal') {
+               this.scheduledCourseData = { title: '', description: '', level: '', category: '', price: null, status: false, liked: false, scheduledPublishDate: '', file: null };
+               this.selectedFile = null;
+             }
         }
     }
 
-    onFileChange(event: any): void {
-        const file = event.target.files[0];
-        if (file) {
-            this.courseData.file = file;
-        }
-    }
-
-
-    // Open the add course popup
-    openAddCoursePopup(): void {
-        const modal = new bootstrap.Modal(document.getElementById('addCourseModal')!);
-        modal.show();
-    }
-
-    // Update a course
-    updateCourse(): void {
-        if (!this.selectedCourse.idCourse) {
-            alert('Erreur : ID du cours introuvable.');
+    // --- AJOUT IMMÉDIAT ---
+    handleAddCourseSubmit(form: NgForm): void {
+        if (form.invalid) {
+            Object.values(form.controls).forEach(control => { control.markAsTouched(); });
             return;
         }
+        const formData = new FormData();
+        formData.append('title', form.value.title);
+        formData.append('description', form.value.description);
+        formData.append('level', form.value.level);
+        formData.append('category', form.value.category);
+        formData.append('price', form.value.price);
+        formData.append('status', form.value.status ? 'true' : 'false');
+        formData.append('liked', form.value.liked ? 'true' : 'false');
+        if (form.value.date) formData.append('date', form.value.date);
+        if (this.selectedFile) formData.append('file', this.selectedFile);
 
-        // Check that category is set in the component
-        if (!this.selectedCourse.category || this.selectedCourse.category.trim() === '') {
-            alert('Erreur : La catégorie doit être spécifiée.');
+        this.courseService.addCourse(formData).subscribe({
+            next: (response) => {
+                console.log('✅ Cours ajouté avec succès !', response);
+                this.loadCourses();
+                this.closeModal('addCourseModal');
+                form.resetForm(); // Important après succès
+                this.selectedFile = null;
+                Swal.fire('Succès!', 'Le cours a été ajouté.', 'success');
+            },
+            error: (error) => {
+                console.error('❌ Erreur lors de l\'ajout du cours :', error);
+                Swal.fire('Erreur!', `Erreur lors de l'ajout: ${error.message || 'Vérifiez la console'}`, 'error');
+            }
+        });
+    }
+
+    // --- AJOUT PLANIFIÉ ---
+    handleScheduleCourseSubmit(form: NgForm): void {
+      if (form.invalid) {
+          Object.values(form.controls).forEach(control => { control.markAsTouched(); });
+          return;
+      }
+      const scheduledDate = new Date(form.value.scheduledPublishDate);
+      if (scheduledDate <= new Date()) {
+          Swal.fire('Erreur', 'La date de publication programmée doit être dans le futur.', 'warning');
+          return;
+      }
+      const dataToSend = { ...form.value };
+      dataToSend.status = true; // Forcer statut à true comme demandé
+      dataToSend.scheduledPublishDate = dataToSend.scheduledPublishDate.replace("T", " ") + ":00"; // Format attendu par backend ?
+      if (this.selectedFile) { dataToSend.file = this.selectedFile; }
+
+      this.courseService.scheduleCoursePublication(dataToSend).subscribe({
+          next: (response) => {
+              console.log('Course scheduled successfully (with status=true):', response);
+              this.loadCourses();
+              this.closeModal('addCourseWithDateModal');
+              form.resetForm(); // Important après succès
+              this.selectedFile = null;
+              Swal.fire({ title: 'Planifié!', text: 'Le cours a été programmé pour publication (et marqué comme disponible).', icon: 'success', timer: 2500, showConfirmButton: false });
+          },
+          error: (error) => {
+             console.error('Error scheduling course:', error);
+             Swal.fire('Erreur!', `La planification a échoué: ${error.message || 'Vérifiez la console'}`, 'error');
+         }
+      });
+    }
+
+    // --- Modification Cours ---
+    openEditModal(course: Course) {
+        // Ajout de stopPropagation ici n'est pas nécessaire car c'est déclenché par le bouton qui l'a déjà
+        this.selectedCourse = {
+            ...course,
+            date: course.date ? new Date(course.date).toISOString().split('T')[0] : null
+        };
+        this.selectedFile = null;
+        this.isEditModalOpen = true;
+        this.cdr.detectChanges();
+        setTimeout(() => { this.openModal('editCourseModal'); }, 0);
+    }
+
+    handleEditModalClosed(): void { // Appelée par (hidden.bs.modal)
+        this.isEditModalOpen = false;
+        this.selectedCourse = {};
+        this.selectedFile = null;
+        console.log("Edit modal closed and state cleaned via (hidden).");
+    }
+
+    handleUpdateCourseSubmit(form: NgForm): void {
+        if (form.invalid || !this.selectedCourse?.idCourse) {
+            if(form.invalid) { Object.values(form.controls).forEach(control => { control.markAsTouched(); }); }
+            if (!this.selectedCourse?.idCourse) { Swal.fire('Erreur', 'ID du cours non trouvé pour la mise à jour.', 'error'); }
             return;
         }
-
-        this.courseService.updateCourse(this.selectedCourse.idCourse, this.selectedCourse, this.selectedFile ?? undefined)
+        const updatedData = { ...form.value }; // Utilise les valeurs du formulaire lié à selectedCourse
+        this.courseService.updateCourse(this.selectedCourse.idCourse, updatedData, this.selectedFile ?? undefined)
             .subscribe({
                 next: (response) => {
-                    console.log('✅ Cours mis à jour avec succès !', response);
-                    this.loadCourses(); // Reload courses after update
-                    const modal = bootstrap.Modal.getInstance(document.getElementById('editCourseModal')!);
-                    modal?.hide(); // Close the modal
+                    console.log('Course updated:', response);
+                    this.loadCourses(); // Recharger pour voir les changements
+                    this.closeModal('editCourseModal'); // Ferme la modale
+                    Swal.fire('Mis à jour!', 'Le cours a été mis à jour.', 'success');
+                    // Nettoyage via closeModal ou handleEditModalClosed
                 },
                 error: (error) => {
-                    console.error('❌ Erreur lors de la mise à jour du cours :', error);
-                    alert(`Erreur lors de la mise à jour du cours: ${error.message}`);
+                    console.error('Error updating course:', error);
+                    Swal.fire('Erreur!', `Erreur mise à jour: ${error.message || 'Vérifiez la console'}`, 'error');
                 }
             });
     }
 
-    // Open the edit modal
-    openEditModal(course: Course) {
-        this.selectedCourse = { ...course };  // Copy course information
-        this.isEditModalOpen = true;        // Open the modal
-    }
-    closeEditModal() {
-        this.isEditModalOpen = false;      // Close the modal
-    }
-
-    // Handle the selected file
-    onFileSelected(event: any): void {
-        this.selectedFile = event.target.files[0];
-    }
-
-    // Add a course
-
-    addCourse(formValues: any): void {
-        const formData = new FormData();
-        formData.append('title', formValues.title);
-        formData.append('description', formValues.description);
-        formData.append('level', formValues.level);
-        formData.append('category', formValues.category);
-        formData.append('price', formValues.price);
-        formData.append('status', formValues.status ? 'true' : 'false');  // Convert to String 'true'/'false'
-        formData.append('liked', formValues.liked ? 'true' : 'false');   // Convert to String 'true'/'false'
-
-        if (this.selectedFile) {
-            formData.append('file', this.selectedFile);
-        }
-
-        this.courseService.addCourse(formData).subscribe({
-            next: (response) => {
-                console.log('✅ Course added successfully!', response);
-                this.loadCourses();
-                const modal = bootstrap.Modal.getInstance(document.getElementById('addCourseModal')!);
-                modal?.hide();
-            },
-            error: (error) => {
-                console.error('❌ Error adding course:', error);
-            }
-        });
-    }
-
-    openAddCourseWithDatePopup(): void {
-        const modal = new bootstrap.Modal(document.getElementById('addCourseWithDateModal')!);
-        modal.show();
-    }
-
-    addCourseWithDate(formValues: any): void {
-        console.log('Form Values:', formValues); // Debugging
-
-        if (!formValues.title || !formValues.description || !formValues.category || !formValues.price || !formValues.level || !formValues.date) {
-            alert('Please fill in all required fields');
-            return;
-        }
-
-        const formData = new FormData();
-        formData.append('date', formValues.date);
-        formData.append('title', formValues.title);
-        formData.append('description', formValues.description);
-        formData.append('level', formValues.level);
-        formData.append('category', formValues.category);
-        formData.append('price', formValues.price.toString());
-        formData.append('status', formValues.status ? 'true' : 'false');
-        formData.append('liked', formValues.liked ? 'true' : 'false');
-
-        if (this.selectedFile) {
-            formData.append('file', this.selectedFile);
-        }
-
-        this.courseService.addCourse(formData).subscribe({
-            next: (response) => {
-                console.log('✅ Course added successfully!', response);
-                this.loadCourses();
-            },
-            error: (error) => {
-                console.error('❌ Error adding course:', error);
-                alert(`Error adding course: ${error.message}`);
-            }
-        });
-    }
-
-    // Load courses from the backend
-    loadCourses() {
-        this.courseService.getCourses().subscribe(data => {
-            console.log('Data received:', data);
-            this.courses = data.map(course => ({
-                ...course,
-                date: course.date ? new Date(course.date).toISOString().split('T')[0] : null,
-                title: course.title || 'Title not available',
-                category: course.category || 'Category not defined',
-                price: course.price || 0,
-                formattedMonth: course.date ? this.datePipe.transform(course.date, 'MMM')?.toUpperCase() : '', // Format month
-                formattedDay: course.date ? this.datePipe.transform(course.date, 'd') : ''       // Format day
-
-            }));
-            this.filteredCourses = this.courses;
-            this.currentPage = 1; // Reset to the first page
-            this.cdr.detectChanges(); // Initialize filtered courses
-        });
-    }
-
-    // Search function
-    searchCourses() {
-        this.filteredCourses = this.courses.filter(course =>
-            course.title.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-            course.description.toLowerCase().includes(this.searchQuery.toLowerCase())
-        );
-        this.currentPage = 1; // Reset to first page after search
-    }
-
-    // Start speech recognition
-    startSpeechRecognition() {
-        const recognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-
-        if (!recognition) {
-            alert('Speech recognition is not supported on your browser.');
-            return;
-        }
-
-        const speechRecognition = new recognition();
-        speechRecognition.lang = 'fr-FR';
-        speechRecognition.continuous = false;
-        speechRecognition.interimResults = false;
-
-        speechRecognition.start();
-
-        speechRecognition.onresult = (event: any) => {
-            const result = event.results[0][0].transcript;
-            this.searchQuery = result;
-            this.searchCourses();
-        };
-
-        speechRecognition.onerror = (event: any) => {
-            console.error('Speech recognition error:', event.error);
-        };
-    }
-
-    // Text-to-Speech Method
-    textToSpeech(course: any) {
-        if (!window.speechSynthesis) {
-            alert('Text-to-Speech is not supported on this browser.');
-            return;
-        }
-
-        if (this.isSpeaking) {
-            window.speechSynthesis.cancel();
-            this.isSpeaking = false;
-            console.log('🔴 Reading stopped.');
-            return;
-        }
-
-        const text = `${course.title}. Description: ${course.description || 'No description available'}. Date: ${course.date}. Price: ${course.price} euros. Level: ${course.level}.`;
-
-        if (!text.trim()) {
-            alert('There is no text to read.');
-            return;
-        }
-
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = 'fr-FR';
-
-        this.isSpeaking = true;
-
-        utterance.onstart = () => console.log('🟢 Reading in progress...');
-        utterance.onend = () => (this.isSpeaking = false);
-        utterance.onerror = (event) => {
-            console.error('❌ Error:', event.error);
-            this.isSpeaking = false;
-        };
-
-        window.speechSynthesis.speak(utterance);
-    }
-
-     // --- Pagination Methods ---
-    // Method to get courses for the current page
-
-    pagedCourses(): any[] {
-    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-    return this.sortedCourses().slice(startIndex, startIndex + this.itemsPerPage);
-  }
-
-
-    // Method to go to the next page
-    nextPage() {
-        if (this.currentPage < this.totalPages()) {
-            this.currentPage++;
-        }
-    }
-
-    // Method to go to the previous page
-    prevPage() {
-        if (this.currentPage > 1) {
-            this.currentPage--;
-        }
-    }
-
-    // Method to calculate the total number of pages
-    totalPages(): number {
-        return Math.ceil(this.filteredCourses.length / this.itemsPerPage);
-    }
-
-    // Sort courses, *then* apply pagination
-      sortedCourses() {
-        return this.filteredCourses.sort((a, b) => Number(b.liked) - Number(a.liked));
-    }
-
-
-    // Manage favorite
-    toggleFavorite(course: any) {
-        course.liked = !course.liked;
-        this.courses = [...this.courses];  // Create a new array to trigger change detection
-        this.courseService.updateCourse(course.idCourse, course).subscribe(
-            () => {
-                console.log('Course updated successfully');
-                this.loadCourses(); // Reload to reflect the updated like status
-            },
-            error => console.error('Error updating course', error)
-        );
-        setTimeout(() => {
-            if (course.liked) {
-                const element = document.getElementById('course-' + course.idCourse);
-                if (element) {
-                    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-            }
-        }, 100);
-    }
-
-    // --- Delete Confirmation and Handling ---
+    // --- Suppression Cours ---
     openDeleteConfirmationModal(course: any): void {
+        // Ajout de stopPropagation ici n'est pas nécessaire
         this.courseToDelete = course;
-
         Swal.fire({
-            title: `Êtes-vous sûr de vouloir supprimer le cours: ${course.title}?`,
-            text: "Cette action est irréversible!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Oui, supprimer!',
-            cancelButtonText: 'Annuler' // Add Cancel button text
+            title: `Supprimer: ${course.title}?`, text: "Cette action est irréversible !", icon: 'warning',
+            showCancelButton: true, confirmButtonColor: '#d33', cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Oui, supprimer!', cancelButtonText: 'Annuler'
         }).then((result) => {
-            if (result.isConfirmed) {
-                this.deleteCourse();
-            }
+            if (result.isConfirmed) { this.deleteCourse(); }
+            else { this.courseToDelete = null; }
         });
     }
 
     deleteCourse(): void {
-        if (!this.courseToDelete?.idCourse) {
-            console.error("⚠️ Course ID is undefined!");
-            return;
-        }
-
-        this.courseService.deleteCoursen(this.courseToDelete.idCourse).subscribe({
+        if (!this.courseToDelete?.idCourse) { console.error("ID cours indéfini!"); return; }
+        const courseIdToDelete = this.courseToDelete.idCourse;
+        this.courseService.deleteCoursen(courseIdToDelete).subscribe({
             next: (response) => {
-                console.log('Server response:', response);
-                // Remove the course from the UI *immediately* after successful deletion
-                this.courses = this.courses.filter(c => c.idCourse !== this.courseToDelete.idCourse);
-                this.filteredCourses = this.filteredCourses.filter(c => c.idCourse !== this.courseToDelete.idCourse);
-                console.log(`✅ Course with ID ${this.courseToDelete.idCourse} removed from UI.`);
-
-                Swal.fire(
-                    'Supprimé!',
-                    'Le cours a été supprimé.',
-                    'success'
-                );
-
-                // Manually trigger change detection
+                console.log('Server response on delete:', response);
+                // Mise à jour UI optimiste
+                this.courses = this.courses.filter(c => c.idCourse !== courseIdToDelete);
+                this.filteredCourses = this.filteredCourses.filter(c => c.idCourse !== courseIdToDelete);
+                Swal.fire('Supprimé!', 'Le cours a été supprimé.', 'success');
+                this.courseToDelete = null;
+                // Ajuster la pagination si page devient vide
+                if (this.pagedCourses().length === 0 && this.currentPage > 1) { this.currentPage--; }
                 this.cdr.detectChanges();
-                 this.currentPage = 1;
             },
             error: (error) => {
-                console.error('❌ Error deleting course:', error);
-                Swal.fire(
-                    'Erreur!',
-                    'Une erreur est survenue lors de la suppression.',
-                    'error'
-                );
+                console.error('Error deleting course:', error);
+                Swal.fire('Erreur!', `Erreur lors de la suppression: ${error.error || error.message || 'Vérifiez la console'}`, 'error');
+                this.courseToDelete = null;
             }
         });
     }
+
+    // --- Bascule Statut Visibilité ---
+    toggleCourseStatusAlternative(course: any): void {
+      // Ajout de stopPropagation ici n'est pas nécessaire
+      const courseId = course.idCourse;
+      const currentStatus = course.status ?? false;
+      const newStatus = !currentStatus;
+      const courseIndex = this.courses.findIndex(c => c.idCourse === courseId);
+      const courseDataToUpdate = { // Préparer l'objet complet attendu par updateCourse
+        idCourse: course.idCourse, title: course.title, description: course.description, level: course.level, category: course.category,
+        price: course.price, date: course.date, liked: course.liked, status: newStatus // Seul status change
+      };
+
+      // Optimistic UI
+      course.status = newStatus;
+      if (courseIndex !== -1) this.courses[courseIndex].status = newStatus;
+      // Il faut aussi potentiellement mettre à jour filteredCourses si on veut voir le changement immédiatement
+      const filteredIndex = this.filteredCourses.findIndex(c => c.idCourse === courseId);
+       if (filteredIndex !== -1) this.filteredCourses[filteredIndex].status = newStatus;
+      this.cdr.detectChanges();
+
+      // Appel API
+      this.courseService.updateCourse(courseId, courseDataToUpdate, undefined).subscribe({
+          next: (updatedCourseFromServer) => {
+            console.log(`Status updated via updateCourse for ${courseId} to ${newStatus}`);
+            // Optionnel : rafraîchir complètement l'objet depuis le serveur
+             if (courseIndex !== -1 && updatedCourseFromServer) {
+                 const updatedData = {
+                     ...updatedCourseFromServer,
+                     date: updatedCourseFromServer.date ? new Date(updatedCourseFromServer.date).toISOString().split('T')[0] : null,
+                     formattedMonth: updatedCourseFromServer.date ? this.datePipe.transform(updatedCourseFromServer.date, 'MMM', 'UTC', 'fr-FR')?.toUpperCase() : '',
+                     formattedDay: updatedCourseFromServer.date ? this.datePipe.transform(updatedCourseFromServer.date, 'd', 'UTC', 'fr-FR') : ''
+                 };
+                 this.courses.splice(courseIndex, 1, updatedData);
+                 this.filteredCourses = [...this.courses]; // Recréer filteredCourses pour la synchro
+                 this.searchCourses(); // Réappliquer filtre/tri si l'ordre dépend du statut
+             }
+          },
+          error: (error) => { // Rollback UI
+              console.error(`Error using updateCourse for status change on ${courseId}:`, error);
+              course.status = currentStatus;
+              if (courseIndex !== -1) { this.courses[courseIndex].status = currentStatus; }
+               if (filteredIndex !== -1) this.filteredCourses[filteredIndex].status = currentStatus;
+              this.cdr.detectChanges();
+              Swal.fire('Erreur', "Impossible de changer la visibilité.", 'error');
+          }
+      });
+    }
+
+    // --- Gestion Fichiers ---
+    onFileSelected(event: any, target: 'add' | 'schedule' | 'edit'): void {
+        const file = event.target.files?.[0];
+        this.selectedFile = file || null;
+    }
+
+    // --- Recherche & Voix ---
+    searchCourses() {
+        const term = this.searchQuery.toLowerCase().trim();
+        if (!term) {
+            this.filteredCourses = [...this.courses];
+        } else {
+            this.filteredCourses = this.courses.filter(course =>
+                (course.title?.toLowerCase() || '').includes(term) ||
+                (course.description?.toLowerCase() || '').includes(term) ||
+                (course.category?.toLowerCase() || '').includes(term) ||
+                (course.level?.toLowerCase() || '').includes(term)
+            );
+        }
+        this.currentPage = 1; // Reset page après recherche
+    }
+
+    startSpeechRecognition() {
+        const recognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+        if (!recognition) { Swal.fire('Erreur', 'Reconnaissance vocale non supportée par ce navigateur.', 'warning'); return; }
+        const speechRecognition = new recognition();
+        speechRecognition.lang = 'fr-FR'; speechRecognition.continuous = false; speechRecognition.interimResults = false;
+        speechRecognition.start();
+        // Optionnel : Indiquer écoute (visuel)
+        speechRecognition.onresult = (event: any) => {
+            this.searchQuery = event.results[0][0].transcript;
+            this.searchCourses();
+        };
+        speechRecognition.onerror = (event: any) => {
+            console.error('Erreur SpeechRecognition:', event.error);
+            Swal.fire('Erreur Vocale', `Erreur: ${event.error}`, 'error');
+        };
+        speechRecognition.onend = () => { /* Fin écoute */ };
+    }
+
+    // --- Text to Speech ---
+    textToSpeech(course: any) {
+      // Ajout de stopPropagation ici n'est pas nécessaire
+        if (!window.speechSynthesis) { Swal.fire('Erreur', 'Synthèse vocale non supportée.', 'warning'); return; }
+        if (this.isSpeaking) { window.speechSynthesis.cancel(); this.isSpeaking = false; return; }
+
+        const text = `${course.title}. Catégorie: ${course.category || 'Non définie'}. Niveau: ${course.level || 'Non défini'}. Description: ${course.description || 'Aucune description'}. ${course.date ? 'Date: ' + (this.datePipe.transform(course.date, 'longDate', 'UTC', 'fr-FR') || 'Non définie') + '.' : ''} Prix: ${course.price ? course.price + ' dollars' : 'Gratuit'}.`;
+        if (!text.trim()) { Swal.fire('Info', 'Pas de texte à lire pour ce cours.', 'info'); return; }
+
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'fr-FR';
+        this.isSpeaking = true;
+        this.cdr.detectChanges();
+
+        utterance.onend = () => { this.isSpeaking = false; this.cdr.detectChanges(); };
+        utterance.onerror = (event) => {
+            console.error('TTS Error:', event.error);
+            this.isSpeaking = false;
+            this.cdr.detectChanges();
+            Swal.fire('Erreur TTS', `Erreur de synthèse: ${event.error}`, 'error');
+        };
+        window.speechSynthesis.speak(utterance);
+    }
+
+    // --- Gestion Favoris ---
+    toggleFavorite(course: any) {
+        // Ajout de stopPropagation ici n'est pas nécessaire
+        const originalLikedStatus = course.liked ?? false;
+        course.liked = !originalLikedStatus; // Optimistic UI
+
+        const courseDataToUpdate = { // Préparer l'objet complet attendu par updateCourse
+          idCourse: course.idCourse, title: course.title, description: course.description, level: course.level, category: course.category,
+          price: course.price, date: course.date, status: course.status, liked: course.liked // liked a changé
+        };
+
+        // Mise à jour UI (optimiste)
+         const courseIndex = this.courses.findIndex(c => c.idCourse === course.idCourse);
+         if(courseIndex !== -1) this.courses[courseIndex].liked = course.liked;
+         const filteredIndex = this.filteredCourses.findIndex(c => c.idCourse === course.idCourse);
+         if(filteredIndex !== -1) this.filteredCourses[filteredIndex].liked = course.liked;
+         this.cdr.detectChanges();
+
+
+        // Appel API
+        this.courseService.updateCourse(course.idCourse, courseDataToUpdate, undefined)
+            .subscribe({
+                next: () => { console.log('Like status updated via updateCourse'); },
+                error: error => { // Rollback UI
+                    console.error('Error updating like status via updateCourse', error);
+                    course.liked = originalLikedStatus;
+                     if(courseIndex !== -1) this.courses[courseIndex].liked = originalLikedStatus;
+                     if(filteredIndex !== -1) this.filteredCourses[filteredIndex].liked = originalLikedStatus;
+                    this.cdr.detectChanges();
+                    Swal.fire('Erreur', 'Impossible de modifier le statut favori.', 'error');
+                }
+            });
+    }
+
+
+    // --- Pagination ---
+    pagedCourses(): any[] {
+        const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+        const sorted = this.sortCoursesForDisplay(this.filteredCourses); // Trier avant de paginer
+        return sorted.slice(startIndex, startIndex + this.itemsPerPage);
+    }
+    nextPage() { if (this.currentPage < this.totalPages()) { this.currentPage++; } }
+    prevPage() { if (this.currentPage > 1) { this.currentPage--; } }
+    totalPages(): number { return Math.ceil(this.filteredCourses.length / this.itemsPerPage); }
+
+    // --- Tri ---
+    sortCoursesForDisplay(coursesToSort: any[]): any[] {
+        // Tri par date décroissante (les plus récents d'abord)
+        return [...coursesToSort].sort((a, b) => {
+            const dateA = a.date ? new Date(a.date).getTime() : 0;
+            const dateB = b.date ? new Date(b.date).getTime() : 0;
+            return dateB - dateA; // Tri décroissant
+        });
+    }
+
+    // ================================================
+    // == MÉTHODE POUR LA NAVIGATION PAR CLIC SUR CARTE ==
+    // ================================================
+    navigateToDetails(course: any): void {
+      // Note: Le $event.stopPropagation() dans le HTML est essentiel
+      // pour que cette méthode ne soit pas appelée si on clique sur un bouton interne.
+      if (course && course.idCourse) {
+          this.router.navigate(['/Admindetailcourses', course.idCourse]);
+      } else {
+          console.error("Impossible de naviguer: ID du cours manquant ou cours invalide.", course);
+      }
+    }
+    // ================================================
+
 }
