@@ -80,6 +80,25 @@ export class UserService {
     return this.http.post(`${this.apiUrlogin}/verify-token/${token}`, {});
   }
 
+  registerFace(userMail: string, faceDescriptor: number[]): Observable<any> {
+    let token = localStorage.getItem('jwt');
+
+    // Ensure "Bearer" is not duplicated
+    if (token?.startsWith('Bearer ')) {
+      token = token.replace('Bearer ', '');
+    }
+    
+    const headers = new HttpHeaders({
+        'Authorization': `Bearer ${token}`
+    });
+    const body = { faceDescriptor: faceDescriptor };
+    return this.http.post<any>(`${this.apiUrlprofile}/register-face`, body, { headers });
+}
+
+loginWithFace(descriptor: number[]): Observable<any> {
+  return this.http.post(`${this.apiUrlogin}/face-login`, { faceDescriptor: descriptor });
+}
+
   //********PARTIE ADMIN*********/
   getusers(): Observable<any[]> {
     let token = localStorage.getItem('jwt');  // Directly get the token from localStorage

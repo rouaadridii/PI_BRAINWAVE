@@ -1,149 +1,79 @@
-body {
-    background: #eee;
+.user-subhead {
+    display: block; /* To make it appear on a new line */
+    font-size: 0.8em; /* Adjust the size as needed */
+    color: #6c757d; /* Optional: Add a slightly muted color */
+    margin-left: 40px;
 }
-
-app-back-header, app-back-menu-admin {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    z-index: 999;
-}
-
-.container {
-    margin-left: 270px; /* Right-side placement */
-    margin-bottom: 20px;
-    overflow: visible;
-    padding-top: 120px; /* Adjusted padding-top */
-}
-
-.main-box.no-header {
-    padding-top: 20px;
-}
-
-.main-box {
-    background: #FFFFFF;
-    box-shadow: 1px 1px 2px 0 #CCCCCC;
-    margin-bottom: 0px;
-    border-radius: 3px;
-    min-height: auto;
-}
-
-.table-responsive {
-    max-height: none;
-    overflow: visible;
-}
-
-.table {
-    width: 100%;
-}
-
-.table a.table-link.danger {
-    color: #e74c3c;
-}
-
-.label {
-    border-radius: 3px;
-    font-size: 0.875em;
-    font-weight: 600;
-}
-
-.user-list tbody td .user-subhead {
-    font-size: 0.875em;
-    font-style: italic;
-}
-
-.user-list tbody td .user-link {
-    display: block;
-    font-size: 1.25em;
-    padding-top: 3px;
-    margin-left: 60px;
-}
-
-a {
-    color: #3498db;
-    outline: none !important;
-}
-
-.user-list tbody td > img {
-    position: relative;
-    max-width: 50px;
-    float: left;
-    margin-right: 15px;
-}
-
-.table thead tr th {
-    text-transform: uppercase;
-    font-size: 0.875em;
-    border-bottom: 2px solid #e7ebee;
-}
-
-.table tbody tr td:first-child {
-    font-size: 1.125em;
-    font-weight: 300;
-}
-
-.table tbody tr td {
-    font-size: 0.875em;
-    vertical-align: middle;
-    border-top: 1px solid #e7ebee;
-    padding: 12px 8px;
-}
-
-a:hover {
-    text-decoration: none;
-}
-
-.bg-success {
-    background-color: green;
-    color: black;
-}
-
-.bg-warning {
-    background-color: yellow;
-    color: black;
-}
-
-.btn-outline-info {
-    border-radius: 50px !important;
-    margin-bottom: 15px;
-    color: #6d9bb9 !important;
-    border-color: #6d9bb9 !important;
-    transition: all 0.3s ease-in-out;
-    pointer-events: auto !important;
-    position: relative;
-    z-index: 10;
-    cursor: pointer;
-}
-
-button.btn-outline-info:hover {
-    background-color: #6d9bb9 !important;
-    border-color: #6d9bb9 !important;
-    color: white !important;
-}
-
 .pagination-controls {
-    margin-top: 20px;
-    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 15px;
 }
 
-.user-icon {
-    position: relative;
-    display: inline-block;
-    font-size: 10px; /* Smaller user icon */
+.pagination-controls button {
+    margin: 0 5px;
+    padding: 8px 12px;
+    border: 1px solid #007bff; /* Blue border */
+    background-color: #007bff; /* Blue background */
+    color: white; /* White text */
+    border-radius: 5px; /* Slightly rounded corners */
+    cursor: pointer; /* Indicate it's clickable */
+    transition: background-color 0.3s ease; /* Smooth transition for hover effect */
 }
 
-.small-icon {
-    position: absolute;
-    bottom: -3px;
-    right: -6px;
-    font-size: 10px; /* Smaller plus/minus icons */
+.pagination-controls button:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+    border-color: #0056b3;
 }
 
-.green-icon {
-    color: green;
+.pagination-controls button:disabled {
+    background-color: #ccc; /* Gray background for disabled state */
+    border-color: #ccc;
+    color: #666;
+    cursor: not-allowed; /* Indicate it's not clickable */
 }
 
-.red-icon {
-    color: red;
+.pagination-controls span {
+    margin: 0 10px;
+}
+.buttons-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start; /* Or center if you prefer */
+    margin-top: 10px;
+    margin-bottom: 15px;
+}
+
+.buttons-wrapper button {
+    margin-left: 10px; /* Default margin between buttons */
+    padding: 8px 16px; /* Adjust padding for better look */
+    border: 1px solid #427b8c; /* Blue sky border color */
+    background-color: #427b8c; /* Blue sky background color */
+    color: white; /* White text for contrast */
+    border-radius: 8px; /* Adjust for more or less rounded corners */
+    cursor: pointer;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.buttons-wrapper button:first-child {
+    margin-left: 35px; /* Keep the initial left margin for the first button */
+}
+
+.buttons-wrapper button:hover {
+    background-color: #3c96b1; /* Slightly darker blue on hover */
+    border-color: #31b0d5;
+}
+
+.buttons-wrapper button:focus {
+    outline: none; /* Remove default focus outline */
+    box-shadow: 0 0 0 0.2rem rgba(91, 208, 222, 0.5); /* Add a subtle focus effect */
+}
+
+.buttons-wrapper button i {
+    margin-right: 5px; /* Space between icon and text */
+}
+
+.buttons-wrapper button .text-blue {
+    color: white !important; /* Ensure icon color is white */
 }

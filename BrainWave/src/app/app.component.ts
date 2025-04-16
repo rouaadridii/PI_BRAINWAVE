@@ -20,7 +20,7 @@ export class AppComponent {
       if (event instanceof NavigationEnd) {
         const currentUrl = this.router.url;
         this.isAuthPage = currentUrl.includes('/login') || currentUrl.includes('/signup') || currentUrl.includes('/profile') || currentUrl.includes('/dashboard') || currentUrl.includes('/listeusers') || currentUrl.includes('/reset-password')   ; // Exclude navbar on login and signup pages
-        this.isback = currentUrl.includes('/login') || currentUrl.includes('/dashboard') || currentUrl.includes('/login')|| currentUrl.includes('/signup')|| currentUrl.includes('/profile')|| currentUrl.includes('/reset-password')|| currentUrl.includes('/home');
+        this.isback = currentUrl.includes('/login') || currentUrl.includes('/dashboard') || currentUrl.includes('/login')|| currentUrl.includes('/signup')|| currentUrl.includes('/profile')|| currentUrl.includes('/reset-password')|| currentUrl.includes('/home')|| currentUrl.includes('/listeusers');
       }
     });
   }
