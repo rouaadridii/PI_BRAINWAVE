@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { StudentQuizService } from 'src/app/services/student-quiz-service.service';
+import { QuizService } from 'src/app/services/quiz.service';
 import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
@@ -7,29 +8,42 @@ import { ActivatedRoute, Router } from '@angular/router';
   templateUrl: './stripe-payment.component.html',
   styleUrls: ['./stripe-payment.component.scss']
 })
-export class StripePaymentComponent {
+export class StripePaymentComponent implements OnInit {
   quizId: number | null = null;
+  quizPrice: number | null = null;
 
-  constructor(private stripeService: StudentQuizService, private router: Router, private route: ActivatedRoute) {
+  constructor(private studentQuizService: StudentQuizService, private quizService: QuizService, private router: Router, private route: ActivatedRoute) {
     this.route.queryParams.subscribe(params => {
       this.quizId = params['quizId'];
     });
   }
 
+  ngOnInit() {
+    if (this.quizId !== null) {
+      this.quizService.getQuizById(this.quizId).subscribe(
+        quiz => {
+          this.quizPrice = quiz.price;
+        },
+        error => {
+          console.error("Erreur lors de la récupération du quiz :", error);
+          this.router.navigate(['/payment-failed']);
+        }
+      );
+    }
+  }
+
   async payWithStripe() {
-    if (this.quizId === null) {
-      console.error("quizId est null. Impossible de procéder au paiement.");
+    if (this.quizId === null || this.quizPrice === null) {
+      console.error("quizId ou quizPrice est null. Impossible de procéder au paiement.");
       return;
     }
 
-    this.stripeService.createCheckoutSession(10.00, 'usd', this.quizId).subscribe(
+    this.studentQuizService.createCheckoutSession(this.quizPrice, 'usd', this.quizId).subscribe(
       sessionUrl => {
-        // Redirection vers Stripe
         window.location.href = sessionUrl;
       },
       error => {
         console.error("Erreur Stripe :", error);
-        // Redirection en cas d'erreur
         this.router.navigate(['/payment-failed']);
       }
     );

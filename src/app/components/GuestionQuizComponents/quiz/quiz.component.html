@@ -1,8 +1,5 @@
 <body>
-  <!-- ***** Header Area Start ***** -->
   <app-front-header></app-front-header>
-  <!-- ***** Header Area End ***** -->
-
   <div class="page-content">
     <br><br><br>
 
@@ -58,6 +55,8 @@
         table,
         th,
         td {
+          text-align: center !important;
+          vertical-align: middle !important;
           border: 1px solid #000000 !important;
         }
 
@@ -71,6 +70,68 @@
           color: white;
           border-radius: 10px;
           text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .certified-quiz {
+          color: red;
+        }
+
+        .training-quiz {
+          color: green;
+        }
+
+        .button-container {
+          display: flex; /* Pour aligner les boutons horizontalement */
+          justify-content: space-between; /* Espacement maximal entre les boutons */
+          align-items: center; /* Alignement vertical au centre */
+          padding: 2px; /* Ajoute un peu d'espace autour des boutons */
+        }
+
+        .ai-button {
+          background: linear-gradient(135deg, #007bff, #6610f2); /* Dégradé de couleurs moderne */
+          color: white;
+          padding: 8px 18px;
+          border: none;
+          border-radius: 8px;
+          cursor: pointer;
+          font-size: 1.1em;
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+          transition: background 0.3s ease, transform 0.2s ease;
+          display: flex; /* Pour aligner le texte et l'icône */
+          align-items: center;
+          gap: 8px; /* Espace entre le texte et l'icône */
+        }
+
+        .ai-button:hover {
+          background: linear-gradient(135deg, #0056b3, #4c0eb0); /* Dégradé plus foncé au survol */
+          transform: translateY(-2px); /* Léger décalage vers le haut au survol */
+          box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .ai-icon {
+          font-size: 1.2em; /* Taille de l'icône */
+          margin-left: 5px; /* Espace à gauche de l'icône */
+        }
+
+        .add-quiz-button {
+          background-color: #28a745;
+          color: white;
+          padding: 8px 18px; /* Même padding que le bouton AI */
+          border: none;
+          border-radius: 8px; /* Même border-radius que le bouton AI */
+          cursor: pointer;
+          font-size: 1.1em; /* Même font-size que le bouton AI */
+          transition: background-color 0.3s ease, transform 0.2s ease; /* Ajout de la transition */
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Ajout de l'ombre */
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .add-quiz-button:hover {
+          background-color: #218838;
+          transform: translateY(-2px);
+          box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
         }
       </style>
     </head>
@@ -86,7 +147,10 @@
         </span>
       </div>
 
-      <button class="btn btn-success" [routerLink]="['/add-quiz']">Add a Quiz <i class="fas fa-plus"></i></button>
+      <div class="button-container">
+        <button class="add-quiz-button" [routerLink]="['/add-quiz']">Add a Quiz<i class="fas fa-plus"></i></button>
+        <button class="ai-button" [routerLink]="['/quiz-generator']">Generate Training Quiz with AI<i class="fas fa-brain ai-icon"></i> </button>
+      </div>
 
       <table class="table table-bordered">
         <thead>
@@ -95,6 +159,8 @@
             <th>Duration</th>
             <th>Start Date</th>
             <th>End Date</th>
+            <th>Price</th>
+            <th>Type</th>
             <th class="actions-column">Actions</th>
           </tr>
         </thead>
@@ -104,6 +170,8 @@
             <td>{{ quiz.duration }}</td>
             <td>{{ quiz.startDate | date:'dd/MM/yyyy HH:mm' }}</td>
             <td>{{ quiz.endDate | date:'dd/MM/yyyy HH:mm' }}</td>
+            <td>{{ quiz.price }}$</td>
+            <td [ngClass]="{'certified-quiz': quiz.type === 'CERTIFIED_QUIZ', 'training-quiz': quiz.type === 'TRAINING_QUIZ'}">{{ quiz.type }}</td>
             <td class="actions-column">
               <button class="btn btn-warning" [routerLink]="['/update-quiz', quiz.idQuiz]">
                 <i class="fas fa-edit"></i>
@@ -120,8 +188,5 @@
     <br><br><br>
   </div>
 
-  <!-- ***** Footer Area Start ***** -->
   <app-front-footer></app-front-footer>
-  <!-- ***** Footer Area End ***** -->
-
-  </body>
+</body>

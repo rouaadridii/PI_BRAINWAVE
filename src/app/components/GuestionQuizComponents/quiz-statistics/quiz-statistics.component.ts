@@ -3,7 +3,7 @@ import { StudentQuizService } from 'src/app/services/student-quiz-service.servic
 import { ChartData, ChartType } from 'chart.js';
 
 @Component({
-  selector: 'app-quiz-statistics',
+  selector: 'quiz-statistics',
   templateUrl: './quiz-statistics.component.html',
   styleUrls: ['./quiz-statistics.component.scss']
 })

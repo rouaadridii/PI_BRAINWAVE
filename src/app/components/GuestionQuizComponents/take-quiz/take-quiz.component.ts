@@ -1,10 +1,11 @@
 import { Component, OnInit, HostListener } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { forkJoin, Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { forkJoin, Observable, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 import { QuestionService } from 'src/app/services/question.service'; 
 import { ResponseService } from 'src/app/services/response.service';
 import { Question } from 'src/app/models/question';
+import { StudentQuiz } from 'src/app/models/StudentQuiz';
 import { QuizService } from 'src/app/services/quiz.service';  
 import { StudentQuizService } from 'src/app/services/student-quiz-service.service'; 
 import { jsPDF } from 'jspdf';
@@ -21,6 +22,7 @@ export class TakeQuizComponent implements OnInit {
   quizDetails: any = null;
   name: any = null;
   surname: any = null;
+  email: any = null;
   questions: Question[] = [];
   selectedResponses: { [key: number]: number } = {};
   currentQuestionIndex: number = 0;
@@ -31,6 +33,8 @@ export class TakeQuizComponent implements OnInit {
   isSubmitted: boolean = false;
   quizStarted: boolean = false;
   paymentSuccess: boolean = false;
+  payed: boolean = false;
+  emailSent: boolean = false;
 
   dragAndDropPairs: { [questionId: number]: DragAndDropPair[] } = {};
   shuffledDragAndDropPairs: { [questionId: number]: DragAndDropPair[] } = {};
@@ -48,16 +52,28 @@ export class TakeQuizComponent implements OnInit {
   ngOnInit(): void {
     this.quizId = Number(this.route.snapshot.paramMap.get('quizId'));
     this.loadQuizDetails();
-    this.loadStudentInfo();
+    
     this.route.queryParams.subscribe(params => {
-      if (params['paymentSuccess'] === 'true') {
-        this.updatePaymentStatus(this.id);
-        this.paymentSuccess = true;
-      }});
+        if (params['paymentSuccess'] === 'true') {
+          forkJoin([this.loadStudentQuizInfo()]).subscribe(() => {
+            if(this.payed == false){
+              this.updatePaymentStatus(this.id);
+              window.location.reload();
+            }
+          });
+            forkJoin([this.loadStudentQuizInfo()]).subscribe(() => {
+              forkJoin([this.loadStudentInfo()]).subscribe(() => {
+                if(this.payed == true && this.emailSent == false){
+                  this.sendPaymentSuccessEmail();
+                }
+              });
+            });
+        }
+        forkJoin([this.loadStudentQuizInfo()]).subscribe(() => {});
+    });
 
-    // Ajouter l'écouteur d'événement visibilitychange
     document.addEventListener('visibilitychange', this.onVisibilityChange.bind(this));
-  }
+}
 
   ngOnDestroy(): void {
     // Nettoyer l'écouteur d'événement
@@ -85,17 +101,94 @@ export class TakeQuizComponent implements OnInit {
     );
   }
 
-  loadStudentInfo(): void {
-    this.studentQuizService.getStudentByCin(this.id).subscribe(
-      (student) => {
-        this.name = student.name; 
-        this.surname = student.surname;
+  updateEmailStatus(studentCin: number) {
+    if (this.quizId === null) {
+      console.error("quizId est null. Impossible de mettre à jour le statut d'email.");
+      return;
+    }
+    this.studentQuizService.updateEmailStatus(studentCin, this.quizId).subscribe(
+      (response) => {
+        console.log("Statut d'email mis à jour avec succès :", response);
+        // Rediriger ou afficher un message de succès
       },
-      (error) => {
-        console.error("Erreur lors de la récupération des informations de l'étudiant :", error);
+      error => {
+        console.error("Erreur lors de la mise à jour du statut d'email :", error);
+        // Gérer l'erreur
       }
     );
-  }  
+  }
+
+  // Créer une fonction qui retourne l'observable de loadStudentInfo
+  loadStudentInfo(): Observable<any> {
+    return this.studentQuizService.getStudentByCin(this.id).pipe(
+        map(student => {
+            this.name = student.name;
+            this.surname = student.surname;
+            this.email = student.email;
+            return student;
+        }),
+        catchError(error => {
+            console.error("Erreur lors de la récupération des informations de l'étudiant :", error);
+            return of(null); //important de retourner un observable même en cas d'erreur.
+        })
+    );
+  }
+
+  // Créer une fonction qui retourne l'observable de load Student_Quiz Info
+  loadStudentQuizInfo(): Observable<StudentQuiz | null> {
+    if (this.quizId != null) {
+      return this.studentQuizService.getStudentQuizByStudentAndQuiz(this.id, this.quizId).pipe(
+        map(studentQuiz => {
+          this.payed = studentQuiz.payed;
+          this.emailSent = studentQuiz.emailSent;
+          return studentQuiz; // Retourner l'objet StudentQuiz complet
+        }),
+        catchError(error => {
+          console.error("Erreur lors de la récupération des informations de l'étudiant et du quiz :", error);
+          return of(null); 
+        })
+      );
+    } else {
+      console.error("quizId est null. Impossible de charger les informations de l'étudiant et du quiz.");
+      return of(null);
+    }
+  }
+
+    sendPaymentSuccessEmail() {
+      const to = this.email;
+      const subject = "Payment Confirmation - Quiz Access Granted";
+      const htmlContent = `
+    <div style="font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: auto; border: 1px solid #ddd; border-radius: 10px;">
+        <h2 style="color: #2c3e50;">Payment Confirmation</h2>
+        <p>Dear <strong>${this.name} ${this.surname}</strong>,</p>
+        <p>We are pleased to inform you that your payment has been successfully processed.</p>
+        <p>You now have full access to your quiz session. We wish you the best of luck!</p>
+        <p>If you have any questions, feel free to contact our support team.</p>
+        <hr>
+        <p style="color: #777; font-size: 12px; display: flex; justify-content: space-between; align-items: center;">
+            <span>Best regards,<br>Your BRAINWAVE Team</span>
+            <img src="https://res.cloudinary.com/dxldo1aut/image/upload/v1741208941/xz3ilh7eqgdzqnpcxav9.png" alt="Logo" style="width: 56px; height: auto; margin-left: 10px;">
+        </p>
+    </div>
+`;
+  
+      console.log("Sending email to:", to);
+      console.log("Subject:", subject);
+      console.log("HTML Content:", htmlContent);
+  
+      this.studentQuizService.sendEmail(to, subject, htmlContent).subscribe(
+          (response) => {
+              console.log("Email sent successfully:", response);
+              if (response && response.message) {
+                  console.log(response.message); // Afficher le message de succès
+              } else {
+                  console.warn("Unexpected response format:", response); // Avertir si le format est inattendu
+              }
+          },
+          (error) => console.error("Error sending email:", error)
+      );
+      this.updateEmailStatus(this.id);
+  }
 
   loadQuizDetails(): void {
     if (this.quizId !== null) {
@@ -145,40 +238,43 @@ export class TakeQuizComponent implements OnInit {
   }
 
   loadQuestions(): void {
-  if (this.quizId !== null) {
-    this.questionService.getListQuestionsByQuizId(this.quizId).subscribe(questions => {
-      const requests: Observable<any>[] = questions.map(question => {
-        if (question.type === 'MULTIPLE_CHOICE') {
-          return this.responseService.getListResponsesByQuestionId(question.idQuestion).pipe(
-            map(responses => ({ ...question, responses: this.shuffleArray(responses) })) // Mélanger les réponses ici
-          );
-        } else if (question.type === 'DRAG_AND_DROP') {
-          return this.responseService.getListDragAndDropByQuestionId(question.idQuestion).pipe(
-            map(dragAndDropPairs => ({ ...question, dragAndDropPairs: this.shuffleArray(dragAndDropPairs) }))
-          );
-        } else {
-          return this.responseService.getListResponsesByQuestionId(question.idQuestion).pipe(
-            map(responses => ({ ...question, responses: this.shuffleArray(responses) }))
-          );
-        }
-      });
-
-      forkJoin(requests).subscribe(completeQuestions => {
-        this.questions = completeQuestions;
-        this.questions.forEach(question => {
-          if (question.dragAndDropPairs) {
-            this.dragAndDropPairs[question.idQuestion] = question.dragAndDropPairs;
-            this.shuffledDragAndDropPairs[question.idQuestion] = this.shuffleArray(JSON.parse(JSON.stringify(question.dragAndDropPairs)));
+    if (this.quizId !== null) {
+      this.questionService.getListQuestionsByQuizId(this.quizId).subscribe(questions => {
+        const shuffledQuestions = this.shuffleArray(questions); // Mélanger les questions ici
+  
+        const requests: Observable<any>[] = shuffledQuestions.map(question => {
+          if (question.type === 'MULTIPLE_CHOICE') {
+            return this.responseService.getListResponsesByQuestionId(question.idQuestion).pipe(
+              map(responses => ({ ...question, responses: this.shuffleArray(responses) }))
+            );
+          } else if (question.type === 'DRAG_AND_DROP') {
+            return this.responseService.getListDragAndDropByQuestionId(question.idQuestion).pipe(
+              map(dragAndDropPairs => ({ ...question, dragAndDropPairs: this.shuffleArray(dragAndDropPairs) }))
+            );
+          } else {
+            return this.responseService.getListResponsesByQuestionId(question.idQuestion).pipe(
+              map(responses => ({ ...question, responses: this.shuffleArray(responses) }))
+            );
           }
         });
-        this.showQuizQuestions = true;
-        this.currentQuestionIndex = 0;
-        this.quizStarted = true;
-        this.startTimer();
+  
+        // Utiliser forkJoin pour combiner tous les Observables en un seul
+        forkJoin(requests).subscribe(completeQuestions => {
+          this.questions = completeQuestions;
+          this.questions.forEach(question => {
+            if (question.dragAndDropPairs) {
+              this.dragAndDropPairs[question.idQuestion] = question.dragAndDropPairs;
+              this.shuffledDragAndDropPairs[question.idQuestion] = this.shuffleArray(JSON.parse(JSON.stringify(question.dragAndDropPairs)));
+            }
+          });
+          this.showQuizQuestions = true;
+          this.currentQuestionIndex = 0;
+          this.quizStarted = true;
+          this.startTimer();
+        });
       });
-    });
+    }
   }
-}
 
   shuffleArray(array: any[]): any[] {
     const newArray = [...array];
@@ -341,7 +437,7 @@ submitQuiz(): void {
         }
 
         if (!allPairsFilled) {
-          alert("Veuillez remplir toutes les paires pour les questions de type Drag and Drop avant de soumettre!");
+          alert("Please fill in all pairs for Drag and Drop questions before submitting!");
           return;
         }
 
@@ -371,12 +467,12 @@ submitQuiz(): void {
 
     // Vérification avant la soumission
     if (!allMultipleChoiceAnswered) {
-      alert("Vous n'avez pas répondu à toutes les questions à choix multiples!")
+      alert("You have not answered all multiple-choice questions!")
       return;
     }
 
     if (!hasResponses) {
-      console.warn("Aucune réponse sélectionnée. Pas de soumission.");
+      console.warn("No answer selected. Submission not allowed.");
       return;
     }
 

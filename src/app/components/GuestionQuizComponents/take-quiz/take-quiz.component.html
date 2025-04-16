@@ -21,7 +21,7 @@
 <div *ngIf="score !== null">
   <div *ngIf="score >= 50">
     <button class="download-button modern-button" (click)="downloadCertificate()">
-      <i class="fas fa-download"></i> Télécharger le certificat
+      <i class="fas fa-download"></i> Download Certificate
     </button>
   </div>
 </div>
@@ -30,24 +30,24 @@
 
   <!-- Affichage des détails du quiz -->
   <div *ngIf="score !== null" class="quiz-details">
-    <h6>Détails du Quiz</h6>
-    Titre : {{ quizDetails?.titleQuiz }}<br>
-    Durée : {{ quizDetails?.duration }}
+    <h6>Quiz Details</h6>
+    Title : {{ quizDetails?.titleQuiz }}<br>
+    Duration : {{ quizDetails?.duration }}
   </div>
 
   <!-- Affichage des informations avant le début du quiz -->
   <div *ngIf="!showQuizQuestions && score === null" class="quiz-details">
-    <h2>Détails du Quiz</h2>
-    <p><strong>Titre :</strong> {{ quizDetails?.titleQuiz }}</p>
-    <p><strong>Durée :</strong> {{ quizDetails?.duration }}</p>
-    <p><strong>Date de début :</strong> {{ quizDetails?.startDate | date:'dd/MM/yyyy HH:mm' }}</p>
-    <p><strong>Date de fin :</strong> {{ quizDetails?.endDate | date:'dd/MM/yyyy HH:mm' }}</p>
+    <h2>Quiz Details</h2>
+    <p><strong>Title :</strong> {{ quizDetails?.titleQuiz }}</p>
+    <p><strong>Duration :</strong> {{ quizDetails?.duration }}</p>
+    <p><strong>Start Date :</strong> {{ quizDetails?.startDate | date:'dd/MM/yyyy HH:mm' }}</p>
+    <p><strong>End Date :</strong> {{ quizDetails?.endDate | date:'dd/MM/yyyy HH:mm' }}</p>
     
-    <div *ngIf="paymentSuccess === true">
-      <button class="start-button" (click)="loadQuestions()">Passer le quiz</button>
+    <div *ngIf="payed === true">
+      <button class="start-button" (click)="loadQuestions()">Take the quiz</button>
     </div>
-    <div *ngIf="paymentSuccess === false">
-      <button class="start-button" (click)="goToPayment()">Passer le quiz</button>
+    <div *ngIf="payed === false">
+      <button class="start-button" (click)="goToPayment()">Take the quiz</button>
     </div>
 
   </div>
@@ -59,7 +59,10 @@
         Question {{ currentQuestionIndex + 1 }} / {{ questions.length }}
         <span class="timer">
             {{ formatTimeWithSeconds(timer) }}
-            <i *ngIf="timer <= 120" class="fas fa-clock" [class.blink]="timer % 2 === 0"></i>
+            <span *ngIf="timer <= 120" class="clock-container">
+                <i *ngIf="timer % 2 === 0" class="fas fa-clock blink"></i>
+                <span *ngIf="timer % 2 !== 0" class="clock-placeholder"></span>
+            </span>
         </span>
     </h3>
       <p class="question-text">{{ questions[currentQuestionIndex].question }}</p>
@@ -103,12 +106,12 @@
 
       <div class="navigation-buttons">
         <button *ngIf="currentQuestionIndex > 0" class="nav-button prev-button"
-                (click)="prevQuestion()">Précédent</button>
+                (click)="prevQuestion()">Previous</button>
         <button *ngIf="currentQuestionIndex < questions.length - 1"
-                class="nav-button next-button" (click)="nextQuestion()">Suivant</button>
+                class="nav-button next-button" (click)="nextQuestion()">Next</button>
       </div>
 
-      <button class="submit-button" (click)="submitQuiz()">Soumettre</button>
+      <button class="submit-button" (click)="submitQuiz()">Submit</button>
     </div>
   </div>
 </div>  
@@ -151,7 +154,7 @@ font-size: 16px;
 }
 
 .start-button {
-background-color: #ff4757;
+background-color: #a41f25;
 color: white;
 padding: 10px 20px;
 border: none;
@@ -159,9 +162,14 @@ border-radius: 5px;
 cursor: pointer;
 }
 
+.start-button:hover {
+  background-color: #72161b;
+}
+
 .question-header {
 font-size: 20px;
 margin-bottom: 10px;
+color: #00bdff;
 }
 
 .question-text {
@@ -236,17 +244,6 @@ margin-bottom: 20px;
 
 .score-circle {
 transform: rotate(0deg); /* Pour commencer à partir du haut */
-}
-
-.quiz-details {
-margin-top: 20px;
-}
-
-.timer {
-font-size: 18px;
-margin-left: 15px;
-font-weight: bold;
-color: #ff4757; /* Couleur rouge pour le timer */
 }
 
 .question-image {
@@ -348,16 +345,39 @@ color: #ff4757; /* Couleur rouge pour le timer */
     font-size: 18px; /* Ajuster la taille de l'icône */
 }
 
+.timer {
+  font-size: 18px;
+  font-weight: bold;
+  color: #ff4757;
+  display: flex;
+  justify-content: flex-end;
+  margin-top: -21px;
+}
+
 .blink {
     animation: blinker 1s linear infinite;
     color: red;
     margin-left: 5px;
 }
 
+.clock-placeholder {
+    width: 21px; /* Ajuster cette valeur selon la largeur de l'icône + la marge */
+    display: inline-block;
+}
+
+.clock-container {
+    display: inline-flex; /* Assurer que les éléments internes sont alignés */
+    align-items: center;
+}
+
 @keyframes blinker {
     50% {
         opacity: 0;
     }
+}
+
+.h2, h2 {
+  color: #0097ff;
 }
 
 </style>

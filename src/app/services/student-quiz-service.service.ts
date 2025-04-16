@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { catchError, Observable, throwError } from 'rxjs';
+import { StudentQuiz } from '../models/StudentQuiz';
 
 @Injectable({
   providedIn: 'root'
@@ -23,11 +24,7 @@ export class StudentQuizService {
     return this.http.get(`${this.apiUrl}/student/${cin}`);
   }
 
-  // Création d'un paiement stripe
-  /*createCheckoutSession(amount: number, currency: string) {
-    return this.http.post(`${this.apiUrl}/create-checkout-session?amount=${amount}&currency=${currency}`, {}, { responseType: 'text' });
-  }*/
- createCheckoutSession(amount: number, currency: string, quizId: number): Observable<string> {
+  createCheckoutSession(amount: number, currency: string, quizId: number): Observable<string> {
     const params = new HttpParams()
       .set('amount', amount.toString())
       .set('currency', currency)
@@ -44,18 +41,20 @@ export class StudentQuizService {
     return this.http.put(this.apiUrl + '/update-payment-status', null, { params, responseType: 'text' });
   }
 
+  updateEmailStatus(studentCin: number, quizId: number): Observable<string> {
+    const params = new HttpParams()
+      .set('studentCin', studentCin.toString())
+      .set('quizId', quizId.toString());
 
-
-
-
-  // Création d'un paiement PayPal
-  createPayPalPayment(amount: number): Observable<string> {
-    return this.http.post<string>(`${this.apiUrl}/pay?amount=${amount}`, {}, { responseType: 'text' as 'json' });
+    return this.http.put(this.apiUrl + '/update-email-status', null, { params, responseType: 'text' });
   }
 
-  // Validation du paiement PayPal
-  executePayPalPayment(paymentId: string, payerId: string): Observable<string> {
-    return this.http.get<string>(`${this.apiUrl}/success?paymentId=${paymentId}&PayerID=${payerId}`, { responseType: 'text' as 'json' });
+  sendEmail(to: string, subject: string, htmlContent: string): Observable<any> {
+    return this.http.post(this.apiUrl + '/send-email', { to, subject, htmlContent }).pipe();
+  }
+
+  getStudentQuizByStudentAndQuiz(studentCin: number, quizId: number): Observable<StudentQuiz> {
+      return this.http.get<StudentQuiz>(`${this.apiUrl}/StudentQuiz/${studentCin}/${quizId}`);
   }
   
 }

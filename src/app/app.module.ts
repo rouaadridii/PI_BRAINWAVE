@@ -25,8 +25,9 @@ import { TakeQuizComponent } from './components/GuestionQuizComponents/take-quiz
 import { QuizStatisticsComponent } from './components/GuestionQuizComponents/quiz-statistics/quiz-statistics.component';
 import { GenerateCertifComponent } from './components/GuestionQuizComponents/generate-certif/generate-certif.component';
 import { NgChartsModule } from 'ng2-charts';
-import { PaypalPaymentComponent } from './components/GuestionQuizComponents/paypal-payment/paypal-payment.component';
 import { StripePaymentComponent } from './components/GuestionQuizComponents/stripe-payment/stripe-payment.component';
+import { TakeQuizTrainingComponent } from './components/GuestionQuizComponents/take-quiz-training/take-quiz-training.component';
+import { QuizGeneratorComponent } from './components/GuestionQuizComponents/quiz-generator/quiz-generator.component';
 
 @NgModule({
   declarations: [
@@ -50,8 +51,9 @@ import { StripePaymentComponent } from './components/GuestionQuizComponents/stri
     TakeQuizComponent,
     QuizStatisticsComponent,
     GenerateCertifComponent,
-    PaypalPaymentComponent,
-    StripePaymentComponent
+    StripePaymentComponent,
+    TakeQuizTrainingComponent,
+    QuizGeneratorComponent
   ],
   imports: [
     FormsModule,

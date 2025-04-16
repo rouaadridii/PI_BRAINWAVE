@@ -19,8 +19,10 @@ import { UpdateQuestionComponent } from './components/GuestionQuizComponents/upd
 import { UpdateResponseComponent } from './components/GuestionQuizComponents/update-response/update-response.component';
 import { TakeQuizComponent } from './components/GuestionQuizComponents/take-quiz/take-quiz.component';
 import { QuizStatisticsComponent } from './components/GuestionQuizComponents/quiz-statistics/quiz-statistics.component';
-import { PaypalPaymentComponent } from './components/GuestionQuizComponents/paypal-payment/paypal-payment.component';
 import { StripePaymentComponent } from './components/GuestionQuizComponents/stripe-payment/stripe-payment.component';
+import { TakeQuizTrainingComponent } from './components/GuestionQuizComponents/take-quiz-training/take-quiz-training.component';
+import { QuizGeneratorComponent } from './components/GuestionQuizComponents/quiz-generator/quiz-generator.component';
+
 //End Quiz
 
 const routes: Routes = [
@@ -47,10 +49,13 @@ const routes: Routes = [
 
   { path: 'take-quiz/:quizId', component: TakeQuizComponent },
 
-  { path: 'app-quiz-statistics', component: QuizStatisticsComponent },
+  { path: 'quiz-statistics', component: QuizStatisticsComponent },
 
-  { path: 'payement', component: PaypalPaymentComponent },
-  { path: 'payement-stripe', component: StripePaymentComponent }
+  { path: 'payement-stripe', component: StripePaymentComponent },
+
+  { path: 'take-quiz-training/:quizId', component: TakeQuizTrainingComponent },
+
+  { path: 'quiz-generator', component: QuizGeneratorComponent }
 
 
 ];

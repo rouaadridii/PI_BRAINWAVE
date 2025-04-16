@@ -125,7 +125,7 @@
     </thead>
     <tbody>
       <tr *ngFor="let response of responses">
-        <td>{{ response.response }}</td>
+        <td class="align-middle">{{ response.response }}</td>
         <td class="correct-column">{{ response.responseCorrect ? 'Yes' : 'No' }}</td>
         <td>
           <button class="btn btn-warning" [routerLink]="['/update-response', questionId, response.idResponse]">
@@ -150,8 +150,8 @@
     </thead>
     <tbody>
       <tr *ngFor="let dragAndDropPair of dragAndDropPairs">
-        <td>{{ dragAndDropPair.sourceText }}</td>
-        <td>{{ dragAndDropPair.targetText }}</td>
+        <td class="align-middle">{{ dragAndDropPair.sourceText }}</td>
+        <td class="align-middle">{{ dragAndDropPair.targetText }}</td>
         <td>
           <button class="btn btn-warning" [routerLink]="['/update-response', questionId, dragAndDropPair.idDragAndDrop]">
             <i class="fas fa-edit"></i>

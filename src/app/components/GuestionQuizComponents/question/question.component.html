@@ -120,7 +120,15 @@
         justify-content: center; /* Centre horizontalement */
         align-items: center; /* Centre verticalement */
         height: 100%; /* Assure que le texte prend toute la hauteur de la cellule */
-     }
+    }
+
+    .drag_and_drop_question {
+        color: red;
+    }
+
+    .multiple_choice_question {
+        color: green;
+    }
   </style>
 </head>
 
@@ -135,6 +143,7 @@
     <thead>
       <tr>
         <th>Question</th>
+        <th>Type</th>
         <th>Image</th>
         <th class="actions-column">Actions</th>
       </tr>
@@ -142,6 +151,7 @@
     <tbody>
       <tr *ngFor="let question of questions">
         <td class="align-middle">{{ question?.question }}</td>
+        <td class="align-middle" [ngClass]="{'drag_and_drop_question': question.type === 'DRAG_AND_DROP', 'multiple_choice_question': question.type === 'MULTIPLE_CHOICE'}">{{ question.type }}</td>
         <td class="align-middle">
           <img *ngIf="question.imageUrl" [src]="question.imageUrl" alt="Question Image">
           <span *ngIf="!question.imageUrl" class="no-image-text">No image</span>
