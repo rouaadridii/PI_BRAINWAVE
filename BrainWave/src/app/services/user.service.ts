@@ -99,6 +99,10 @@ loginWithFace(descriptor: number[]): Observable<any> {
   return this.http.post(`${this.apiUrlogin}/face-login`, { faceDescriptor: descriptor });
 }
 
+loginWithGoogle(idToken: string) {
+  return this.http.post(`${this.apiUrlogin}/google-login`, { idToken });
+}
+
   //********PARTIE ADMIN*********/
   getusers(): Observable<any[]> {
     let token = localStorage.getItem('jwt');  // Directly get the token from localStorage
@@ -152,6 +156,41 @@ loginWithFace(descriptor: number[]): Observable<any> {
 
   const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
   return this.http.put(`${this.apiurladmin}/unban/${email}`, {}, { headers });
+}
+
+private createAuthHeaders(): { headers: HttpHeaders } {
+  let token = localStorage.getItem('jwt');
+  if (token && token.startsWith('Bearer ')) {
+    token = token.replace('Bearer ', '');
+  }
+  const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+  return { headers: headers };
+}
+getTotalUsers(): Observable<number> {
+  return this.http.get<number>(`${this.apiurladmin}/total-users`, this.createAuthHeaders());
+}
+
+getActiveUsersLastMonth(): Observable<number> {
+  return this.http.get<number>(`${this.apiurladmin}/active-users`, this.createAuthHeaders());
+}
+
+getNewUsersToday(): Observable<number> {
+  return this.http.get<number>(`${this.apiurladmin}/new-users/today`, this.createAuthHeaders());
+}
+
+getUsersByRole(): Observable<{ [key: string]: number }> {
+  return this.http.get<{ [key: string]: number }>(`${this.apiurladmin}/users-by-role`, this.createAuthHeaders());
+}
+
+getUsersByStatus(): Observable<{ [key: string]: number }> {
+  return this.http.get<{ [key: string]: number }>(`${this.apiurladmin}/users-by-status`, this.createAuthHeaders());
+}
+
+getActiveUsersPreviousMonth(): Observable<number> {
+  return this.http.get<number>(`${this.apiurladmin}/active-users/previous-month`, this.createAuthHeaders());
+}
+getbanned(): Observable<number> {
+  return this.http.get<number>(`${this.apiurladmin}/banned-users`, this.createAuthHeaders());
 }
 
 

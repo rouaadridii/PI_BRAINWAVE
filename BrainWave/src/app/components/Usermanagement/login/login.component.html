@@ -32,6 +32,8 @@
     <button class="btn" type="submit" [disabled]="formLogin.invalid">Login</button>
   </form>
 
+  <div id="g_id_signin" style="width: 100%; margin-top: 20px;"></div>
+
   <div class="text-center mt-3">
     <a href="#" class="forget" (click)="showForgotPasswordForm(); $event.preventDefault();">Forgot password?</a>
   </div>
@@ -83,7 +85,7 @@
           <button type="button" class="btn-close" (click)="isForgotPassword = false" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <p class="lead text-muted mb-4">Enter the email you'll receive a link to reset your password</p>
+          <p class="lead text-muted mb-4">You'll receive a link to reset your password</p>
           <form [formGroup]="forgotPasswordForm" (ngSubmit)="submitForgotPassword()">
             <div class="mb-3">
               <label for="resetEmail" class="form-label">

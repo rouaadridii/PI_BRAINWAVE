@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { HttpClientModule } from '@angular/common/http';
@@ -18,7 +17,6 @@ import { FrontHeaderAuthentificatedComponent } from './components/front-header-a
 import { UsersListComponent } from './components/Usermanagement/users-list/users-list.component';
 import { RecaptchaFormsModule, RecaptchaModule } from 'ng-recaptcha';
 import { ResetPasswordComponent } from './components/Usermanagement/reset-password/reset-password.component';
-
 @NgModule({
   declarations: [
     AppComponent,

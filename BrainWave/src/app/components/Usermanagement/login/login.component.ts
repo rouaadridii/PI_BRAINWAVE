@@ -1,4 +1,4 @@
-  import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
+  import { AfterViewInit, Component, ElementRef, ViewChild, OnInit } from '@angular/core';
   import { FormGroup, FormControl, Validators } from '@angular/forms';
   import { Router } from '@angular/router';
   import { jwtDecode } from 'jwt-decode';
@@ -6,12 +6,19 @@
   import * as faceapi from 'face-api.js';
 
 
+  declare global {
+    interface Window {
+      google: any;
+    }
+  }
+
+  
   @Component({
     selector: 'app-login',
     templateUrl: './login.component.html',
     styleUrls: ['./login.component.scss']
   })
-  export class LoginComponent implements AfterViewInit {
+  export class LoginComponent implements AfterViewInit, OnInit  {
 
     formLogin = new FormGroup({
       email: new FormControl('', [Validators.required, Validators.email]),
@@ -52,9 +59,58 @@
 
     constructor(private userService: UserService, private router: Router) { }
 
+    
+    ngOnInit(): void {
+      
+    }
+    
+
+   
+
     ngAfterViewInit(): void {
       this.loadFaceAPIModelsForLogin(); // Load models after the view is initialized
+      this.initializeGoogleSignIn();
+
     }
+
+    initializeGoogleSignIn() {
+      if (window.google && window.google.accounts) {
+        window.google.accounts.id.initialize({
+          client_id: '728808317335-5km4brscvrbiioaevv4bjo2nkfhh3nob.apps.googleusercontent.com', // Replace with your actual Google Client ID
+          callback: this.handleCredentialResponse.bind(this),
+        });
+  
+        window.google.accounts.id.renderButton(
+          document.getElementById('g_id_signin'),
+          {
+            theme: 'filled',
+            text: 'signin_with',
+            locale: 'en' }
+            
+        );
+      } else {
+        console.error('Google Identity Services library not loaded.');
+        // Optionally, you could try to load the script again here if it fails initially
+      }
+    }
+  
+    handleCredentialResponse(response: any) {
+      console.log('Encoded JWT ID token:', response.credential);
+    this.userService.loginWithGoogle(response.credential).subscribe(
+      (res: any) => {
+        console.log('Google login successful', res);
+        localStorage.setItem('token', res.token);
+        localStorage.setItem('email', res.email);
+        this.handleSuccessfulLogin(res.token);
+      },
+      (error) => {
+        console.error('Google login failed', error);
+        // Handle the error appropriately (e.g., show an error message)
+      }
+    );
+    }
+  
+    
 
     async loadFaceAPIModelsForLogin() {
       try {
