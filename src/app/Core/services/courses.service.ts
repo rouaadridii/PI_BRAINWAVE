@@ -140,4 +140,11 @@ updateCourseStatus(idCourse: number, newStatus: boolean): Observable<any> {
   return this.http.put(url, null, { params: params });
 }
 
+ // Nouvelle méthode pour récupérer les cours recommandés
+ getRecommendedCourses(limit: number = 5): Observable<Course[]> {
+  return this.http.get<Course[]>(`${this.baseUrl}/recommended`, {
+    params: new HttpParams().set('limit', limit.toString())
+  });
+}
+
 }

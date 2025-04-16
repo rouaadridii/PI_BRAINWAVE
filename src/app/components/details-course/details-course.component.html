@@ -163,7 +163,9 @@
 
                 <div class="add-review-section">
                     <h3 class="section-title"><i class="lucide lucide-edit"></i> Laissez votre avis</h3>
-                    <form (ngSubmit)="submitReviewn()" #reviewForm="ngForm" class="review-form">
+                    
+                    <form (ngSubmit)="submitReview()" #reviewForm="ngForm" class="review-form">
+                        
                         <div class="form-group rating-group">
                             <label for="rating" class="form-label">Votre note :</label>
                             <div class="rating">
@@ -178,17 +180,20 @@
                                    (mouseleave)="hoverStar(0)"
                                    (click)="setRating(star)"></i>
                             </div>
-                            <input type="hidden" id="rating" [(ngModel)]="newReview.rating" name="rating" required>
-                        </div>
+                            <input type="hidden" id="rating" [(ngModel)]="newReview.rating" name="rating" required min="1"> 
+                            </div>
+                  
                         <div class="form-group">
                             <label for="comment" class="form-label">Votre commentaire :</label>
                             <textarea id="comment" class="form-control" [(ngModel)]="newReview.comment" name="comment" required rows="4" placeholder="Décrivez votre expérience..."></textarea>
                         </div>
+                  
                         <button type="submit" class="submit-review-button" [disabled]="reviewForm.invalid || newReview.rating === 0">
                             <i class="lucide lucide-send"></i> Envoyer l'avis
                         </button>
+                  
                     </form>
-                </div>
+                  </div>
             </div>
 
             <div class="back-button-container">

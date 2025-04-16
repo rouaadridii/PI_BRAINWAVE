@@ -25,6 +25,15 @@ export class ReviewService {
     const review: Review = { rating, comment };
     return this.http.post(`http://localhost:8087/cours/reviews/courses/${idCourse}`, review, { responseType: 'text' });
   }
+  
+  addReviewp(courseId: number, rating: number, comment: string): Observable<Review> {
+    // Crée un objet partiel contenant seulement les données nécessaires pour l'ajout
+    // Note : On n'envoie pas idReview (généré par backend), ni les champs IA, ni l'objet Course complet.
+    const reviewData: Partial<Review> = { rating, comment }; 
+    
+    // Envoie la requête POST à l'endpoint backend /reviews/add/{courseId}
+    return this.http.post<Review>(`${this.baseUrl}/add/${courseId}`, reviewData);
+  }
 
   // Récupérer les avis d'un cours
   getReviewsByCourse(courseId: number): Observable<Review[]> {
@@ -50,6 +59,30 @@ export class ReviewService {
   
   getAverageRating(idCourse: number): Observable<number> {
     return this.http.get<number>(`${this.baseUrl}/${idCourse}/averageRating`); // 🔑 Corrected Path: /{idCourse}/averageRating  (relative to apiUrl)
+  }
+
+
+  // --- NOUVELLE MÉTHODE : Récupérer tous les avis ---
+  /**
+   * Récupère la liste de tous les avis depuis le backend.
+   * Attention: Retourne des entités Review complètes. Peut causer des problèmes
+   * de performance ou de sérialisation si la liste est très grande ou les relations complexes.
+   */
+  getAllReviews(): Observable<Review[]> {
+    // Appelle GET http://localhost:8087/cours/reviews
+    return this.http.get<Review[]>(`${this.baseUrl}`); 
+  }
+
+  // --- NOUVELLE MÉTHODE : Récupérer les statistiques de sentiment ---
+  /**
+   * Récupère les statistiques agrégées sur les sentiments des avis.
+   * Retourne un Observable d'une Map où la clé est le sentiment (string) 
+   * et la valeur est le nombre d'avis (number).
+   */
+  getSentimentStatistics(): Observable<Map<string, number>> { 
+    // Appelle GET http://localhost:8087/cours/reviews/statistics/sentiment
+    // Le backend renvoie Map<String, Long>, Angular reçoit Map<string, number>
+    return this.http.get<Map<string, number>>(`${this.baseUrl}/statistics/sentiment`);
   }
   
 }

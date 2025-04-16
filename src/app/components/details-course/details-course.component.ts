@@ -10,6 +10,7 @@ import { Review } from 'src/app/Core/Model/Review';
 import { AttachmentService } from 'src/app/Core/services/attachement.service';
 import { CoursesService } from 'src/app/Core/services/courses.service';
 import { ReviewService } from 'src/app/Core/services/review.service';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-details-course',
@@ -351,100 +352,131 @@ export class DetailsCourseComponent implements OnInit, OnDestroy {
   // ****************************************************************
   // *** MODIFICATION DE LA LOGIQUE submitReviewn (WORKAROUND) ***
   // ****************************************************************
-  submitReviewn(): void {
+
+  
+  submitReview(): void { // Renommée pour la clarté (ou gardez submitReviewn si appelée ainsi dans le HTML)
     if (!this.newReview.comment.trim() || this.newReview.rating === 0) {
       Swal.fire('Erreur', 'Veuillez fournir une note et un commentaire.', 'error');
       return;
     }
-    if (!this.course || this.course.idCourse === undefined || this.course.idCourse === null) {
-        console.error("Impossible d'ajouter un avis : ID du cours non défini.");
-        Swal.fire('Erreur', "Impossible d'identifier le cours pour cet avis.", 'error');
+    if (!this.course || this.course.idCourse === undefined) {
+        console.error("ID du cours indéfini lors de la soumission de l'avis.");
+        Swal.fire('Erreur', "Impossible d'identifier le cours.", 'error');
         return;
     }
 
-    // Garder une copie des données soumises AVANT l'appel backend
-    const submittedRating = this.newReview.rating;
-    const submittedComment = this.newReview.comment;
+    const courseId = this.course.idCourse; // Utiliser l'ID du cours chargé
+    const rating = this.newReview.rating;
+    const comment = this.newReview.comment;
 
-    this.reviewService.addReviewn(this.course.idCourse, submittedRating, submittedComment)
+    // Appel à la méthode principale addReview du service
+    this.reviewService.addReview(courseId, rating, comment)
       .subscribe({
-        // ATTENTION: On suppose que 'next' signifie succès, même si la réponse est une string
-        next: (successMessage) => {
-          console.log("Réponse succès (probablement string) du backend:", successMessage);
-
-          // Créer un objet Review temporaire basé sur les données SOUMISES
-          // Cet objet n'aura PAS l'idReview correct de la base de données.
-          const temporaryReview: Review = {
-            // idReview: undefined, // <- ID inconnu !
-            rating: submittedRating,
-            comment: submittedComment
-            // Ajoutez d'autres champs si nécessaire avec des valeurs par défaut
-          };
-          console.warn("Ajout d'un avis temporaire localement (sans ID réel du backend)");
-
-          // Utiliser une nouvelle référence de tableau
-          this.reviews = [...this.reviews, temporaryReview];
-
-          this.calculateAverageRating(); // Recalculer la moyenne
-
-          // Logs de débogage
-          console.log('--- Dans submitReviewn (WORKAROUND - après MAJ locale) ---');
-          console.log('Nouvelle longueur this.reviews:', this.reviews.length);
-          console.log('Contenu this.reviews (ratings):', JSON.stringify(this.reviews.map(r => r.rating )));
-          console.log('Valeur this.averageRating:', this.averageRating);
-          console.log('------------------------------------------------------');
-
-          // Réinitialiser le formulaire SEULEMENT APRES avoir utilisé ses valeurs
-          this.newReview = { rating: 0, comment: '' };
-          this.hoveredStar = 0;
-
-          this.cdRef.detectChanges(); // Forcer la MAJ UI
-
+        next: (savedReview) => {
+          // Succès ! L'avis a été ajouté et a passé la modération backend.
+          console.log('Avis ajouté avec succès (backend):', savedReview);
           Swal.fire('Succès', 'Votre avis a été ajouté !', 'success');
 
-          // OPTIONNEL MAIS RECOMMANDÉ: Recharger tous les avis pour obtenir les vrais IDs
-          // Décommentez la ligne suivante si la suppression ou modification immédiate est nécessaire
-          // this.loadCourseReviews(this.course.idCourse);
+          // *** MEILLEURE APPROCHE : Recharger la liste des avis depuis le backend ***
+          // pour obtenir les données à jour (y compris le nouvel idReview et les futurs champs IA)
+          this.loadCourseReviews(courseId); 
 
-        }, // Fin du bloc next (Workaround)
+          // Réinitialiser le formulaire
+          this.newReview = { rating: 0, comment: '' };
+          this.hoveredStar = 0;
+          
+          // Optionnel : forcer la détection de changement si Angular ne met pas à jour immédiatement
+          this.cdRef.detectChanges(); 
+        },
+        error: (errorResponse: HttpErrorResponse) => {
+          // Gestion des erreurs
+          console.error('Erreur lors de l\'ajout de l\'avis:', errorResponse);
+          let displayMessage = "Une erreur est survenue lors de l'ajout de votre avis. Veuillez réessayer."; // Message par défaut
 
-        error: (error) => {
-          console.error("Erreur ajout avis :", error);
-          Swal.fire('Erreur', "L'ajout de l'avis a échoué.", 'error');
+          if (errorResponse.status === 400 && typeof errorResponse.error === 'string' && errorResponse.error.includes('inapproprié')) {
+            // *** Gestion spécifique de l'erreur de MODÉRATION (HTTP 400) ***
+            // errorResponse.error contient le message textuel envoyé par le backend
+            displayMessage = errorResponse.error; 
+          } else if (errorResponse.error && typeof errorResponse.error === 'string') {
+             // Afficher une autre erreur texte du backend si disponible
+             displayMessage = errorResponse.error;
+          }
+          // Afficher l'erreur à l'utilisateur via Swal
+          Swal.fire('Erreur', displayMessage, 'error');
         }
       });
-  } // Fin submitReviewn (Workaround)
+  } 
 
 
   deleteReview(reviewId?: number): void {
-      if (!reviewId) {
-        // Si l'ID est manquant (peut arriver pour l'avis temporaire ajouté localement)
-        console.warn("Tentative de suppression d'un avis sans ID. L'avis a peut-être été ajouté localement sans rechargement.");
-        Swal.fire('Info', "Impossible de supprimer cet avis car son ID n'est pas connu. Veuillez rafraîchir la page.", 'info');
-        return;
+    // 1. Vérifier si l'ID est fourni
+    if (!reviewId) {
+      console.warn("Tentative de suppression d'un avis sans ID.");
+      Swal.fire(
+        'Information',
+        "Impossible de supprimer cet avis car son ID n'est pas connu. Veuillez rafraîchir la page.",
+        'info'
+      );
+      return;
+    }
+
+    // 2. Afficher la boîte de dialogue de confirmation SweetAlert
+    Swal.fire({
+      title: 'Êtes-vous sûr ?',
+      text: "Cette action est irréversible !",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33', // Rouge pour la suppression
+      cancelButtonColor: '#3085d6', // Bleu pour annuler
+      confirmButtonText: 'Oui, supprimer !',
+      cancelButtonText: 'Annuler'
+    }).then((result) => {
+      // 3. Traiter le résultat
+      if (result.isConfirmed) {
+        // 4. Si confirmé, appeler le service de suppression
+        this.reviewService.deleteReview(reviewId).subscribe({
+          next: () => {
+            // 5. Succès: Mettre à jour la liste locale
+            const updatedReviews = this.reviews.filter(review => review.idReview !== reviewId);
+            this.reviews = updatedReviews; // Remplacer par le nouveau tableau
+
+            // Recalculer la note moyenne
+            this.calculateAverageRating();
+
+            // Logs de débogage
+            console.log('--- Dans deleteReview (après MAJ locale) ---');
+            console.log('Avis supprimé avec succès (ID:', reviewId, ')');
+            console.log('Nouvelle longueur this.reviews:', this.reviews.length);
+            console.log('Nouvelle Valeur this.averageRating:', this.averageRating);
+            console.log('---------------------------------------------');
+
+            // Forcer la détection des changements pour mettre à jour l'UI
+            this.cdRef.detectChanges();
+
+            // Afficher message de succès
+            Swal.fire(
+              'Supprimé !',
+              'L\'avis a été supprimé.',
+              'success'
+            );
+            
+            // Optionnel: Mettre à jour les graphiques si la suppression a un impact
+            // this.createSentimentChart(); // Par exemple, si les stats de sentiments doivent changer
+          },
+          error: (err) => {
+            // 6. Erreur lors de la suppression
+            console.error("Erreur suppression avis:", err);
+            Swal.fire(
+              'Erreur !',
+              'La suppression de l\'avis a échoué. Veuillez réessayer.',
+              'error'
+            );
+          }
+        });
+      } else {
+        // 7. Si annulé
+        console.log('Suppression annulée pour l\'avis ID:', reviewId);
       }
-    Swal.fire({ /* ... confirmation ... */ }).then((result) => {
-        if (result.isConfirmed) {
-            this.reviewService.deleteReview(reviewId).subscribe({
-                next: () => {
-                    const updatedReviews = this.reviews.filter(review => review.idReview !== reviewId);
-                    this.reviews = updatedReviews; // Nouvelle référence
-                    this.calculateAverageRating(); // Recalculer
-
-                    console.log('--- Dans deleteReview (après MAJ locale) ---');
-                    console.log('Nouvelle longueur this.reviews:', this.reviews.length);
-                    console.log('Valeur this.averageRating:', this.averageRating);
-                    console.log('---------------------------------------------');
-
-                    this.cdRef.detectChanges(); // MAJ UI
-                    Swal.fire( 'Supprimé !', 'L\'avis a été supprimé.', 'success' );
-                },
-                error: (err) => {
-                   console.error("Erreur suppression avis:", err);
-                   Swal.fire( 'Erreur !', 'La suppression a échoué.', 'error' );
-                }
-            });
-        }
     });
   }
 
@@ -457,5 +489,8 @@ export class DetailsCourseComponent implements OnInit, OnDestroy {
      this.newReview.rating = rating;
     this.hoveredStar = rating;
   }
+
+
+  
 
 } // Fin classe DetailsCourseComponent

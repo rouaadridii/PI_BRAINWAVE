@@ -18,4 +18,5 @@ export interface Course {
     attachments?: Attachment[]; // Optionnel pour éviter des erreurs si non fourni
     reviews?: Review[];
     averageRating:Float32Array;
+    averageRatingnumber:number;
   }

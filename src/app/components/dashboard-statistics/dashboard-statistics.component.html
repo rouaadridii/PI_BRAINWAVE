@@ -1,30 +1,101 @@
 <div class="dashboard-statistics">
   <div *ngIf="isLoading" class="loading-message">Chargement des statistiques...</div>
   <div *ngIf="errorMessage && !isLoading" class="error-message">
-    {{ errorMessage }}
-    <button (click)="loadAllStatistics()">Réessayer</button>
+    {{ errorMessage }} <button (click)="loadAllStatistics()">Réessayer</button>
   </div>
 
   <div *ngIf="!isLoading && !errorMessage">
-    <div class="chart-card overall-chart">
-       <h2>Statistiques Globales</h2>
-       <div class="chart-container">
-         <div class="chart-center-text">
-           <span class="center-text-line1">{{ centerTextLine1 }}</span>
-           <span class="center-text-line2">{{ centerTextLine2 }}</span>
-         </div>
-         <canvas id="overallChart"></canvas>
-       </div>
-       </div>
 
-    <div class="chart-card category-distribution-chart">
-       <h2>Répartition par Catégorie</h2>
-       <div *ngIf="categoryDistributionData.length === 0 && !isLoading" class="no-data-message">
-         Aucune donnée de catégorie à visualiser.
-       </div>
-       <div class="category-distribution-container" *ngIf="categoryDistributionData.length > 0">
-         <canvas id="categoryDistributionChart"></canvas>
-       </div>
-       </div>
-  </div>
-</div>
+    <div class="dashboard-grid">
+
+      <div class="chart-card overall-chart">
+        <h2>Statistiques Globales</h2>
+        <div class="chart-container">
+          <div class="chart-center-text">
+            <span class="center-text-line1">{{ centerTextLine1 }}</span>
+            <span class="center-text-line2">{{ centerTextLine2 }}</span>
+          </div>
+          <canvas id="overallChart"></canvas>
+        </div>
+      </div>
+
+      <div class="chart-card category-distribution-chart">
+        <h2>Répartition par Catégorie</h2>
+        <div *ngIf="categoryDistributionData.length === 0 && !isLoading" class="no-data-message">
+          Aucune donnée de catégorie à visualiser.
+        </div>
+        <div class="category-distribution-container" *ngIf="categoryDistributionData.length > 0">
+          <canvas id="categoryDistributionChart"></canvas>
+        </div>
+      </div>
+
+      <div class="chart-card sentiment-chart-card">
+        <h2>Analyse des Sentiments</h2>
+        <div class="sentiment-chart-container">
+          <canvas id="sentimentChart"></canvas>
+        </div>
+      </div>
+
+      <div class="chart-card reviews-list-card">
+        <h2>Avis Reçus</h2>
+        <div *ngIf="!reviews || reviews.length === 0 && !isLoading" class="no-data-message">
+          Aucun avis reçu pour le moment.
+        </div>
+        <div class="reviews-table-container" *ngIf="reviews && reviews.length > 0">
+          <table class="reviews-table">
+            <thead>
+              <tr>
+                <th>Cours</th>
+                <th>Note</th>
+                <th>Commentaire</th>
+                <th>Sentiment (IA)</th>
+                <th>Résumé (IA)</th>
+                <th>Date Analyse</th>
+                <th>Actions</th> </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let review of reviews">
+                <td>{{ review.course?.title || (review.course?.idCourse ? 'ID: ' + review.course?.idCourse : 'N/A') }}</td>
+                <td>
+                  <span class="rating-stars" title="{{ review.rating }} / 5">
+                    <i *ngFor="let i of [1, 2, 3, 4, 5]"
+                       class="fa fa-star"
+                       [class.filled]="i <= review.rating"></i>
+                  </span>
+                </td>
+                <td class="comment-cell" title="{{ review.comment }}">
+                  {{ review.comment }}
+                </td>
+                <td>
+                  <span *ngIf="review.sentiment && review.sentiment !== 'Erreur'" class="sentiment-badge" [ngClass]="'sentiment-' + (review.sentiment.toLowerCase() || 'indetermine')">
+                    {{ review.sentiment }}
+                  </span>
+                  <span *ngIf="!review.sentiment || review.sentiment === 'Erreur'">-</span>
+                </td>
+                <td class="summary-cell" title="{{ review.reviewSummary || '' }}">
+                  <span *ngIf="review.reviewSummary && review.sentiment !== 'Erreur'">
+                    {{ review.reviewSummary }}
+                  </span>
+                  <span *ngIf="!review.reviewSummary || review.sentiment === 'Erreur'">-</span>
+                </td>
+                <td>{{ review.analysisTimestamp ? (review.analysisTimestamp | date:'dd/MM/yy HH:mm') : '-' }}</td>
+                <td class="actions-cell" style="text-align: center;">
+                    <button (click)="deleteReview(review.idReview)"  class="btn btn-danger btn-sm" title="Supprimer cet avis">
+                        <i class="fa fa-trash" aria-hidden="true"></i>
+                    </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div> </div> <div class="report-buttons" style="margin-top: 30px; padding: 20px 0 10px 0; text-align: right; border-top: 1px solid var(--border-color);">
+        <a href="http://localhost:8087/cours/reviews/reports/csv"
+           download="rapport_avis.csv"
+           class="btn btn-success btn-sm"
+           role="button">
+            <i class="fa fa-file-csv" style="margin-right: 5px;" aria-hidden="true"></i>
+            Exporter Avis (CSV)
+        </a>
+    </div>
+
+  </div> </div>
