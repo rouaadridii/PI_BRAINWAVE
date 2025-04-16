@@ -181,4 +181,89 @@
     }
   }
   
+  .publication-status {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 2;
+
+    .badge {
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+
+      &.badge-warning {
+        background-color: #ffc107;
+        color: #000;
+      }
+
+      &.badge-success {
+        background-color: #28a745;
+        color: #fff;
+      }
+    }
+  }
+  .heart-animation {
+    animation: pulse 0.5s ease-in-out;
+  }
+  
+  @keyframes pulse {
+    0% {
+      transform: scale(1);
+      color: #ff4081;
+    }
+    50% {
+      transform: scale(1.2);
+      color: #ff4081;
+    }
+    100% {
+      transform: scale(1);
+      color: #ff4081;
+    }
+  }
+  
+  .fa-heart {
+    color: red;  /* Heart color when it's in favorites */
+  }
+  
+  .fa-heart-o {
+    color: gray;  /* Heart color when it's not in favorites */
+  }
+  .btn-outline-danger {
+    transition: background-color 0.3s, border-color 0.3s;
+  }
+  
+  .btn-outline-danger:hover {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+  }
+  .btn-outline-danger {
+    transition: background-color 0.3s, border-color 0.3s;
+  }
+  
+  .btn-outline-danger:hover {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+  }
+  .btn-favorite {
+    background-color: #007bff; /* Change to your desired blue color */
+    color: white; /* Text color */
+    border: none; /* Remove border */
+    border-radius: 5px; /* Rounded corners */
+    padding: 10px 15px; /* Padding for the button */
+    font-size: 16px; /* Font size */
+    transition: background-color 0.3s; /* Smooth transition for hover effect */
+  
+    &:hover {
+      background-color: #0056b3; /* Darker blue on hover */
+    }
+  
+    &:focus {
+      outline: none; /* Remove default focus outline */
+    }
+    
+  }
+  
   

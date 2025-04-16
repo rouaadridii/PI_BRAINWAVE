@@ -15,3 +15,20 @@
   <script src="https://owlcarousel2.github.io/OwlCarousel2/assets/owlcarousel/owl.carousel.min.js"></script>
 </body>
 </html>
+<script>
+  window.fbAsyncInit = function() {
+    FB.init({
+      appId: '619729617493909', // Replace with your Facebook App ID
+      xfbml: true,
+      version: 'v17.0'
+    });
+  };
+
+  (function(d, s, id){
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) {return;}
+    js = d.createElement(s); js.id = id;
+    js.src = "https://connect.facebook.net/en_US/sdk.js";
+    fjs.parentNode.insertBefore(js, fjs);
+  }(document, 'script', 'facebook-jssdk'));
+</script>

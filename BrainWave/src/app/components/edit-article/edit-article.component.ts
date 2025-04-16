@@ -18,9 +18,13 @@ export class EditArticleComponent implements OnInit {
     views: 0,
     numberShares: 0,
     ressources: [],
-    user: { id: 1 }
+    user: { id: 1 },
+    published: false,
+    scheduled: false,
+    publicationStatus: 'DRAFT' // Initialisation par défaut
   };
 
+  publicationStatuses: string[] = ['DRAFT', 'PENDING_REVIEW', 'PUBLISHED', 'ARCHIVED'];
   newResource: Ressource = {
     description: '',
     video: '',
@@ -40,12 +44,11 @@ export class EditArticleComponent implements OnInit {
   ngOnInit(): void {
     this.loading = true;
     const id = this.route.snapshot.paramMap.get('id');
-    
+
     if (id) {
       this.articleService.getArticleById(Number(id)).subscribe({
         next: (article) => {
           console.log('Loaded article:', article);
-          // Ensure we have the complete article with resources
           this.article = {
             ...article,
             ressources: article.ressources || []
@@ -82,14 +85,13 @@ export class EditArticleComponent implements OnInit {
 
   onSubmit(): void {
     if (this.article.id) {
-      // Ensure resources are properly included
       const articleToUpdate = {
         ...this.article,
         ressources: this.article.ressources || []
       };
 
       console.log('Submitting update for article:', articleToUpdate);
-      
+
       this.articleService.updateArticle(this.article.id, articleToUpdate).subscribe({
         next: (response) => {
           console.log('Article updated successfully:', response);
@@ -113,4 +115,23 @@ export class EditArticleComponent implements OnInit {
   cancel(): void {
     this.router.navigate(['/articles']);
   }
-} 
+
+  // Méthode pour changer le statut de publication
+  changePublicationStatus(newStatus: 'DRAFT' | 'PENDING_REVIEW' | 'PUBLISHED' | 'ARCHIVED'): void {
+    if (this.article.id) {
+      this.articleService.updateArticleStatus(this.article.id, newStatus).subscribe({
+        next: (response) => {
+          console.log('Publication status updated:', response);
+          this.article.publicationStatus = response.publicationStatus; // Mettre à jour l'état localement
+          // Optionally, display a success message
+        },
+        error: (error) => {
+          console.error('Error updating publication status:', error);
+          this.error = `Error updating publication status: ${error.message || 'Unknown error'}`;
+        }
+      });
+    } else {
+      this.error = 'Cannot update publication status: No ID provided';
+    }
+  }
+}

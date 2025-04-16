@@ -31,7 +31,6 @@ export class TranslationService {
 
     document.body.setAttribute('dir', targetLang === 'ar' ? 'rtl' : 'ltr');
 
-    // Traduire les placeholders
     document.querySelectorAll('.translate-placeholder').forEach(element => {
       const placeholder = element.getAttribute('placeholder');
       if (placeholder) {

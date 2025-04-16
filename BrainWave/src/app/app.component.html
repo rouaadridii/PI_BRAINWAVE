@@ -1,3 +1,12 @@
-<app-front-header></app-front-header>
-<router-outlet></router-outlet>
-<app-front-footer></app-front-footer>
+<ng-container *ngIf="!isBackOfficePage">
+  <app-front-header></app-front-header>
+</ng-container>
+
+<router-outlet class="content-area"></router-outlet>
+
+<ng-container *ngIf="!isBackOfficePage">
+  <app-front-footer></app-front-footer>
+</ng-container>
+
+<app-chatbot></app-chatbot>
+

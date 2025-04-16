@@ -114,6 +114,21 @@
   }
 }
 
+.tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.tag {
+  background-color: #e9ecef;
+  color: #495057;
+  padding: 5px 10px;
+  border-radius: 15px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
 .gradient-button {
   background: linear-gradient(105deg, #3ac3ff 0%, #ff3b2c 100%);
   color: #fff;
@@ -126,4 +141,4 @@
   &:hover {
     background: linear-gradient(105deg, #ff3b2c 0%, #3ac3ff 100%);
   }
-} 
+}

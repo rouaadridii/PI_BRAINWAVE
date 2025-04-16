@@ -1,21 +1,51 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ArticleServiceService } from '../../article-service.service';
 import { Article } from '../../models/article';
 import { Ressource } from '../../models/ressource';
 import { Router } from '@angular/router';
 import { TranslationService } from '../../services/translation.service';
-import { HttpErrorResponse } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { FavoriteService } from '../../favorite.service';
+import { Favorite } from '../../models/favorite';
+import { TextToSpeechService } from '../../text-to-speech.service';
+import { ReadLaterService } from '../../read-later.service';
+import { ReadLater } from '../../models/read-later';
+import { ChatbotService } from '../../services/chatbot.service';
+import { ViewChild, ElementRef } from '@angular/core';
+import { Subscription } from 'rxjs';
+import { filter } from 'rxjs/operators'; // Added missing filter import
+import { NotificationWebsocketService } from '../../services/notification-websocket.service';
 
+@Injectable({
+  providedIn: 'root'
+})
 @Component({
   selector: 'app-article',
   templateUrl: './article.component.html',
   styleUrls: ['./article.component.scss']
 })
-export class ArticleComponent implements OnInit {
+export class ArticleComponent implements OnInit, OnDestroy {
   searchText: string = '';
   filteredArticles: Article[] = [];
   articles: Article[] = [];
   showAddForm = false;
+  userId: number = 1; // Replace with actual user ID
+  favoriteArticleIds: number[] = [];
+  showReactionsPanel: { [articleId: number]: boolean } = {}; // Control visibility of reaction panel
+  showReadLaterModal = false;
+  
+  // Changed properties
+  readLaterItems: ReadLater[] = []; // Changed from readLaterArticleIds to store full items
+  selectedArticleForReadLater: Article | null = null; // Changed to store full article
+  reminderDate: string = '';
+  
+  // New properties for notifications
+  notifications: ReadLater[] = [];
+  showNotifications = false;
+
+  // Add missing properties
+  currentUserReactions: { [articleId: number]: string | null } = {}; // Track user reaction per article
+  availableReactions: string[] = ["like", "love", "haha", "wow", "sad", "angry"];
 
   newArticle: Article = {
     title: '',
@@ -25,7 +55,10 @@ export class ArticleComponent implements OnInit {
     views: 0,
     numberShares: 0,
     ressources: [],
-    user: { id: 1 }
+    user: { id: 1 },
+    published: false,
+    scheduled: false,
+    publicationStatus: 'DRAFT'
   };
 
   newResource: Ressource = {
@@ -38,49 +71,94 @@ export class ArticleComponent implements OnInit {
   loading = false;
   error: string | null = null;
   selectedCategorie: 'ALL' | 'NEWS' | 'SUCCESS_STORY' | 'BLOG' = 'ALL';
-
   sourceLang: string = 'fr';
   targetLang: string = 'en';
-
   searchPlaceholder: string = 'Search by title...';
+
+  // Add chatbot-related properties
+  showAnalysisModal = false;
+  selectedArticleForAnalysis: Article | null = null;
+  analysisResult: any = null;
+  analysisLoading = false;
+
+  // Chatbot properties
+  showChatbot = false;
+  botMessages: { content: string; isUser: boolean; timestamp: Date; data?: any }[] = [];
+  chatbotInput = '';
+  isChatbotTyping = false;
+  @ViewChild('chatMessages') private chatMessagesContainer!: ElementRef;
+
+  // Add these properties
+  showBackToTop = false;
+
+  // Add WebSocket subscription
+  private notificationSubscription: Subscription | null = null;
 
   constructor(
     private articleService: ArticleServiceService,
     private router: Router,
-    private translationService: TranslationService
+    private translationService: TranslationService,
+    private textToSpeechService: TextToSpeechService,
+    private favoriteService: FavoriteService,
+    private readLaterService: ReadLaterService,
+    private chatbotService: ChatbotService, // Add chatbot service
+    private websocketService: NotificationWebsocketService // Add websocket service
   ) { }
 
   ngOnInit(): void {
     console.log('Article component initialized');
     this.sourceLang = localStorage.getItem('sourceLanguage') || 'fr';
     this.targetLang = localStorage.getItem('targetLanguage') || 'en';
-    
     this.translationService.setLanguages(this.sourceLang, this.targetLang);
-    
     this.loadArticles();
-
-    // Ajouter le placeholder à la liste des éléments à traduire
+    this.loadUserFavorites(); // Load user's favorites on initialization
+    this.loadReadLater(); // Changed from loadUserReadLater
+    this.checkNotifications(); // Add initial notification check
+    this.setupWebSocketNotifications(); // Setup WebSocket for real-time notifications
+    
     const searchInput = document.querySelector('input[type="text"]');
     if (searchInput) {
       searchInput.setAttribute('placeholder', this.searchPlaceholder);
       searchInput.classList.add('translate-placeholder');
     }
+    
+    // Initialize chatbot with a welcome message
+    this.botMessages.push({
+      content: 'Hello! I am your BrainWave assistant. How can I help you with articles today?',
+      isUser: false,
+      timestamp: new Date()
+    });
+
+    // Initialize back to top button logic
+    window.addEventListener('scroll', this.checkScrollPosition.bind(this));
+  }
+
+  ngOnDestroy(): void {
+    // Stop WebSocket connection and clean up subscriptions
+    if (this.notificationSubscription) {
+      this.notificationSubscription.unsubscribe();
+    }
+    
+    this.readLaterService.stopNotificationPolling();
+    this.websocketService.disconnect();
+    
+    window.removeEventListener('scroll', this.checkScrollPosition.bind(this));
   }
 
   onLanguageChange(source: string, target: string) {
     try {
       // Garder la langue actuelle comme source
       const currentSource = this.sourceLang;
-      
+
       // Mettre à jour la langue source avec la langue cliquée
       this.sourceLang = source;
-      
+
       // La langue cible devient la langue sur laquelle on clique
       this.targetLang = source;
-      
+
       // Configurer le service de traduction
       this.translationService.setLanguages(currentSource, source);
-      
+
       // Traduire la page
       const elementsToTranslate = document.querySelectorAll('.translate');
       this.translationService.translatePage(elementsToTranslate);
@@ -93,43 +171,42 @@ export class ArticleComponent implements OnInit {
     this.loading = true;
     this.error = null;
     this.articleService.getAllArticles().subscribe({
-      next: (data: Article[]) => {
-        if (data && Array.isArray(data)) {
-          this.articles = data;
-          this.filteredArticles = [...this.articles];
-          setTimeout(() => {
-            const elementsToTranslate = document.querySelectorAll('.translate');
-            this.translationService.translatePage(elementsToTranslate);
-          }, 100);
-        } else {
-          this.error = 'Invalid data format received';
-        }
+      next: (articles) => {
+        this.articles = articles;
+        this.filteredArticles = [...this.articles];
         this.loading = false;
+        this.filteredArticles.forEach(article => {
+          if (article.id !== undefined) {
+            this.loadReactions(article.id);
+            this.loadUserReaction(article.id, this.userId);
+            this.showReactionsPanel[article.id] = false; // Initialize panel visibility
+          }
+        });
+        setTimeout(() => {
+          const elementsToTranslate = document.querySelectorAll('.translate');
+          this.translationService.translatePage(elementsToTranslate);
+        }, 100);
       },
-      error: (error: HttpErrorResponse) => {
-        console.error('Failed to load articles:', error);
-        this.error = `Error loading articles: ${error.message}`;
+      error: (error) => {
+        console.error('Error loading articles:', error);
+        this.error = 'Error loading articles';
         this.loading = false;
       }
     });
   }
-  
+
   filterArticles(): void {
-    let filtered = this.articles;
-    
-    // First filter by search text if any
-    if (this.searchText) {
-      filtered = filtered.filter(article =>
-        article.title.toLowerCase().includes(this.searchText.toLowerCase())
-      );
-    }
-    
-    // Then filter by category if not ALL
-    if (this.selectedCategorie !== 'ALL') {
-      filtered = filtered.filter(article => article.categorie === this.selectedCategorie);
-    }
-    
-    this.filteredArticles = filtered;
+    this.filteredArticles = this.articles.filter(article => {
+      // Filtre par catégorie
+      const categoryMatch = this.selectedCategorie === 'ALL' ||
+                          article.categorie === this.selectedCategorie;
+
+      // Filtre par recherche
+      const searchMatch = !this.searchText ||
+                          article.title.toLowerCase().includes(this.searchText.toLowerCase());
+
+      return categoryMatch && searchMatch;
+    });
   }
 
   onCategorieChange(categorie: 'ALL' | 'NEWS' | 'SUCCESS_STORY' | 'BLOG'): void {
@@ -192,7 +269,7 @@ export class ArticleComponent implements OnInit {
       this.router.navigate(['/articles/edit', id]);
     }
   }
-  
+
   private resetNewArticle(): void {
     this.newArticle = {
       title: '',
@@ -202,7 +279,10 @@ export class ArticleComponent implements OnInit {
       views: 0,
       numberShares: 0,
       ressources: [],
-      user: { id: 1 }
+      user: { id: 1 },
+      published: false,
+      scheduled: false,
+      publicationStatus: 'DRAFT'
     };
     this.newResource = {
       description: '',
@@ -210,5 +290,644 @@ export class ArticleComponent implements OnInit {
       pdf: '',
       picture: ''
     };
+  }
+  onArticleClick(article: any): void {
+    if (article.id) {
+      this.articleService.incrementView(article.id).subscribe({
+        next: () => {
+          article.views += 1;
+          // No need to navigate here, as the routerLink in the template will handle it.
+        },
+        error: err => console.error('Erreur lors de l’incrémentation des vues:', err)
+      });
+    }
+  }
+
+  speakDescription(description: string): void {
+    this.textToSpeechService.speak(description);
+  }
+  addFavorite(articleId: number): void {
+    if (!this.isFavorite(articleId)) {
+      this.favoriteService.addFavorite(this.userId, articleId).subscribe({
+        next: (response) => {
+          console.log('Article added to favorites', response);
+          // Add the article ID to the favorites array
+          this.favoriteArticleIds.push(articleId);
+        },
+        error: (error) => {
+          console.error('Error adding article to favorites', error);
+        }
+      });
+    } else {
+      console.log('Article is already in favorites');
+    }
+  }
+
+  toggleFavorite(articleId: number | undefined): void {
+    if (articleId !== undefined) {
+      if (this.isFavorite(articleId)) {
+        // Find the favorite ID from the favorites list
+        this.favoriteService.getFavoriteArticles(this.userId).subscribe({
+          next: (favorites: Favorite[]) => {
+            // Find the favorite entry for this article
+            const favorite = favorites.find(fav => 
+              fav.articles && fav.articles.length > 0 && fav.articles[0].id === articleId
+            );
+            
+            if (favorite && favorite.id) {
+              // Now remove using the favorite ID
+              this.favoriteService.removeFavorite(favorite.id).subscribe({
+                next: () => {
+                  console.log('Article removed from favorites');
+                  this.favoriteArticleIds = this.favoriteArticleIds.filter(id => id !== articleId);
+                },
+                error: (err) => console.error('Error removing favorite:', err)
+              });
+            }
+          },
+          error: (err) => console.error('Error finding favorite item:', err)
+        });
+      } else {
+        this.favoriteService.addFavorite(this.userId, articleId).subscribe({
+          next: () => {
+            console.log('Article added to favorites');
+            this.favoriteArticleIds.push(articleId);
+          },
+          error: (err) => console.error('Error adding favorite:', err)
+        });
+      }
+    } else {
+      console.error('Article ID is undefined');
+    }
+  }
+
+  isFavorite(articleId: number): boolean {
+    return this.favoriteArticleIds.includes(articleId);
+  }
+
+  loadReactions(articleId: number): void { // Ensure articleId is always a number here
+    this.articleService.getArticleReactions(articleId).subscribe(
+      (counts: { [key: string]: number }) => {
+        this.reactionCounts[articleId] = counts;
+      },
+      (error) => {
+        console.error('Error fetching reactions for article', articleId, ':', error);
+      }
+    );
+  }
+
+  loadUserReaction(articleId: number, userId: number): void { // Ensure articleId is always a number here
+    this.articleService.getUserReaction(articleId, userId).subscribe(
+      (reaction) => {
+        this.currentUserReactions[articleId] = reaction;
+      },
+      (error) => {
+        console.error('Error fetching user reaction for article', articleId, ':', error);
+      }
+    );
+  }
+
+  react(articleId: number, reactionType: string): void { // Ensure articleId is always a number here
+    this.articleService.reactArticle(articleId, this.userId, reactionType).subscribe(
+      () => {
+        this.loadReactions(articleId);
+        this.loadUserReaction(articleId, this.userId);
+      },
+      (error) => {
+        console.error('Error reacting to article', articleId, 'with', reactionType, ':', error);
+      }
+    );
+  }
+
+  unreact(articleId: number): void { // Ensure articleId is always a number here
+    this.articleService.unreactArticle(articleId, this.userId).subscribe(
+      () => {
+        this.loadReactions(articleId);
+        this.loadUserReaction(articleId, this.userId);
+      },
+      (error) => {
+        console.error('Error unreacting to article', articleId, ':', error);
+      }
+    );
+  }
+
+  toggleReactionsPanel(articleId: number | undefined): void {
+    if (articleId !== undefined) {
+      this.showReactionsPanel[articleId] = !this.showReactionsPanel[articleId];
+    }
+  }
+
+  // Load user's favorite articles
+  loadUserFavorites(): void {
+    this.favoriteService.getFavoriteArticles(this.userId).subscribe({
+      next: (favorites: Favorite[]) => {
+        // Extract article IDs from favorites and store them in the favoriteArticleIds array
+        this.favoriteArticleIds = favorites
+          .filter(fav => fav.articles && fav.articles.length > 0 && fav.articles[0].id !== undefined)
+          .map(fav => fav.articles![0].id!);
+        console.log('Loaded favorite article IDs:', this.favoriteArticleIds);
+      },
+      error: (error) => {
+        console.error('Error loading user favorites:', error);
+      }
+    });
+  }
+
+  // Replace the previous Read Later methods with the new implementations
+  loadReadLater(): void {
+    // Force refresh from server with cache-busting
+    const timestamp = new Date().getTime();
+
+    // Add a small delay before loading to ensure DB transaction completes
+    setTimeout(() => {
+      this.readLaterService.getReadLaterByUser(this.userId).subscribe({
+        next: (readLaterItems) => {
+          this.readLaterItems = readLaterItems;
+          console.log('Read Later items loaded (timestamp: ' + timestamp + '):', readLaterItems);
+
+          // Force component update
+          this.filteredArticles = [...this.filteredArticles];
+        },
+        error: (error) => {
+          console.error('Error loading read later items:', error);
+        }
+      });
+    }, 300); // Small delay to ensure database commit
+  }
+
+  openReadLaterModal(article: Article): void {
+    this.selectedArticleForReadLater = article;
+    this.showReadLaterModal = true;
+
+    // Set default reminder time to current time + 1 day
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    this.reminderDate = tomorrow.toISOString().slice(0, 16);
+  }
+
+  closeReadLaterModal(): void {
+    this.showReadLaterModal = false;
+    this.selectedArticleForReadLater = null;
+  }
+
+   addToReadLater(): void { 
+
+        if (!this.selectedArticleForReadLater || !this.selectedArticleForReadLater.id || this.userId === null) { 
+   
+          console.error('Missing data for adding to read later'); 
+   
+          return; 
+   
+        } 
+   
+   
+   
+        const articleId = this.selectedArticleForReadLater.id; 
+   
+         
+   
+        // Check if this article is already marked for read later 
+   
+        const existingItem = this.readLaterItems.find(item => 
+   
+          item.article && item.article.id === articleId); 
+   
+   
+   
+        if (existingItem) { 
+   
+          // If it already exists, ask the user if they want to update the reminder date 
+   
+          if (confirm('This article is already in your "Read Later" list. Do you want to update the reminder date?')) { 
+   
+            // Use the existing ID to update the reminder date 
+   
+            const reminderDateTime = new Date(this.reminderDate).toISOString(); 
+   
+   
+   
+            console.log(`Updating existing read later item (ID: ${existingItem.id}) with new reminder date: ${reminderDateTime}`); 
+   
+   
+   
+            this.readLaterService.addReadLater(this.userId, articleId, reminderDateTime).subscribe({ 
+   
+              next: (response) => { 
+   
+                console.log('Read later reminder updated:', response); 
+   
+   
+   
+                // Close modal first to avoid UI freezing 
+   
+                this.closeReadLaterModal(); 
+   
+   
+   
+                // Force reload data from server with a longer delay 
+   
+                setTimeout(() => { 
+   
+                  this.loadReadLater(); 
+   
+                }, 500); 
+   
+              }, 
+   
+              error: (error) => { 
+   
+                console.error('Error updating read later reminder:', error); 
+   
+                alert('Failed to update the reminder. Please try again.'); 
+   
+              } 
+   
+            }); 
+   
+          } else { 
+   
+            this.closeReadLaterModal(); 
+   
+          } 
+   
+        } else { 
+   
+          // New entry 
+   
+          const reminderDateTime = new Date(this.reminderDate).toISOString(); 
+   
+   
+   
+          console.log('Adding new article to read later:', { 
+   
+            userId: this.userId, 
+   
+            articleId: articleId, 
+   
+            reminderDate: reminderDateTime 
+   
+          }); 
+   
+   
+   
+          this.readLaterService.addReadLater(this.userId, articleId, reminderDateTime).subscribe({ 
+   
+            next: (response) => { 
+   
+              console.log('Article added to read later:', response); 
+   
+   
+   
+              // Close modal first to avoid UI freezing 
+   
+              this.closeReadLaterModal(); 
+   
+   
+   
+              // Force reload data from server with a longer delay 
+   
+              setTimeout(() => { 
+   
+                this.loadReadLater(); 
+   
+              }, 500); 
+   
+            }, 
+   
+            error: (error) => { 
+   
+              console.error('Error adding to read later:', error); 
+   
+              alert('Failed to add article to read later. Please try again.'); 
+   
+            } 
+   
+          }); 
+   
+        } 
+   
+      }
+  removeFromReadLater(readLaterId: number | undefined): void {
+    if (readLaterId !== undefined) {
+      this.readLaterService.removeReadLater(readLaterId).subscribe({
+        next: () => {
+          console.log('Article removed from read later');
+          this.loadReadLater();
+        },
+        error: (error) => {
+          console.error('Error removing from read later:', error);
+        }
+      });
+    }
+  }
+
+  isReadLater(articleId: number): boolean {
+    return this.isInReadLater(articleId);
+  }
+
+  isInReadLater(articleId: number): boolean {
+    return this.readLaterItems.some(item => item.article && item.article.id === articleId);
+  }
+
+  getReadLaterId(articleId: number): number | undefined {
+    const readLaterItem = this.readLaterItems.find(item => item.article && item.article.id === articleId);
+    return readLaterItem?.id;
+  }
+
+  toggleNotificationsPanel(): void {
+    this.showNotifications = !this.showNotifications;
+  }
+
+  markNotificationAsRead(notificationId: number): void {
+    this.readLaterService.markNotificationAsRead(notificationId).subscribe({
+      next: () => {
+        console.log('Notification marked as read:', notificationId);
+        this.notifications = this.notifications.filter(n => n.id !== notificationId);
+      },
+      error: (error) => {
+        console.error('Error marking notification as read:', error);
+      }
+    });
+  }
+
+  // Add a new method to check notifications immediately
+  checkNotifications(): void {
+    if (this.userId) {
+      console.log('Initial notification check...');
+      this.readLaterService.checkPendingNotifications(this.userId).subscribe({
+        next: (notifications) => {
+          this.handleNotificationsResponse(notifications);
+        },
+        error: (error) => {
+          console.error('Error in initial notification check:', error);
+        }
+      });
+    }
+  }
+
+  // Separate method to handle notification response
+  handleNotificationsResponse(notifications: ReadLater[]): void {
+    console.log('Received notifications:', notifications);
+
+    if (notifications.length > 0) {
+      // If notifications are received, display them and possibly show a notification
+      this.notifications = notifications;
+
+      // Check if any new notifications compared to what we already have
+      const newNotifications = notifications.filter(n =>
+        !this.notifications.some(existing => existing.id === n.id)
+      );
+
+      if (newNotifications.length > 0) {
+        console.log('New notifications arrived:', newNotifications);
+        // You could play a sound or show a toast notification here
+        this.showNotificationAlert(newNotifications);
+      }
+    }
+  }
+
+  // Method to display an alert for new notifications
+  showNotificationAlert(newNotifications: ReadLater[]): void {
+    // This is a simple alert, but you could use a more sophisticated notification system
+    if (newNotifications.length > 0) {
+      const notification = newNotifications[0];
+      const articleTitle = notification.article?.title || 'an article';
+
+      // Show browser notification if supported
+      if ('Notification' in window) {
+        if (Notification.permission === 'granted') {
+          new Notification('Reading Reminder', {
+            body: `Time to read: ${articleTitle}`,
+            icon: '/assets/images/notification-icon.png'
+          });
+        } else if (Notification.permission !== 'denied') {
+          Notification.requestPermission().then(permission => {
+            if (permission === 'granted') {
+              new Notification('Reading Reminder', {
+                body: `Time to read: ${articleTitle}`,
+                icon: '/assets/images/notification-icon.png'
+              });
+            }
+          });
+        }
+      }
+
+      // Also show an alert as a fallback
+      alert(`Reading Reminder: It's time to read "${articleTitle}"`);
+    }
+  }
+
+  toggleReadLater(article: Article): void {
+    if (!article.id) {
+      console.error('Article ID is undefined');
+      return;
+    }
+    
+    if (this.isInReadLater(article.id)) {
+      const readLaterId = this.getReadLaterId(article.id);
+      this.removeFromReadLater(readLaterId);
+    } else {
+      this.openReadLaterModal(article);
+    }
+  }
+
+  // Make sure we have the reactionCounts property properly defined
+  reactionCounts: { [articleId: number]: { [key: string]: number } } = {}; // Track reactions per article
+
+  // Add methods for article analysis
+  openAnalysisModal(article: Article): void {
+    this.selectedArticleForAnalysis = article;
+    this.showAnalysisModal = true;
+    this.analysisResult = null;
+    this.analysisLoading = true;
+    
+    if (article.id) {
+      this.chatbotService.analyzeArticle(article.id).subscribe({
+        next: (result) => {
+          this.analysisResult = result;
+          this.analysisLoading = false;
+        },
+        error: (error) => {
+          console.error('Error analyzing article:', error);
+          this.analysisLoading = false;
+          this.analysisResult = { error: 'Failed to analyze article. Please try again.' };
+        }
+      });
+    }
+  }
+
+  closeAnalysisModal(): void {
+    this.showAnalysisModal = false;
+    this.selectedArticleForAnalysis = null;
+    this.analysisResult = null;
+  }
+
+  // Chatbot methods
+  toggleChatbot(): void {
+    this.showChatbot = !this.showChatbot;
+    if (this.showChatbot) {
+      // Initialize if first time opening
+      if (this.botMessages.length === 0) {
+        this.botMessages.push({
+          content: 'Hello! I am your BrainWave assistant. How can I help you with articles today?',
+          isUser: false,
+          timestamp: new Date()
+        });
+      }
+      setTimeout(() => {
+        this.scrollChatToBottom();
+      }, 100);
+    }
+  }
+  
+  sendChatbotMessage(): void {
+    if (!this.chatbotInput.trim()) return;
+    
+    // Add user message
+    const userMessage = this.chatbotInput.trim();
+    this.botMessages.push({
+      content: userMessage,
+      isUser: true,
+      timestamp: new Date()
+    });
+    
+    // Clear input and scroll to bottom
+    this.chatbotInput = '';
+    this.scrollChatToBottom();
+    
+    // Show typing indicator
+    this.isChatbotTyping = true;
+    
+    // Send message to service
+    this.chatbotService.sendMessage(userMessage, this.userId).subscribe({
+      next: (response) => {
+        // Small delay to simulate typing
+        setTimeout(() => {
+          this.isChatbotTyping = false;
+          this.botMessages.push({
+            content: response.message,
+            isUser: false,
+            timestamp: new Date(),
+            data: response
+          });
+          this.scrollChatToBottom();
+        }, 1000);
+      },
+      error: (error) => {
+        console.error('Error sending message to chatbot:', error);
+        setTimeout(() => {
+          this.isChatbotTyping = false;
+          this.botMessages.push({
+            content: 'Sorry, I encountered an error. Please try again later.',
+            isUser: false,
+            timestamp: new Date()
+          });
+          this.scrollChatToBottom();
+        }, 1000);
+      }
+    });
+  }
+  
+  private scrollChatToBottom(): void {
+    try {
+      setTimeout(() => {
+        if (this.chatMessagesContainer) {
+          const element = this.chatMessagesContainer.nativeElement;
+          element.scrollTop = element.scrollHeight;
+        }
+      }, 100);
+    } catch (err) {
+      console.error('Error scrolling to bottom:', err);
+    }
+  }
+
+  // Add these methods
+  checkScrollPosition() {
+    this.showBackToTop = window.scrollY > 500;
+  }
+
+  scrollToTop() {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  }
+
+  // Add a method to handle image URLs
+  getImageUrl(imagePath: string | undefined): string {
+    if (!imagePath) {
+      return 'assets/images/default-article.jpg';
+    }
+    
+    // Check if the image path is already a full URL
+    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+      return imagePath;
+    }
+    
+    // Check if the path includes the UUID format from the backend (has underscore)
+    if (imagePath.includes('_')) {
+      // This is likely a file uploaded through multipart/form-data
+      return `http://localhost:8085/uploads/${imagePath}`;
+    }
+    
+    // Fallback to assuming it's a relative path in assets
+    return `assets/images/${imagePath}`;
+  }
+  
+  // Method to check if article has additional media
+  hasAdditionalMedia(article: Article): boolean {
+    return this.hasVideo(article) || this.hasPdf(article);
+  }
+  
+  // Method to check if article has video
+  hasVideo(article: Article): boolean {
+    return article.ressources?.some(res => res.video) || false;
+  }
+  
+  // Method to check if article has PDF
+  hasPdf(article: Article): boolean {
+    return article.ressources?.some(res => res.pdf) || false;
+  }
+
+  // Setup WebSocket for real-time notifications
+  private setupWebSocketNotifications(): void {
+    if (this.userId) {
+      console.log('Setting up WebSocket notifications for user:', this.userId);
+      
+      // Connect to WebSocket and listen for notifications
+      this.notificationSubscription = this.websocketService.connect(this.userId)
+        .pipe(
+          filter((msg: any) => msg?.type === 'readLaterNotification')
+        )
+        .subscribe({
+          next: (notification: any) => { // Added type annotation to fix the unknown type error
+            console.log('Real-time notification received:', notification);
+            
+            // Show notification UI
+            this.showRealTimeNotification(notification.message);
+            
+            // Fetch latest notifications to update the UI
+            this.checkNotifications();
+          },
+          error: (error) => {
+            console.error('WebSocket notification error:', error);
+          }
+        });
+    }
+  }
+
+  // Display a real-time notification
+  private showRealTimeNotification(message: string): void {
+    // Show browser notification if supported
+    if ('Notification' in window && Notification.permission === 'granted') {
+      new Notification('BrainWave Reminder', {
+        body: message,
+        icon: '/assets/images/notification-icon.png'
+      });
+    }
+    
+    // You could also use a toast notification library here
+    // For simplicity, we'll just use alert in this example
+    alert(message);
   }
 }
